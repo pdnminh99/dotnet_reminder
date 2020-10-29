@@ -46,9 +46,8 @@ export class Login extends Component {
         const action = this.props.action;
         const {message} = this.state;
 
-        if (!!message) {
-            return <div>{message}</div>
-        } else {
+        if (!!message) return <div>{message}</div>
+        else {
             switch (action) {
                 case LoginActions.Login:
                     return (<div>Processing login</div>);

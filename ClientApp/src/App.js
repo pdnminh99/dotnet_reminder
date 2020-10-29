@@ -16,8 +16,10 @@ export default class App extends Component {
     render() {
         return (
             <Layout>
+                {/* Use Route for unauthenticated route */}
                 <Route exact path='/' component={Home}/>
                 <Route path='/counter' component={Counter}/>
+                {/* Use AuthorizeRoute for authenticated route */}
                 <AuthorizeRoute path='/fetch-data' component={FetchData}/>
                 <Route path={ApplicationPaths.ApiAuthorizationPrefix} component={ApiAuthorizationRoutes}/>
             </Layout>

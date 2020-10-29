@@ -9,7 +9,7 @@ using Reminder.Data;
 namespace Reminder.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201028163653_CreateIdentitySchema")]
+    [Migration("20201029031220_CreateIdentitySchema")]
     partial class CreateIdentitySchema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
