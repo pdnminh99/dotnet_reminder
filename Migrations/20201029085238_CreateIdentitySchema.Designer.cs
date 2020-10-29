@@ -9,7 +9,7 @@ using Reminder.Data;
 namespace Reminder.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201029031220_CreateIdentitySchema")]
+    [Migration("20201029085238_CreateIdentitySchema")]
     partial class CreateIdentitySchema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -232,6 +232,73 @@ namespace Reminder.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("Reminder.Models.Collection", b =>
+                {
+                    b.Property<Guid>("CollectionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<DateTime>("CreationDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue(new DateTime(2020, 10, 29, 15, 52, 38, 39, DateTimeKind.Local).AddTicks(6707));
+
+                    b.Property<DateTime>("LastEdited")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue(new DateTime(2020, 10, 29, 15, 52, 38, 40, DateTimeKind.Local).AddTicks(9689));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OwnerId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CollectionId");
+
+                    b.HasIndex("OwnerId");
+
+                    b.ToTable("Collections");
+                });
+
+            modelBuilder.Entity("Reminder.Models.Task", b =>
+                {
+                    b.Property<Guid>("TaskId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValueSql("NEWID()");
+
+                    b.Property<Guid?>("CollectionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreationDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue(new DateTime(2020, 10, 29, 15, 52, 38, 41, DateTimeKind.Local).AddTicks(2147));
+
+                    b.Property<DateTime?>("DueDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("LastEdited")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue(new DateTime(2020, 10, 29, 15, 52, 38, 41, DateTimeKind.Local).AddTicks(2414));
+
+                    b.Property<string>("Note")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("TaskId");
+
+                    b.HasIndex("CollectionId");
+
+                    b.ToTable("Tasks");
+                });
+
             modelBuilder.Entity("Reminder.Models.User", b =>
                 {
                     b.Property<string>("Id")
@@ -345,6 +412,20 @@ namespace Reminder.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Reminder.Models.Collection", b =>
+                {
+                    b.HasOne("Reminder.Models.User", "Owner")
+                        .WithMany()
+                        .HasForeignKey("OwnerId");
+                });
+
+            modelBuilder.Entity("Reminder.Models.Task", b =>
+                {
+                    b.HasOne("Reminder.Models.Collection", "Collection")
+                        .WithMany("Tasks")
+                        .HasForeignKey("CollectionId");
                 });
 #pragma warning restore 612, 618
         }
