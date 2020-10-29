@@ -186,6 +186,50 @@ namespace Reminder.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Collections",
+                columns: table => new
+                {
+                    CollectionId = table.Column<Guid>(nullable: false, defaultValueSql: "NEWID()"),
+                    Name = table.Column<string>(nullable: false),
+                    CreationDate = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2020, 10, 29, 15, 52, 38, 39, DateTimeKind.Local).AddTicks(6707)),
+                    LastEdited = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2020, 10, 29, 15, 52, 38, 40, DateTimeKind.Local).AddTicks(9689)),
+                    OwnerId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Collections", x => x.CollectionId);
+                    table.ForeignKey(
+                        name: "FK_Collections_AspNetUsers_OwnerId",
+                        column: x => x.OwnerId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Tasks",
+                columns: table => new
+                {
+                    TaskId = table.Column<Guid>(nullable: false, defaultValueSql: "NEWID()"),
+                    Content = table.Column<string>(nullable: true),
+                    DueDate = table.Column<DateTime>(nullable: true),
+                    Note = table.Column<string>(nullable: true),
+                    CreationDate = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2020, 10, 29, 15, 52, 38, 41, DateTimeKind.Local).AddTicks(2147)),
+                    LastEdited = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2020, 10, 29, 15, 52, 38, 41, DateTimeKind.Local).AddTicks(2414)),
+                    CollectionId = table.Column<Guid>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tasks", x => x.TaskId);
+                    table.ForeignKey(
+                        name: "FK_Tasks_Collections_CollectionId",
+                        column: x => x.CollectionId,
+                        principalTable: "Collections",
+                        principalColumn: "CollectionId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -224,6 +268,11 @@ namespace Reminder.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Collections_OwnerId",
+                table: "Collections",
+                column: "OwnerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_DeviceCodes_DeviceCode",
                 table: "DeviceCodes",
                 column: "DeviceCode",
@@ -243,6 +292,11 @@ namespace Reminder.Migrations
                 name: "IX_PersistedGrants_SubjectId_ClientId_Type",
                 table: "PersistedGrants",
                 columns: new[] { "SubjectId", "ClientId", "Type" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tasks_CollectionId",
+                table: "Tasks",
+                column: "CollectionId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -269,7 +323,13 @@ namespace Reminder.Migrations
                 name: "PersistedGrants");
 
             migrationBuilder.DropTable(
+                name: "Tasks");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Collections");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
