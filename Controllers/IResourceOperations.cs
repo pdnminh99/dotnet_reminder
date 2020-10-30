@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Reminder.Controllers
@@ -7,15 +6,15 @@ namespace Reminder.Controllers
     public abstract class ResourceOperations<T, K> : ControllerBase
     {
         [HttpGet]
-        public abstract Task<List<T>> GetAll();
+        public abstract Task<IActionResult> GetAll();
 
         [HttpPost]
-        public abstract Task<T> Create(T instance);
+        public abstract Task<IActionResult> Create(T instance);
 
         [HttpPatch]
-        public abstract Task<T> Update(T instance);
+        public abstract Task<IActionResult> Update(T instance);
 
         [HttpDelete]
-        public abstract Task<T> Delete(K uuid);
+        public abstract Task<IActionResult> Delete(K uuid);
     }
 }

@@ -14,8 +14,8 @@ Run the following commands in exact order:
  
  - This will apply migration configs (which located in the `Migrations` folder):
  
-`dotnet ef migration update`
+`dotnet ef database update`
 
 ## Drop database
 
-`dotnet ef migration drop`
+`dotnet ef database drop`

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 // using Microsoft.AspNetCore.Authorization;
@@ -8,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Reminder.Data;
 using Reminder.Models;
-using Task = System.Threading.Tasks.Task;
 
 namespace Reminder.Controllers
 {
@@ -33,10 +31,10 @@ namespace Reminder.Controllers
             _context = dbContext;
         }
 
-        [HttpGet]
-        public override Task<List<Collection>> GetAll()
+        public override async Task<IActionResult> GetAll()
         {
-            return Task.FromResult(_context.Collections.ToList());
+            await _userManager.GetUserAsync(User);
+            return Ok(_context.Collections.OrderBy(p => p.CreationDate).ToList());
 
             // Unblock this comment when this controller is called with Authorized route
 
@@ -49,25 +47,37 @@ namespace Reminder.Controllers
             //     .ToList();
         }
 
-        public override async Task<Collection> Create(Collection instance)
+        public override async Task<IActionResult> Create(Collection instance)
         {
             // var user = await _userManager.GetUserAsync(User);
+            instance.CollectionId = null;
+            instance.CreationDate = null;
+            instance.LastEdited = null;
             await _context.Collections.AddAsync(instance);
             await _context.SaveChangesAsync();
-            return instance;
+            return Ok(instance);
         }
 
-        public override Task<Collection> Update(Collection instance)
+        public override async Task<IActionResult> Update(Collection instance)
         {
-            throw new NotImplementedException();
+            if (instance.CollectionId == null)
+                return NotFound($"`id` field must not empty.");
+            Collection collection = await _context.Collections.FindAsync(instance.CollectionId);
+            if (collection == null) return NotFound($"Collection with id {instance.CollectionId} is not found.");
+            collection.Name = instance.Name;
+            collection.LastEdited = DateTime.Now;
+            _context.Collections.Update(collection);
+            await _context.SaveChangesAsync();
+            return Ok(collection);
         }
 
-        public override async Task<Collection> Delete(int uuid)
+        public override async Task<IActionResult> Delete(int cid)
         {
-            Collection collection = await _context.Collections.FindAsync(uuid);
+            Collection collection = await _context.Collections.FindAsync(cid);
+            if (collection == null) return NotFound($"Collection with id {cid} is not found.");
             _context.Collections.Remove(collection);
             await _context.SaveChangesAsync();
-            return collection;
+            return Ok(collection);
         }
     }
 }
