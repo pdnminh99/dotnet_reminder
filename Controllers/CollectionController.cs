@@ -15,7 +15,7 @@ namespace Reminder.Controllers
     // [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class CollectionController : ResourceOperations<Collection, Guid>
+    public class CollectionController : ResourceOperations<Collection, int>
     {
         private readonly ApplicationDbContext _context;
 
@@ -36,7 +36,6 @@ namespace Reminder.Controllers
         [HttpGet]
         public override Task<List<Collection>> GetAll()
         {
-            _logger.LogInformation("Get all collections action invoked.");
             return Task.FromResult(_context.Collections.ToList());
 
             // Unblock this comment when this controller is called with Authorized route
@@ -50,11 +49,12 @@ namespace Reminder.Controllers
             //     .ToList();
         }
 
-        public override Task<Collection> Create(Collection instance)
+        public override async Task<Collection> Create(Collection instance)
         {
             // var user = await _userManager.GetUserAsync(User);
-            _context.Collections.Add(instance);
-            return Task.FromResult(instance);
+            await _context.Collections.AddAsync(instance);
+            await _context.SaveChangesAsync();
+            return instance;
         }
 
         public override Task<Collection> Update(Collection instance)
@@ -62,7 +62,7 @@ namespace Reminder.Controllers
             throw new NotImplementedException();
         }
 
-        public override async Task<Collection> Delete(Guid uuid)
+        public override async Task<Collection> Delete(int uuid)
         {
             Collection collection = await _context.Collections.FindAsync(uuid);
             _context.Collections.Remove(collection);

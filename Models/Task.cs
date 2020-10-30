@@ -8,7 +8,7 @@ namespace Reminder.Models
     public class Task
     {
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid TaskId { get; set; }
+        public int TaskId { get; set; }
 
         public string Content { get; set; }
 

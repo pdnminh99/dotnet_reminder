@@ -23,20 +23,12 @@ namespace Reminder.Data
             base.OnModelCreating(builder);
 
             builder.Entity<Collection>()
-                .Property(p => p.CollectionId)
-                .HasDefaultValueSql("NEWID()");
-
-            builder.Entity<Collection>()
                 .Property(p => p.CreationDate)
                 .HasDefaultValue(DateTime.Now);
 
             builder.Entity<Collection>()
                 .Property(p => p.LastEdited)
                 .HasDefaultValue(DateTime.Now);
-
-            builder.Entity<Task>()
-                .Property(p => p.TaskId)
-                .HasDefaultValueSql("NEWID()");
 
             builder.Entity<Task>()
                 .Property(p => p.CreationDate)
