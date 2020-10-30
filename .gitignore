@@ -3,6 +3,7 @@
 
 # SQLite
 app.db
+Migrations/*
 
 # Rider
 .idea/*
