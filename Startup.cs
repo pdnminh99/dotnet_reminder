@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -24,13 +25,23 @@ namespace Reminder
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("SQLiteConnection"))
+                options.UseLazyLoadingProxies().UseSqlite(Configuration.GetConnectionString("SQLiteConnection"))
             );
 
             services.AddDefaultIdentity<User>(options =>
                 {
+                    // TODO: Config password, remove this before deploying
+                    options.Password.RequireDigit = false;
+                    options.Password.RequireLowercase = false;
+                    options.Password.RequireNonAlphanumeric = false;
+                    options.Password.RequireUppercase = false;
+                    options.Password.RequiredLength = 6;
+                    options.Password.RequiredUniqueChars = 1;
+
+                    options.User.RequireUniqueEmail = true;
                     options.SignIn.RequireConfirmedAccount = false;
                     options.SignIn.RequireConfirmedEmail = false;
+                    options.SignIn.RequireConfirmedPhoneNumber = false;
                 }
             ).AddEntityFrameworkStores<ApplicationDbContext>();
 
@@ -40,7 +51,13 @@ namespace Reminder
             services.AddAuthentication()
                 .AddIdentityServerJwt();
 
-            services.AddControllersWithViews();
+            services.AddControllersWithViews()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                    options.JsonSerializerOptions.IgnoreNullValues = true;
+                });
+
             services.AddRazorPages();
 
             // In production, the React files will be served from this directory

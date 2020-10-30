@@ -2,22 +2,22 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+// using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Reminder.Data;
 using Reminder.Models;
+using Task = System.Threading.Tasks.Task;
 
 namespace Reminder.Controllers
 {
-    [Authorize]
+    // [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class CollectionController : ControllerBase, IResourceOperations<Collection, Guid>
+    public class CollectionController : ResourceOperations<Collection, Guid>
     {
-        private readonly DbSet<Collection> _collections;
+        private readonly ApplicationDbContext _context;
 
         private readonly ILogger<Collection> _logger;
 
@@ -30,40 +30,44 @@ namespace Reminder.Controllers
         {
             _userManager = userManager;
             _logger = logger;
-            _collections = dbContext.Collections;
+            _context = dbContext;
         }
 
         [HttpGet]
-        public async Task<List<Collection>> GetAll()
+        public override Task<List<Collection>> GetAll()
         {
             _logger.LogInformation("Get all collections action invoked.");
+            return Task.FromResult(_context.Collections.ToList());
+
+            // Unblock this comment when this controller is called with Authorized route
 
             // Just believe that `GetUserAsync` will never return NULL.
-            // Since middleware will redirect unauthorized request. 
-            var user = await _userManager.GetUserAsync(User);
-            return _collections
-                .Where(p => p.Owner.Id == user.Id)
-                .ToList();
+            // Since middleware will redirect unauthorized request.
+
+            // var user = await _userManager.GetUserAsync(User);
+            // return _collections
+            //     .Where(p => p.Owner.Id == user.Id)
+            //     .ToList();
         }
 
-        [HttpPost]
-        public async Task<Collection> Create(Collection instance)
+        public override Task<Collection> Create(Collection instance)
         {
-            var user = await _userManager.GetUserAsync(User);
-            _collections.Add(instance);
-            return instance;
+            // var user = await _userManager.GetUserAsync(User);
+            _context.Collections.Add(instance);
+            return Task.FromResult(instance);
         }
 
-        [HttpPatch]
-        public Task<Collection> Update(Collection instance)
-        {
-            throw new NotImplementedException();
-        }
-
-        [HttpDelete]
-        public Task<Collection> Delete(Guid uuid)
+        public override Task<Collection> Update(Collection instance)
         {
             throw new NotImplementedException();
+        }
+
+        public override async Task<Collection> Delete(Guid uuid)
+        {
+            Collection collection = await _context.Collections.FindAsync(uuid);
+            _context.Collections.Remove(collection);
+            await _context.SaveChangesAsync();
+            return collection;
         }
     }
 }

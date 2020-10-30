@@ -192,8 +192,8 @@ namespace Reminder.Migrations
                 {
                     CollectionId = table.Column<Guid>(nullable: false, defaultValueSql: "NEWID()"),
                     Name = table.Column<string>(nullable: false),
-                    CreationDate = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2020, 10, 29, 15, 52, 38, 39, DateTimeKind.Local).AddTicks(6707)),
-                    LastEdited = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2020, 10, 29, 15, 52, 38, 40, DateTimeKind.Local).AddTicks(9689)),
+                    CreationDate = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2020, 10, 30, 12, 6, 49, 100, DateTimeKind.Local).AddTicks(5328)),
+                    LastEdited = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2020, 10, 30, 12, 6, 49, 101, DateTimeKind.Local).AddTicks(7583)),
                     OwnerId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -215,8 +215,8 @@ namespace Reminder.Migrations
                     Content = table.Column<string>(nullable: true),
                     DueDate = table.Column<DateTime>(nullable: true),
                     Note = table.Column<string>(nullable: true),
-                    CreationDate = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2020, 10, 29, 15, 52, 38, 41, DateTimeKind.Local).AddTicks(2147)),
-                    LastEdited = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2020, 10, 29, 15, 52, 38, 41, DateTimeKind.Local).AddTicks(2414)),
+                    CreationDate = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2020, 10, 30, 12, 6, 49, 102, DateTimeKind.Local).AddTicks(176)),
+                    LastEdited = table.Column<DateTime>(nullable: false, defaultValue: new DateTime(2020, 10, 30, 12, 6, 49, 102, DateTimeKind.Local).AddTicks(823)),
                     CollectionId = table.Column<Guid>(nullable: true)
                 },
                 constraints: table =>

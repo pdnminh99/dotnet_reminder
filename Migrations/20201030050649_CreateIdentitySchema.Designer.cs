@@ -9,7 +9,7 @@ using Reminder.Data;
 namespace Reminder.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201029085238_CreateIdentitySchema")]
+    [Migration("20201030050649_CreateIdentitySchema")]
     partial class CreateIdentitySchema
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -242,12 +242,12 @@ namespace Reminder.Migrations
                     b.Property<DateTime>("CreationDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasDefaultValue(new DateTime(2020, 10, 29, 15, 52, 38, 39, DateTimeKind.Local).AddTicks(6707));
+                        .HasDefaultValue(new DateTime(2020, 10, 30, 12, 6, 49, 100, DateTimeKind.Local).AddTicks(5328));
 
                     b.Property<DateTime>("LastEdited")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasDefaultValue(new DateTime(2020, 10, 29, 15, 52, 38, 40, DateTimeKind.Local).AddTicks(9689));
+                        .HasDefaultValue(new DateTime(2020, 10, 30, 12, 6, 49, 101, DateTimeKind.Local).AddTicks(7583));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -279,7 +279,7 @@ namespace Reminder.Migrations
                     b.Property<DateTime>("CreationDate")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasDefaultValue(new DateTime(2020, 10, 29, 15, 52, 38, 41, DateTimeKind.Local).AddTicks(2147));
+                        .HasDefaultValue(new DateTime(2020, 10, 30, 12, 6, 49, 102, DateTimeKind.Local).AddTicks(176));
 
                     b.Property<DateTime?>("DueDate")
                         .HasColumnType("TEXT");
@@ -287,7 +287,7 @@ namespace Reminder.Migrations
                     b.Property<DateTime>("LastEdited")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
-                        .HasDefaultValue(new DateTime(2020, 10, 29, 15, 52, 38, 41, DateTimeKind.Local).AddTicks(2414));
+                        .HasDefaultValue(new DateTime(2020, 10, 30, 12, 6, 49, 102, DateTimeKind.Local).AddTicks(823));
 
                     b.Property<string>("Note")
                         .HasColumnType("TEXT");

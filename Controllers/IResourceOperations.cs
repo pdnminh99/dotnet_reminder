@@ -1,17 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Reminder.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Reminder.Controllers
 {
-    public interface IResourceOperations<T, K>
+    public abstract class ResourceOperations<T, K> : ControllerBase
     {
-        public Task<List<Collection>> GetAll();
+        [HttpGet]
+        public abstract Task<List<T>> GetAll();
 
-        public Task<T> Create(T instance);
+        [HttpPost]
+        public abstract Task<T> Create(T instance);
 
-        public Task<T> Update(T instance);
+        [HttpPatch]
+        public abstract Task<T> Update(T instance);
 
-        public Task<T> Delete(K uuid);
+        [HttpDelete]
+        public abstract Task<T> Delete(K uuid);
     }
 }
