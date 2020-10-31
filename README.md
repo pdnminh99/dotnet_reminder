@@ -4,6 +4,10 @@ Subject: .NET 20.1A
 
 # How to run the server
 
+## Restore dotnet dependencies
+
+`dotnet restore`
+
 ## Initiate database using migration
 
 Run the following commands in exact order: 
@@ -15,6 +19,8 @@ Run the following commands in exact order:
  - This will init migrations
  
  `dotnet ef migrations add [name]`
+ 
+ Ex: `dotnet ef migrations add CreateIdentitySchema`
  
  - This will apply migration configs (which located in the `Migrations` folder):
  
