@@ -34,7 +34,7 @@ namespace Reminder.Controllers
         public override async Task<IActionResult> GetAll()
         {
             var user = await _userManager.GetUserAsync(User);
-            _logger.LogInformation($"Getting {user}");
+            _logger.LogInformation($"Getting {user?.ToString() ?? "null"}");
 
             if (user == null)
                 return Ok(_context.Collections
