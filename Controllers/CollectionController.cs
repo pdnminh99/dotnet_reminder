@@ -10,7 +10,7 @@ using Reminder.Models;
 
 namespace Reminder.Controllers
 {
-    [Authorize]
+    // [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     public class CollectionController : ResourceOperations<Collection, int>
@@ -34,7 +34,7 @@ namespace Reminder.Controllers
         public override async Task<IActionResult> GetAll()
         {
             var user = await _userManager.GetUserAsync(User);
-            _logger.LogInformation($"Getting {user?.ToString() ?? "null"}");
+            _logger.LogInformation($"Getting user: {user?.ToString() ?? "null"}");
 
             if (user == null)
                 return Ok(_context.Collections
