@@ -46,7 +46,10 @@ namespace Reminder
             ).AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddIdentityServer()
-                .AddApiAuthorization<User, ApplicationDbContext>();
+                .AddApiAuthorization<User, ApplicationDbContext>()
+                .AddDeveloperSigningCredential()
+                .AddInMemoryClients(IdentityConfig.GetClients())
+                .AddTestUsers(IdentityConfig.GetUsers());
 
             services.AddAuthentication()
                 .AddIdentityServerJwt();
