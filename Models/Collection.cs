@@ -16,7 +16,7 @@ namespace Reminder.Models
 
         public DateTime? LastEdited { get; set; }
 
-        [JsonIgnore] public virtual User? Owner { get; set; }
+        [JsonIgnore] public virtual AppUser? Owner { get; set; }
 #nullable disable
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "`Name` field must not empty or null.")]

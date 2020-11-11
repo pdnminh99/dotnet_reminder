@@ -2,7 +2,6 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,32 +20,29 @@ namespace Reminder
             Configuration = configuration;
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<AppDbContext>(options =>
                 options.UseLazyLoadingProxies().UseSqlite(Configuration.GetConnectionString("SQLiteConnection"))
             );
 
-            services.AddDefaultIdentity<User>(options =>
+            services.AddDefaultIdentity<AppUser>(options =>
                 {
-                    // TODO: Config password, remove this before deploying
                     options.Password.RequireDigit = false;
-                    options.Password.RequireLowercase = false;
+                    options.Password.RequiredLength = 4;
                     options.Password.RequireNonAlphanumeric = false;
                     options.Password.RequireUppercase = false;
-                    options.Password.RequiredLength = 6;
-                    options.Password.RequiredUniqueChars = 1;
+                    options.Password.RequireLowercase = false;
 
                     options.User.RequireUniqueEmail = true;
                     options.SignIn.RequireConfirmedAccount = false;
                     options.SignIn.RequireConfirmedEmail = false;
                     options.SignIn.RequireConfirmedPhoneNumber = false;
                 }
-            ).AddEntityFrameworkStores<ApplicationDbContext>();
+            ).AddEntityFrameworkStores<AppDbContext>();
 
             services.AddIdentityServer()
-                .AddApiAuthorization<User, ApplicationDbContext>();
+                .AddApiAuthorization<AppUser, AppDbContext>();
 
             services.AddAuthentication()
                 .AddIdentityServerJwt();
@@ -60,11 +56,9 @@ namespace Reminder
 
             services.AddRazorPages();
 
-            // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -75,7 +69,6 @@ namespace Reminder
             else
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -85,11 +78,8 @@ namespace Reminder
 
             app.UseRouting();
 
-            // The authentication middleware that is responsible for validating the request
-            // credentials and setting the user on the request context.
             app.UseAuthentication();
 
-            // The IdentityServer middleware that exposes the OpenID Connect endpoints.
             app.UseIdentityServer();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
@@ -103,7 +93,7 @@ namespace Reminder
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "ClientApp";
-                if (env.IsDevelopment()) spa.UseReactDevelopmentServer(npmScript: "start");
+                spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
             });
         }
     }

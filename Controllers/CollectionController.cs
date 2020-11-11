@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -15,15 +14,15 @@ namespace Reminder.Controllers
     [Route("api/v1/[controller]")]
     public class CollectionController : ResourceOperations<Collection, int>
     {
-        private readonly ApplicationDbContext _context;
+        private readonly AppDbContext _context;
 
         private readonly ILogger<Collection> _logger;
 
-        private readonly UserManager<User> _userManager;
+        private readonly UserManager<AppUser> _userManager;
 
         public CollectionController(
-            UserManager<User> userManager,
-            ApplicationDbContext dbContext,
+            UserManager<AppUser> userManager,
+            AppDbContext dbContext,
             ILogger<Collection> logger)
         {
             _userManager = userManager;
