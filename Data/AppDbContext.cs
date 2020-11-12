@@ -11,7 +11,7 @@ namespace Reminder.Data
     {
         public virtual DbSet<Collection> Collections { get; set; }
 
-        public virtual DbSet<Task> Tasks { get; set; }
+        public virtual DbSet<AppTask> Tasks { get; set; }
 
         public AppDbContext(DbContextOptions options, IOptions<OperationalStoreOptions> operationalStoreOptions)
             : base(options, operationalStoreOptions)
@@ -30,13 +30,18 @@ namespace Reminder.Data
                 .Property(p => p.LastEdited)
                 .HasDefaultValue(DateTime.Now);
 
-            builder.Entity<Task>()
+            builder.Entity<AppTask>()
                 .Property(p => p.CreationDate)
                 .HasDefaultValue(DateTime.Now);
 
-            builder.Entity<Task>()
+            builder.Entity<AppTask>()
                 .Property(p => p.LastEdited)
                 .HasDefaultValue(DateTime.Now);
+
+            builder.Entity<Collection>()
+                .HasMany(p => p.Tasks)
+                .WithOne(t => t.Collection)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

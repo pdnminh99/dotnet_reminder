@@ -50,6 +50,7 @@ namespace Reminder
             services.AddAuthentication()
                 .AddIdentityServerJwt();
 
+            // Ref: https://github.com/dotnet/AspNetCore.Docs/issues/17517
             services.Configure<IdentityOptions>(options =>
             {
                 options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
@@ -93,9 +94,7 @@ namespace Reminder
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    "default",
-                    "{controller}/{action=Index}/{id?}");
+                endpoints.MapDefaultControllerRoute();
                 endpoints.MapRazorPages();
             });
 
