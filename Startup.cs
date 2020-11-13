@@ -1,9 +1,12 @@
+using System;
 using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -57,7 +60,8 @@ namespace Reminder
                 options.ClaimsIdentity.UserNameClaimType = ClaimTypes.Email;
             });
 
-            services.AddControllersWithViews()
+            services.AddControllersWithViews(options =>
+                    options.Filters.Add(new HttpResponseExceptionFilter()))
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
@@ -103,6 +107,37 @@ namespace Reminder
                 spa.Options.SourcePath = "ClientApp";
                 spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
             });
+        }
+    }
+
+    public class HttpResponseExceptionFilter : IActionFilter, IOrderedFilter
+    {
+        public int Order { get; } = int.MaxValue - 10;
+
+        public void OnActionExecuting(ActionExecutingContext context)
+        {
+        }
+
+        public void OnActionExecuted(ActionExecutedContext context)
+        {
+            if (context.Exception is HttpResponseException exception)
+            {
+                context.Result = new ObjectResult(exception.Message)
+                {
+                    StatusCode = exception.StatusCode
+                };
+                context.ExceptionHandled = true;
+            }
+        }
+    }
+
+    public class HttpResponseException : Exception
+    {
+        public int StatusCode { get; }
+
+        public HttpResponseException(string message, int statusCode = 400) : base(message)
+        {
+            StatusCode = statusCode;
         }
     }
 }

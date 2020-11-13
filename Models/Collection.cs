@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace Reminder.Models
@@ -30,6 +31,10 @@ namespace Reminder.Models
         [Required(AllowEmptyStrings = false, ErrorMessage = "Collection `Name` field must not empty or null.")]
         public string Name { get; set; }
 
-        public virtual IEnumerable<AppTask> Tasks { get; set; }
+        [JsonIgnore] public virtual List<AppTask> Tasks { get; set; }
+
+        [NotMapped] public List<AppTask> CompletedTasks => Tasks?.Where(t => t.IsCompleted).ToList();
+
+        [NotMapped] public List<AppTask> IncompletedTasks => Tasks?.Where(t => !t.IsCompleted).ToList();
     }
 }

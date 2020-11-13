@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,48 +10,31 @@ using Reminder.Models;
 
 namespace Reminder.Controllers
 {
-    [Authorize]
-    [ApiController]
     [Route("api/v1/[controller]")]
-    public class CollectionController : ControllerBase
+    public class CollectionController : GenericController
     {
-        private readonly AppDbContext _context;
-
-        private readonly ILogger<CollectionController> _logger;
-
-        private readonly UserManager<AppUser> _userManager;
-
         public CollectionController(
             UserManager<AppUser> userManager,
             AppDbContext dbContext,
-            ILogger<CollectionController> logger)
+            ILogger<CollectionController> logger) : base(userManager, dbContext, logger)
         {
-            _userManager = userManager;
-            _logger = logger;
-            _context = dbContext;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(bool includeTasks = false)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                _logger.LogInformation("Unauthenticated user tried to get all collections.");
-                return Forbid();
-            }
+            await StartAuthenticate("get all collections");
 
-            _logger.LogInformation($"User [{user.Id}] get all collections.");
-
-            return Ok(await _context.Collections
-                .Where(c => c.Owner == user)
+            return Ok(await Context.Collections
+                .Where(c => c.Owner == CurrentUser)
                 .OrderBy(c => c.CreationDate)
                 .Select(c => new Collection
                 {
                     CollectionId = c.CollectionId,
                     Name = c.Name,
                     CreationDate = c.CreationDate,
-                    LastEdited = c.LastEdited
+                    LastEdited = c.LastEdited,
+                    Tasks = includeTasks ? c.Tasks : null
                 })
                 .ToListAsync());
         }
@@ -60,76 +42,73 @@ namespace Reminder.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Collection instance)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                _logger.LogInformation("Unauthenticated user tried to get all collections.");
-                return Forbid();
-            }
+            await StartAuthenticate("create new collection.");
 
-            instance.Owner = user;
+            instance.Owner = CurrentUser;
 
             // Commit changes
-            await _context.Collections.AddAsync(instance);
-            await _context.SaveChangesAsync();
+            await Context.Collections.AddAsync(instance);
+            await Context.SaveChangesAsync();
             return Ok(instance);
         }
 
-        [HttpPatch]
-        public async Task<IActionResult> Update(Collection instance)
+        [HttpPatch("{collectionId}")]
+        public async Task<IActionResult> Update(int collectionId, [FromBody] Collection instance)
         {
-            if (instance?.CollectionId == null)
-                return NotFound($"`id` field must not empty.");
+            await StartAuthenticate($"update collection [{collectionId}]");
 
-            AppUser user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                _logger.LogInformation("Unauthenticated user tried to get all collections.");
-                return Forbid();
-            }
-
-            Collection collection = await _context.Collections.FindAsync(instance.CollectionId);
+            Collection collection = await Context.Collections.FindAsync(collectionId);
             if (collection == null)
-                return NotFound($"Collection with id {instance.CollectionId} is not found.");
+                return NotFound($"Collection with id {collectionId} is not found.");
 
-            if (collection.Owner != user)
+            if (collection.Owner != CurrentUser)
             {
-                _logger.LogInformation(
-                    $"User [{user.Id}] tries to update collection [{collection.CollectionId}], " +
+                Logger.LogInformation(
+                    $"User [{CurrentUser.Id}] tries to update collection [{collectionId}], " +
                     $"which belongs to user {collection.Owner?.Id}.");
                 return Forbid();
             }
 
+            bool hasChanges = collection.Name != instance.Name;
+
+            // Apply changes
             collection.Name = instance.Name;
-            collection.LastEdited = DateTime.Now;
-            _context.Collections.Update(collection);
-            await _context.SaveChangesAsync();
-            return Ok(collection);
+
+            // Commit changes if there are changes
+            if (hasChanges)
+            {
+                collection.LastEdited = DateTime.Now;
+
+                Context.Collections.Update(collection);
+                await Context.SaveChangesAsync();
+            }
+
+            // Exclude `Owner` field from response
+            collection.Owner = null;
+
+            return hasChanges ? Ok(collection) : StatusCode(202, collection);
         }
 
-        [HttpDelete]
-        public async Task<IActionResult> Delete(int cid)
+        [HttpDelete("{collectionId}")]
+        public async Task<IActionResult> Delete(int collectionId)
         {
-            var user = await _userManager.GetUserAsync(User);
-            if (user == null)
-            {
-                _logger.LogInformation("Unauthenticated user tried to get all collections.");
-                return Forbid();
-            }
+            await StartAuthenticate($"delete collection [{collectionId}]");
 
-            Collection collection = await _context.Collections.FindAsync(cid);
-            if (collection == null) return NotFound($"Collection [{cid}] is not found.");
+            Collection collection = await Context.Collections.FindAsync(collectionId);
+            if (collection == null) return NotFound($"Collection [{collectionId}] is not found.");
 
-            if (collection.Owner != user)
+            if (collection.Owner != CurrentUser)
             {
-                _logger.LogCritical(
-                    $"User [{user.Id}] tries to delete collection [{collection.CollectionId}], " +
+                Logger.LogCritical(
+                    $"User [{CurrentUser.Id}] tries to delete collection [{collection.CollectionId}], " +
                     $"which belongs to user {collection.Owner?.Id}.");
                 return Forbid();
             }
 
-            _context.Collections.Remove(collection);
-            await _context.SaveChangesAsync();
+            Context.Collections.Remove(collection);
+            await Context.SaveChangesAsync();
+
+            collection.Owner = null;
             return Ok(collection);
         }
     }

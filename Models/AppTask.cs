@@ -52,6 +52,8 @@ namespace Reminder.Models
 
         [JsonPropertyName("lastEdited")] public long? LastEditedAtInUnix => Utils.DateTimeToUnixTime(LastEdited);
 
+        public bool IsCompleted => CompletedAt != null;
+
         [JsonIgnore] public virtual Collection Collection { get; set; }
     }
 }
