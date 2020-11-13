@@ -1,8 +1,12 @@
+using System;
+using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,37 +25,43 @@ namespace Reminder
             Configuration = configuration;
         }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options =>
+            services.AddDbContext<AppDbContext>(options =>
                 options.UseLazyLoadingProxies().UseSqlite(Configuration.GetConnectionString("SQLiteConnection"))
             );
 
-            services.AddDefaultIdentity<User>(options =>
-                {
-                    // TODO: Config password, remove this before deploying
-                    options.Password.RequireDigit = false;
-                    options.Password.RequireLowercase = false;
-                    options.Password.RequireNonAlphanumeric = false;
-                    options.Password.RequireUppercase = false;
-                    options.Password.RequiredLength = 6;
-                    options.Password.RequiredUniqueChars = 1;
+            services.AddDefaultIdentity<AppUser>(options =>
+                    {
+                        options.Password.RequireDigit = false;
+                        options.Password.RequiredLength = 4;
+                        options.Password.RequireNonAlphanumeric = false;
+                        options.Password.RequireUppercase = false;
+                        options.Password.RequireLowercase = false;
 
-                    options.User.RequireUniqueEmail = true;
-                    options.SignIn.RequireConfirmedAccount = false;
-                    options.SignIn.RequireConfirmedEmail = false;
-                    options.SignIn.RequireConfirmedPhoneNumber = false;
-                }
-            ).AddEntityFrameworkStores<ApplicationDbContext>();
+                        options.User.RequireUniqueEmail = true;
+                        options.SignIn.RequireConfirmedAccount = false;
+                        options.SignIn.RequireConfirmedEmail = false;
+                        options.SignIn.RequireConfirmedPhoneNumber = false;
+                    }
+                ).AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders();
 
             services.AddIdentityServer()
-                .AddApiAuthorization<User, ApplicationDbContext>();
+                .AddApiAuthorization<AppUser, AppDbContext>();
 
             services.AddAuthentication()
                 .AddIdentityServerJwt();
 
-            services.AddControllersWithViews()
+            // Ref: https://github.com/dotnet/AspNetCore.Docs/issues/17517
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
+                options.ClaimsIdentity.UserNameClaimType = ClaimTypes.Email;
+            });
+
+            services.AddControllersWithViews(options =>
+                    options.Filters.Add(new HttpResponseExceptionFilter()))
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
@@ -60,11 +70,9 @@ namespace Reminder
 
             services.AddRazorPages();
 
-            // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -75,7 +83,6 @@ namespace Reminder
             else
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -85,26 +92,52 @@ namespace Reminder
 
             app.UseRouting();
 
-            // The authentication middleware that is responsible for validating the request
-            // credentials and setting the user on the request context.
             app.UseAuthentication();
 
-            // The IdentityServer middleware that exposes the OpenID Connect endpoints.
             app.UseIdentityServer();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllerRoute(
-                    "default",
-                    "{controller}/{action=Index}/{id?}");
+                endpoints.MapDefaultControllerRoute();
                 endpoints.MapRazorPages();
             });
 
             app.UseSpa(spa =>
             {
                 spa.Options.SourcePath = "ClientApp";
-                if (env.IsDevelopment()) spa.UseReactDevelopmentServer(npmScript: "start");
+                spa.UseProxyToSpaDevelopmentServer("http://localhost:3000");
             });
+        }
+    }
+
+    public class HttpResponseExceptionFilter : IActionFilter, IOrderedFilter
+    {
+        public int Order { get; } = int.MaxValue - 10;
+
+        public void OnActionExecuting(ActionExecutingContext context)
+        {
+        }
+
+        public void OnActionExecuted(ActionExecutedContext context)
+        {
+            if (context.Exception is HttpResponseException exception)
+            {
+                context.Result = new ObjectResult(exception.Message)
+                {
+                    StatusCode = exception.StatusCode
+                };
+                context.ExceptionHandled = true;
+            }
+        }
+    }
+
+    public class HttpResponseException : Exception
+    {
+        public int StatusCode { get; }
+
+        public HttpResponseException(string message, int statusCode = 400) : base(message)
+        {
+            StatusCode = statusCode;
         }
     }
 }

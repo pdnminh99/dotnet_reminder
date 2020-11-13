@@ -2,7 +2,7 @@
 
 namespace Reminder.Models
 {
-    public class User : IdentityUser
+    public class AppUser : IdentityUser
     {
         
     }
