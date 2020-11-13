@@ -61,13 +61,8 @@ namespace Reminder.Controllers
             if (collection == null)
                 return NotFound($"Collection with id {collectionId} is not found.");
 
-            if (collection.Owner != CurrentUser)
-            {
-                Logger.LogInformation(
-                    $"User [{CurrentUser.Id}] tries to update collection [{collectionId}], " +
-                    $"which belongs to user {collection.Owner?.Id}.");
-                return Forbid();
-            }
+            Utils.CheckIfBelongToCurrentUser(collection.Owner, CurrentUser, Logger,
+                $"update collection [{collectionId}]");
 
             bool hasChanges = collection.Name != instance.Name;
 
@@ -97,13 +92,8 @@ namespace Reminder.Controllers
             Collection collection = await Context.Collections.FindAsync(collectionId);
             if (collection == null) return NotFound($"Collection [{collectionId}] is not found.");
 
-            if (collection.Owner != CurrentUser)
-            {
-                Logger.LogCritical(
-                    $"User [{CurrentUser.Id}] tries to delete collection [{collection.CollectionId}], " +
-                    $"which belongs to user {collection.Owner?.Id}.");
-                return Forbid();
-            }
+            Utils.CheckIfBelongToCurrentUser(collection.Owner, CurrentUser, Logger,
+                $"delete collection [{collection.CollectionId}]");
 
             Context.Collections.Remove(collection);
             await Context.SaveChangesAsync();

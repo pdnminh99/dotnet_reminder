@@ -40,8 +40,13 @@ namespace Reminder.Controllers
             await StartAuthenticate("get today's tasks");
 
             Collection collection = await Context.Collections.FindAsync(collectionId);
-            if (collection == null) return NotFound($"Collection with id {collectionId} is not found.");
+            if (collection == null) return NotFound($"Collection with id [{collectionId}] is not found.");
 
+            Utils.CheckIfBelongToCurrentUser(collection.Owner, CurrentUser, Logger,
+                $"query tasks of collection [{collectionId}]");
+
+            // Exclude `Owner` field from response.
+            collection.Owner = null;
             return Ok(collection);
         }
 
@@ -51,10 +56,16 @@ namespace Reminder.Controllers
             await StartAuthenticate($"create task for collection [{collectionId}]");
 
             Collection collection = await Context.Collections.FindAsync(collectionId);
-            if (collection == null) return NotFound($"Collection with id {collectionId} is not found.");
+            if (collection == null) return NotFound($"Collection with id [{collectionId}] is not found.");
 
+            Utils.CheckIfBelongToCurrentUser(collection.Owner, CurrentUser, Logger,
+                $"query tasks of collection [{collectionId}]");
+
+            instance.Note ??= "";
             instance.Collection = collection;
             await Context.Tasks.AddAsync(instance);
+            await Context.SaveChangesAsync();
+
             return Ok(instance);
         }
 
@@ -65,28 +76,41 @@ namespace Reminder.Controllers
 
             AppTask task = await Context.Tasks.FindAsync(taskId);
             if (task == null)
-                return NotFound($"Task with id {taskId} is not found.");
+                return NotFound($"Task with id [{taskId}] is not found.");
 
-            if (task.Collection?.Owner != CurrentUser)
-            {
-                Logger.LogInformation(
-                    $"User [{CurrentUser.Id}] tries to update task [{taskId}], " +
-                    $"which belongs to user {task.Collection?.Owner?.Id}.");
-                return Forbid();
-            }
+            Utils.CheckIfBelongToCurrentUser(task.Collection?.Owner, CurrentUser, Logger, $"update task [{taskId}]");
 
             // `Content` and `Note` fields must not null. They could be empty.
             // If update request does not include these fields, they will not be changed.
-            task.Content = instance.Content ?? task.Content;
-            task.Note = instance.Note ?? task.Note;
-            
+            string newContent = instance.Content ?? task.Content;
+            string newNote = instance.Note ?? task.Note;
+
+            bool hasChanges = task.Content != newContent || task.Note != newNote;
+            task.Content = newContent;
+            task.Note = newNote;
+
             // These fields are nullable
+            hasChanges = hasChanges || task.DueDate != instance.DueDate;
             task.DueDate = instance.DueDate;
+
+            hasChanges = hasChanges || task.IsFlagged != instance.IsFlagged;
             task.IsFlagged = instance.IsFlagged;
+
+            hasChanges = hasChanges || task.CompletedAt != instance.CompletedAt;
             task.CompletedAt = instance.CompletedAt;
 
-            await Context.SaveChangesAsync();
-            return Ok(task);
+            // Commit changes if there are changes
+            if (hasChanges)
+            {
+                task.LastEdited = DateTime.Now;
+
+                Context.Tasks.Update(task);
+                await Context.SaveChangesAsync();
+            }
+
+            if (task.Collection?.Tasks != null)
+                task.Collection.Tasks = null;
+            return hasChanges ? Ok(task) : StatusCode(202, task);
         }
 
         [HttpDelete("{taskId}")]
@@ -96,18 +120,15 @@ namespace Reminder.Controllers
 
             AppTask task = await Context.Tasks.FindAsync(taskId);
             if (task == null)
-                return NotFound($"Task with id {taskId} is not found.");
+                return NotFound($"Task with id [{taskId}] is not found.");
 
-            if (task.Collection?.Owner != CurrentUser)
-            {
-                Logger.LogInformation(
-                    $"User [{CurrentUser.Id}] tries to delete task [{taskId}], " +
-                    $"which belongs to user {task.Collection?.Owner?.Id}.");
-                return Forbid();
-            }
+            Utils.CheckIfBelongToCurrentUser(task.Collection?.Owner, CurrentUser, Logger, $"delete task [{taskId}]");
 
             Context.Tasks.Remove(task);
             await Context.SaveChangesAsync();
+
+            if (task.Collection?.Tasks != null)
+                task.Collection.Tasks = null;
             return Ok(task);
         }
 
