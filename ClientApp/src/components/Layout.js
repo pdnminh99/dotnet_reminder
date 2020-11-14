@@ -1,29 +1,31 @@
 import React, { Component } from 'react';
-//import { NavMenu } from './NavMenu';
+// import { NavMenu } from './NavMenu';
 import { SideBar } from "./SideBar";
 import 'office-ui-fabric-core/dist/css/fabric.min.css'
 import { ToolBar } from './ToolBar';
+import { Home } from './Home';
 
 export class Layout extends Component {
   static displayName = Layout.name;
 
-  render () {
+  render() {
     return (
       <div>
         {/* <NavMenu /> */}
-        <ToolBar/>
-        <div className = "ms-Grid" dir="ltr">
-          <div className = "ms-Grid-row">
-            <div className = "ms-Grid-col ms-sm1 ms-xl1">
-              <SideBar/>
+
+        <div className="ms-Grid" dir="ltr">
+          <ToolBar />
+          <div className="ms-Grid-row">
+            <div className="ms-Grid-col ms-sm2 ms-xl2">
+              <SideBar />
             </div>
-            <div className = "ms-Grid-col ms-sm11 main-element">
-              <div className = "ms-Grid-row">
-
+            <div className="ms-Grid-col ms-sm10 main-element">
+              {/* <div className="ms-Grid-row">
               </div>
-              <div className = "ms-Grid-row">
+              <div className="ms-Grid-row">
 
-              </div>
+              </div> */}
+              <Home/>
             </div>
           </div>
         </div>
