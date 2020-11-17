@@ -1,0 +1,23 @@
+/* Layout */
+*, *:focus, *:hover {
+    outline: none;
+}
+
+/* Customizable */
+
+.underline-off {
+    text-decoration: none;
+}
+
+.bg-gray-300 {
+    background-color: lightgray;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.bg-azure {
+    background-color: #0078D7;
+}
+
