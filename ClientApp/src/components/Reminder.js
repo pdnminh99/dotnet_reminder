@@ -50,13 +50,14 @@ export const Reminder = () => {
     const response = await fetch('/api/v1/Collection?includeTasks=true', {
       headers: !token ? {} : { 'Authorization': `Bearer ${token}` },
     })
-    const data = await response.text()
-    console.log(data)
+    return await response.json()
   }
 
-  useEffect(() => {
-    retrieveCollections().then(() => console.log('Success!'))
-  })
+  useEffect(async () => {
+    let collections = await retrieveCollections()
+    console.log(collections)
+    setCollections(collections)
+  }, [])
 
   return <>
     <Stack styles={{ root: { height: '100%' } }}>
