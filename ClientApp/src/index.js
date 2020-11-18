@@ -19,7 +19,8 @@ const App = () => <>
   <AuthorizeRoute exact path={'/today'} component={Reminder} />
   <AuthorizeRoute exact path={'/planned'} component={Reminder} />
   <AuthorizeRoute exact path={'/flagged'} component={Reminder} />
-  <AuthorizeRoute exact path={'/tasks/index'} component={Reminder} />
+  <AuthorizeRoute exact path={'/tasks'} component={Reminder} />
+  <AuthorizeRoute exact path={'/collection/:cid'} component={Reminder} />
   <Route path={ApplicationPaths.ApiAuthorizationPrefix} component={ApiAuthorizationRoutes} />
 </>
 

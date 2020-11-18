@@ -21,3 +21,15 @@
     background-color: #0078D7;
 }
 
+.bg-azure-light {
+    background-color: #c3ddf7;
+}
+
+.border-none {
+    border: none;
+    outline: none;
+}
+
+.border-rounded {
+    border-radius: 20px;
+}
