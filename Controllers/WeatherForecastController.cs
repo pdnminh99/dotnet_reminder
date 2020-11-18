@@ -21,18 +21,13 @@ public class WeatherForecastController : ControllerBase
 
     private readonly SignInManager<AppUser> _signInManager;
 
-
     private readonly ILogger<WeatherForecastController> _logger;
 
     public WeatherForecastController(
         UserManager<AppUser> userManager,
         SignInManager<AppUser> signInManager,
         ILogger<WeatherForecastController> logger)
-    {
-        _signInManager = signInManager;
-        _userManager = userManager;
-        _logger = logger;
-    }
+    => (_signInManager, _userManager, _logger) = (signInManager, userManager, logger);
 
     [HttpGet]
     public async Task<IEnumerable<WeatherForecast>> Get()

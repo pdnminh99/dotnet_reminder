@@ -9,12 +9,15 @@
 
     <!-- Enable single app file -->
     <OutputType>Exe</OutputType>
-    <PublishTrimmed>true</PublishTrimmed>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishTrimmed>false</PublishTrimmed>
     <PublishReadyToRun>true</PublishReadyToRun>
     <PublishReadyToRunShowWarnings>true</PublishReadyToRunShowWarnings>
 
     <SpaRoot>ClientApp\</SpaRoot>
     <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
+    <UserSecretsId>185136c1-59e7-4457-94f0-f11860003cab</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

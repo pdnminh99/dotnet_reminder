@@ -51,10 +51,7 @@ public class ApplicationContext : ApiAuthorizationDbContext<AppUser>
         DbContextOptions options,
         IOptions<OperationalStoreOptions> operationalStoreOptions,
         IConfiguration configuration)
-        : base(options, operationalStoreOptions)
-    {
-        _configuration = configuration;
-    }
+        : base(options, operationalStoreOptions) => _configuration = configuration;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
             optionsBuilder.UseSqlite(_configuration.GetConnectionString("DefaultConnection"));

@@ -8,10 +8,7 @@ public class OidcConfigurationController : Controller
 
     public OidcConfigurationController(IClientRequestParametersProvider clientRequestParametersProvider,
         ILogger<OidcConfigurationController> logger)
-    {
-        ClientRequestParametersProvider = clientRequestParametersProvider;
-        _logger = logger;
-    }
+    => (ClientRequestParametersProvider, _logger) = (clientRequestParametersProvider, logger);
 
     private IClientRequestParametersProvider ClientRequestParametersProvider { get; }
 

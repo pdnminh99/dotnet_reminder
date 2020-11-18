@@ -20,11 +20,7 @@ public abstract class GenericController : ControllerBase
         UserManager<AppUser> userManager,
         ApplicationContext dbContext,
         ILogger<GenericController> logger)
-    {
-        _userManager = userManager;
-        Logger = logger;
-        Context = dbContext;
-    }
+    => (_userManager, Logger, Context) = (userManager, logger, dbContext);
 
 #nullable enable
     protected async Task StartAuthenticate(string? actionName = null)
