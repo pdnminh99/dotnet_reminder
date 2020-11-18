@@ -73,26 +73,16 @@ const _farItems = [
         ariaLabel: 'Info',
         iconOnly: true,
         iconProps: { iconName: 'ReminderPerson' },
-        onRender: ()=> <LoginMenu></LoginMenu>
+        onClick: () => console.log('Account'),
     },
 
 ]
-
-// const _overflowItems = [
-//     { key: 'move', text: 'Move to...', onClick: () => console.log('Move to'), iconProps: { iconName: 'MoveToFolder' } },
-//     { key: 'copy', text: 'Copy to...', onClick: () => console.log('Copy to'), iconProps: { iconName: 'Copy' } },
-//     { key: 'rename', text: 'Rename...', onClick: () => console.log('Rename'), iconProps: { iconName: 'Edit' } },
-// ];
-
-// const _overflowProps = { ariaLabel: 'News' };
 
 export class ToolBar extends Component {
     render() {
         return (
             <CommandBar
                 items={_items}
-                // overflowItems={_overflowItems}
-                // overflowButtonProps={_overflowProps}
                 farItems={_farItems}
                 styles={commandBarStyles}
             />

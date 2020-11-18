@@ -20,12 +20,12 @@ export class Layout extends Component {
               <SideBar />
             </div>
             <div className="ms-Grid-col ms-sm10 main-element">
-              {/* <div className="ms-Grid-row">
+              <div className="ms-Grid-row">
               </div>
               <div className="ms-Grid-row">
 
-              </div> */}
-              <Home/>
+              </div>
+              
             </div>
           </div>
         </div>
