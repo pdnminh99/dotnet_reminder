@@ -34,6 +34,14 @@
     border-radius: 0.25rem;
 }
 
+.circle {
+    border-radius: 50%;
+}
+
+.bg-gray-300--hover:hover {
+    background-color: lightgray;
+}
+
 .bg-azure-dark--hover:hover {
     background-color: #005a9e;
 }
