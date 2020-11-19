@@ -30,6 +30,10 @@
     outline: none;
 }
 
-.border-rounded {
-    border-radius: 20px;
+.rounded {
+    border-radius: 0.25rem;
+}
+
+.bg-azure-dark--hover:hover {
+    background-color: #005a9e;
 }
