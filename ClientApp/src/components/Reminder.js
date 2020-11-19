@@ -3,19 +3,18 @@ import {
   Stack,
   DefaultPalette,
   Text,
-  Icon,
-  TextField,
-  List,
-  IconButton,
   Panel,
-  FocusZone,
-  FocusZoneDirection,
   ContextualMenuItemType,
 } from '@fluentui/react'
 import './Reminder.css'
-import { Link, useLocation } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import { matchPath } from 'react-router'
 import authService from './api-authorization/AuthorizeService'
+import { CollectionNav } from './CollectionNav'
+import { TaskDetail } from './TaskDetail'
+import { TopNav } from './TopNav'
+import { TaskHeader } from './TaskHeader'
+import { customCollections, standardCollections } from './dummy_data'
 
 const bodyStyles = {
   root: {
@@ -27,49 +26,16 @@ const bodyStyles = {
   },
 }
 
-const standardCollections = [
-  {
-    name: 'Today',
-    icon: 'Brightness',
-    url: '/today',
+const taskDetailStyles = {
+  root: {
+    background: 'red',
+    width: '360px',
+    borderColor: 'lightgray',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    padding: '13px',
   },
-  {
-    name: 'Planned',
-    icon: 'Calendar',
-    color: 'green',
-    url: '/planned',
-  },
-  {
-    name: 'Flagged',
-    icon: 'Flag',
-    url: '/flagged',
-  },
-  {
-    name: 'Tasks',
-    icon: 'TaskLogo',
-    url: '/tasks',
-  },
-]
-
-const customCollections = [
-  {
-    name: 'HSU',
-    url: '/collection/1',
-  },
-  {
-    name: 'Personal',
-    color: 'green',
-    url: '/collection/2',
-  },
-  {
-    name: 'Shopping',
-    url: '/collection/3',
-  },
-  {
-    name: 'Study',
-    url: '/collection/4',
-  },
-]
+}
 
 const TaskContainer = ({ pathname }) => {
   const menuProps = () => ({
@@ -114,27 +80,7 @@ const TaskContainer = ({ pathname }) => {
       >
         <Stack>
           <Stack.Item align='stretch'>
-            <Stack horizontal>
-              <Stack.Item align='stretch'>
-                <Text variant={'xLarge'} className='px-3'>
-                  {pathname}
-                </Text>
-              </Stack.Item>
-
-              <Stack.Item align='stretch'>
-                <IconButton
-                  iconProps={{
-                    iconName: 'More',
-                    styles: { root: { color: '#000', fontSize: '16px' } },
-                  }}
-                  title='CollapseMenu'
-                  ariaLabel='CollapseMenu'
-                  disabled={false}
-                  borderless={true}
-                  menuProps={menuProps}
-                />
-              </Stack.Item>
-            </Stack>
+            <TaskHeader pathname={pathname} menuProps={menuProps} />
           </Stack.Item>
 
           <Stack.Item align='stretch'>
@@ -144,25 +90,18 @@ const TaskContainer = ({ pathname }) => {
           </Stack.Item>
 
           <Stack.Item align='stretch' className='py-3'>
-            Collection goes here
+            <TasksList />
           </Stack.Item>
         </Stack>
       </Stack.Item>
+
       <Stack.Item
         align='stretch'
         grow={0}
         className='ms-bgColor-gray10'
-        styles={{
-          root: {
-            background: 'red',
-            width: '360px',
-            borderColor: 'lightgray',
-            borderWidth: '1px',
-            borderStyle: 'solid',
-          },
-        }}
+        styles={taskDetailStyles}
       >
-        <div>This is the right nav</div>
+        <TaskDetail />
       </Stack.Item>
     </Stack>
   )
@@ -191,7 +130,7 @@ export const Reminder = () => {
     return undefined
   }
 
-  useEffect(async () => {
+  useEffect(() => {
     console.log('Use effect run')
     // let collections = await retrieveCollections()
     // if (collections !== undefined) setCollections(collections)
@@ -206,72 +145,11 @@ export const Reminder = () => {
           styles={{ root: { height: '50px', color: '#FFF' } }}
           className='bg-azure'
         >
-          <Stack horizontal className='h-100 w-100'>
-            <Stack.Item
-              align='stretch'
-              grow={0}
-              className='cursor-pointer px-3 bg-azure-dark--hover'
-            >
-              <Stack horizontal className='h-100 w-100'>
-                <Stack.Item align='center'>
-                  <Icon iconName={'WaffleOffice365'} />
-                </Stack.Item>
-              </Stack>
-            </Stack.Item>
-
-            <Stack.Item align='stretch' grow={0}>
-              <Stack horizontal className='h-100 w-100 px-2'>
-                <Stack.Item align='center'>
-                  <Text variant={'large'}>Reminder</Text>
-                </Stack.Item>
-              </Stack>
-            </Stack.Item>
-
-            <Stack.Item align='stretch' grow={3}>
-              <Stack
-                className='h-100 w-100'
-                verticalAlign='center'
-                horizontalAlign='center'
-              >
-                <Stack.Item align='stretch'>
-                  <TextField
-                    className='mx-auto w-50 rounded'
-                    inputClassName='bg-azure-light'
-                    borderless={true}
-                    styles={{ root: { borderRadius: '10px' } }}
-                    iconProps={{
-                      iconName: 'Search',
-                      styles: { root: { color: '#0078D7' } },
-                    }}
-                  />
-                </Stack.Item>
-              </Stack>
-            </Stack.Item>
-
-            <Stack.Item
-              align='stretch'
-              grow={0}
-              className='cursor-pointer px-4 bg-azure-dark--hover'
-            >
-              <Stack
-                horizontal
-                className='h-100 w-100'
-                tokens={{ childrenGap: 10 }}
-                onClick={onCollapsedClick}
-              >
-                <Stack.Item align='center'>
-                  <Text variant={'medium'}>hello@gmail.com</Text>
-                </Stack.Item>
-                <Stack.Item align='center'>
-                  <Icon iconName={'PlayerSettings'} />
-                </Stack.Item>
-              </Stack>
-            </Stack.Item>
-          </Stack>
+          <TopNav onCollapsedClick={onCollapsedClick} />
         </Stack.Item>
 
         <Stack.Item grow={1} align='auto' styles={bodyStyles}>
-          <CollectionNav />
+          <CollectionNav standardCollections={standardCollections} customCollections={customCollections} />
           <Stack.Item align='stretch' grow={3} className='ms-depth-4 h-100'>
             <TaskContainer pathname={currentRoute.pathname} />
           </Stack.Item>
@@ -290,95 +168,6 @@ export const Reminder = () => {
   )
 }
 
-const CollectionNav = () => {
-  const [collapsed, setCollapsed] = useState(false)
-
-  function onCollapsedClick() {
-    setCollapsed(!collapsed)
-  }
-
-  return (
-    <Stack.Item
-      styles={{
-        root: {
-          color: '#000',
-          width: collapsed ? '48px' : '290px',
-          overflow: 'hidden',
-        },
-      }}
-      align='stretch'
-      grow={0}
-      className='ms-bgColor-gray10 h-100 py-3'
-    >
-      <FocusZone direction={FocusZoneDirection.vertical}>
-        <CollapseButton onCollapsedClick={onCollapsedClick} />
-        <List
-          items={standardCollections}
-          onRenderCell={OnRenderCollection}
-          className='py-3'
-        />
-        <List items={customCollections} onRenderCell={OnRenderCollection} />
-      </FocusZone>
-    </Stack.Item>
-  )
-}
-
-const CollapseButton = ({ onCollapsedClick }) => {
-  return (
-    <div className='px-2'>
-      <Stack horizontal styles={{ root: { height: '36px' } }}>
-        <Stack.Item align='center'>
-          <IconButton
-            iconProps={{
-              iconName: 'CollapseMenu',
-              styles: { root: { color: '#000', fontSize: '16px' } },
-            }}
-            title='CollapseMenu'
-            secondaryText='collapsed'
-            ariaLabel='CollapseMenu'
-            onClick={onCollapsedClick}
-            disabled={false}
-            borderless={true}
-            checked={false}
-          />
-        </Stack.Item>
-      </Stack>
-    </div>
-  )
-}
-
-const OnRenderCollection = ({ name, icon, url, color, isActive }) => {
-  icon = icon || 'AllApps'
-
-  let style = 'px-3 cursor-pointer '
-  style += isActive ? 'ms-bgColor-gray30' : 'ms-bgColor-white--hover'
-
-  let textStyle = {
-    root: { fontSize: '16px', fontWeight: isActive ? '500' : '350' },
-  }
-  if (isActive) {
-    if (color !== undefined) textStyle.root.color = color
-  } else textStyle.root.color = '#000'
-
-  return (
-    <div className={style}>
-      <Link to={url} style={{ textDecoration: 'none' }}>
-        <Stack
-          horizontal
-          styles={{ root: { height: '36px' } }}
-          tokens={{ childrenGap: 15 }}
-        >
-          <Stack.Item horizontal align='center'>
-            <Icon iconName={icon} styles={textStyle} />
-          </Stack.Item>
-
-          <Stack.Item horizontal align='center'>
-            <Text nowrap variant={'medium'} styles={textStyle}>
-              {name}
-            </Text>
-          </Stack.Item>
-        </Stack>
-      </Link>
-    </div>
-  )
+const TasksList = () => {
+  return <h1>Yo</h1>
 }
