@@ -30,6 +30,10 @@
     outline: none;
 }
 
+.rounded-sm {
+    border-radius: 0.125rem;
+}
+
 .rounded {
     border-radius: 0.25rem;
 }
@@ -44,4 +48,16 @@
 
 .bg-azure-dark--hover:hover {
     background-color: #005a9e;
+}
+
+.border-b-azure {
+    border-bottom-color: #005a9e;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+}
+
+.border-b-gray {
+    border-bottom-color: lightgray;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
 }

@@ -3,8 +3,10 @@ import {
   Stack,
   DefaultPalette,
   Text,
+  DefaultButton,
   Panel,
-  ContextualMenuItemType,
+  Icon,
+  FocusZone,
 } from '@fluentui/react'
 import './Reminder.css'
 import { useLocation } from 'react-router-dom'
@@ -15,6 +17,7 @@ import { TaskDetail } from './TaskDetail'
 import { TopNav } from './TopNav'
 import { TaskHeader } from './TaskHeader'
 import { customCollections, standardCollections } from './dummy_data'
+import { useText } from './custom_hooks'
 
 const bodyStyles = {
   root: {
@@ -35,76 +38,6 @@ const taskDetailStyles = {
     borderStyle: 'solid',
     padding: '13px',
   },
-}
-
-const TaskContainer = ({ pathname }) => {
-  const menuProps = () => ({
-    shouldFocusOnMount: true,
-    items: [
-      {
-        key: 'Actions',
-        itemType: ContextualMenuItemType.Header,
-        text: 'Actions',
-        itemProps: { lang: 'en-us' },
-      },
-      {
-        key: 'upload',
-        iconProps: { iconName: 'Upload', style: { color: 'salmon' } },
-        text: 'Upload',
-        title: 'Upload a file',
-      },
-      { key: 'rename', text: 'Rename' },
-      {
-        key: 'navigation',
-        itemType: ContextualMenuItemType.Header,
-        text: 'Navigation',
-      },
-      { key: 'properties', text: 'Properties' },
-      { key: 'print', iconProps: { iconName: 'Print' }, text: 'Print' },
-      {
-        key: 'Bing',
-        text: 'Go to Bing',
-        href: 'http://www.bing.com',
-        target: '_blank',
-      },
-    ],
-  })
-
-  return (
-    <Stack horizontal className='h-100 w-100'>
-      <Stack.Item
-        grow={1}
-        align='stretch'
-        className='px-2 py-3'
-        styles={{ root: { color: '#000', background: '#FFF' } }}
-      >
-        <Stack>
-          <Stack.Item align='stretch'>
-            <TaskHeader pathname={pathname} menuProps={menuProps} />
-          </Stack.Item>
-
-          <Stack.Item align='stretch'>
-            <Text variant={'small'} className='px-3'>
-              Sunday, September 26th, 2020
-            </Text>
-          </Stack.Item>
-
-          <Stack.Item align='stretch' className='py-3'>
-            <TasksList />
-          </Stack.Item>
-        </Stack>
-      </Stack.Item>
-
-      <Stack.Item
-        align='stretch'
-        grow={0}
-        className='ms-bgColor-gray10'
-        styles={taskDetailStyles}
-      >
-        <TaskDetail />
-      </Stack.Item>
-    </Stack>
-  )
 }
 
 export const Reminder = () => {
@@ -168,6 +101,95 @@ export const Reminder = () => {
   )
 }
 
+const TaskContainer = ({ pathname }) => {
+
+  const [isDetailActive, setDetailActive] = useState(false)
+
+  return (
+    <Stack horizontal className='h-100 w-100'>
+      <Stack.Item
+        grow={1}
+        align='stretch'
+        className='px-2 py-3'
+        styles={{ root: { color: '#000', background: '#FFF' } }}
+      >
+        <Stack>
+          <Stack.Item align='stretch'>
+            <TaskHeader pathname={pathname} onDetailPanelToggle={() => setDetailActive(!isDetailActive)} />
+          </Stack.Item>
+
+          <Stack.Item align='stretch'>
+            <Text variant={'small'} className='px-3'>
+              Sunday, September 26th, 2020
+            </Text>
+          </Stack.Item>
+
+          <Stack.Item align='stretch' className='py-3'>
+            <TasksList />
+          </Stack.Item>
+        </Stack>
+      </Stack.Item>
+
+      {isDetailActive && <Stack.Item
+        align='stretch'
+        grow={0}
+        className='ms-bgColor-gray10'
+        styles={taskDetailStyles}
+      >
+        <TaskDetail />
+      </Stack.Item>}
+    </Stack>
+  )
+}
+
 const TasksList = () => {
-  return <h1>Yo</h1>
+  return <Stack>
+    <Stack.Item align={'stretch'} className={'px-3'} styles={{ root: { height: '50px' } }}>
+      <TaskInsertField />
+    </Stack.Item>
+
+    <Stack.Item align={'stretch'}>
+
+    </Stack.Item>
+  </Stack>
+}
+
+const TaskInsertField = () => {
+  const [isFocus, setIsFocus] = useState(false)
+  const { value, setValue, handleOnChange, setCancelActive, isCancelActive } = useText('')
+
+  function onInputLoseFocus() {
+    setValue('')
+    setCancelActive(false)
+    setIsFocus(false)
+  }
+
+  function handleOnFocus() {
+    setIsFocus(true)
+  }
+
+  return <FocusZone className={`w-100 h-100 ${isFocus ? 'border-b-azure' : 'border-b-gray'}`}
+                    onFocus={handleOnFocus}
+                    onBlur={onInputLoseFocus}>
+    <Stack horizontal className={'h-100 w-100'}>
+      <Stack.Item grow={0} align={'center'} className={'px-2'}>
+        <Icon iconName="Add" styles={{ root: { color: '#0078D7', fontSize: '16px' } }} />
+      </Stack.Item>
+
+      <Stack.Item grow={1} align={'stretch'} styles={{ root: { paddingRight: '5px' } }}>
+        <input
+          type='text'
+          style={{ border: 'none' }}
+          className='w-100 h-100 px-2'
+          placeholder={'Add a task'}
+          onChange={handleOnChange}
+          value={value}
+        />
+      </Stack.Item>
+
+      {isCancelActive && <Stack.Item grow={0} align={'center'}>
+        <DefaultButton text={'Add'} styles={{ root: { border: 'none', color: '#0078D7' } }} />
+      </Stack.Item>}
+    </Stack>
+  </FocusZone>
 }
