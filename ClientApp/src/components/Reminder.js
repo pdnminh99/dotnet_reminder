@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Stack,
   DefaultPalette,
@@ -10,7 +10,7 @@ import {
   Panel,
   FocusZone,
   FocusZoneDirection,
-  CollapseAllVisibility,
+  ContextualMenuItemType,
 } from '@fluentui/react'
 import './Reminder.css'
 import { Link, useLocation } from 'react-router-dom'
@@ -72,10 +72,99 @@ const customCollections = [
 ]
 
 const TaskContainer = ({ pathname }) => {
+  const menuProps = () => ({
+    shouldFocusOnMount: true,
+    items: [
+      {
+        key: 'Actions',
+        itemType: ContextualMenuItemType.Header,
+        text: 'Actions',
+        itemProps: { lang: 'en-us' },
+      },
+      {
+        key: 'upload',
+        iconProps: { iconName: 'Upload', style: { color: 'salmon' } },
+        text: 'Upload',
+        title: 'Upload a file',
+      },
+      { key: 'rename', text: 'Rename' },
+      {
+        key: 'navigation',
+        itemType: ContextualMenuItemType.Header,
+        text: 'Navigation',
+      },
+      { key: 'properties', text: 'Properties' },
+      { key: 'print', iconProps: { iconName: 'Print' }, text: 'Print' },
+      {
+        key: 'Bing',
+        text: 'Go to Bing',
+        href: 'http://www.bing.com',
+        target: '_blank',
+      },
+    ],
+  })
+
   return (
-    <>
-      <h1>Hello, you are currently at {pathname}</h1>
-    </>
+    <Stack horizontal className='h-100 w-100'>
+      <Stack.Item
+        grow={1}
+        align='stretch'
+        className='px-2 py-3'
+        styles={{ root: { color: '#000', background: '#FFF' } }}
+      >
+        <Stack>
+          <Stack.Item align='stretch'>
+            <Stack horizontal>
+              <Stack.Item align='stretch'>
+                <Text variant={'xLarge'} className='px-3'>
+                  {pathname}
+                </Text>
+              </Stack.Item>
+
+              <Stack.Item align='stretch'>
+                <IconButton
+                  iconProps={{
+                    iconName: 'More',
+                    styles: { root: { color: '#000', fontSize: '16px' } },
+                  }}
+                  title='CollapseMenu'
+                  ariaLabel='CollapseMenu'
+                  disabled={false}
+                  borderless={true}
+                  menuProps={menuProps}
+                />
+              </Stack.Item>
+            </Stack>
+          </Stack.Item>
+
+          <Stack.Item align='stretch'>
+            <Text variant={'small'} className='px-3'>
+              Sunday, September 26th, 2020
+            </Text>
+          </Stack.Item>
+
+          <Stack.Item align='stretch' className='py-3'>
+            Collection goes here
+          </Stack.Item>
+        </Stack>
+      </Stack.Item>
+      <Stack.Item
+        align='stretch'
+        grow={0}
+        className='ms-bgColor-gray10'
+        styles={{
+          root: {
+            background: 'red',
+            width: '360px',
+            borderColor: 'lightgray',
+            borderWidth: '1px',
+            borderStyle: 'solid',
+          },
+        }}
+      >
+        <div>This is the right nav</div>
+      </Stack.Item>
+    </Stack>
   )
 }
 
@@ -183,12 +272,7 @@ export const Reminder = () => {
 
         <Stack.Item grow={1} align='auto' styles={bodyStyles}>
           <CollectionNav />
-
-          <Stack.Item
-            align='stretch'
-            grow={3}
-            className='ms-depth-4 ms-fontWeight-bold ms-fontColor-alert p-3 h-100'
-          >
+          <Stack.Item align='stretch' grow={3} className='ms-depth-4 h-100'>
             <TaskContainer pathname={currentRoute.pathname} />
           </Stack.Item>
         </Stack.Item>
