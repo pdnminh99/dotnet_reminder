@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { PrimaryButton } from '@fluentui/react'
 
-
 export function Counter() {
 
   const [count, setCount] = useState(0)
