@@ -1,4 +1,12 @@
-import { FocusZone, FocusZoneDirection, Icon, IconButton, List, Stack, Text } from '@fluentui/react'
+import {
+  FocusZone,
+  FocusZoneDirection,
+  Icon,
+  IconButton,
+  List,
+  Stack,
+  Text,
+} from '@fluentui/react'
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import './Reminder.css'
@@ -47,7 +55,7 @@ const OnRenderCollection = ({ name, icon, url, color, isActive }) => {
   }
   if (isActive) {
     if (color !== undefined) textStyle.root.color = color
-  } else textStyle.root.color = '#000'
+  } else textStyle.root.color = '#34373d'
 
   return (
     <div className={style}>

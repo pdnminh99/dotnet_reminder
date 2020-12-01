@@ -4,9 +4,16 @@ import {
   DefaultPalette,
   Text,
   DefaultButton,
+  DetailsList,
+  CheckboxVisibility,
+  DetailsListLayoutMode,
   Panel,
   Icon,
   FocusZone,
+  SelectionZone,
+  SelectionMode,
+  GroupedList,
+  DetailsRow,
 } from '@fluentui/react'
 import './Reminder.css'
 import { useLocation } from 'react-router-dom'
@@ -72,6 +79,7 @@ export const Reminder = () => {
   return (
     <>
       <Stack styles={{ root: { height: '100%' } }}>
+        {/* Rendering topnav */}
         <Stack.Item
           align='auto'
           grow={0}
@@ -81,13 +89,18 @@ export const Reminder = () => {
           <TopNav onCollapsedClick={onCollapsedClick} />
         </Stack.Item>
 
+        {/* Rendering left nav (or collections list)*/}
         <Stack.Item grow={1} align='auto' styles={bodyStyles}>
-          <CollectionNav standardCollections={standardCollections} customCollections={customCollections} />
+          <CollectionNav
+            standardCollections={standardCollections}
+            customCollections={customCollections}
+          />
           <Stack.Item align='stretch' grow={3} className='ms-depth-4 h-100'>
             <TaskContainer pathname={currentRoute.pathname} />
           </Stack.Item>
         </Stack.Item>
 
+        {/* Right panel */}
         <Panel
           headerText='Sample panel'
           isOpen={!collapsed}
@@ -102,11 +115,11 @@ export const Reminder = () => {
 }
 
 const TaskContainer = ({ pathname }) => {
-
   const [isDetailActive, setDetailActive] = useState(false)
 
   return (
     <Stack horizontal className='h-100 w-100'>
+      {/* Tasks list display */}
       <Stack.Item
         grow={1}
         align='stretch'
@@ -115,7 +128,10 @@ const TaskContainer = ({ pathname }) => {
       >
         <Stack>
           <Stack.Item align='stretch'>
-            <TaskHeader pathname={pathname} onDetailPanelToggle={() => setDetailActive(!isDetailActive)} />
+            <TaskHeader
+              pathname={pathname}
+              onDetailPanelToggle={() => setDetailActive(!isDetailActive)}
+            />
           </Stack.Item>
 
           <Stack.Item align='stretch'>
@@ -130,33 +146,46 @@ const TaskContainer = ({ pathname }) => {
         </Stack>
       </Stack.Item>
 
-      {isDetailActive && <Stack.Item
-        align='stretch'
-        grow={0}
-        className='ms-bgColor-gray10'
-        styles={taskDetailStyles}
-      >
-        <TaskDetail />
-      </Stack.Item>}
+      {/* Task detail with editing control */}
+      {isDetailActive && (
+        <Stack.Item
+          align='stretch'
+          grow={0}
+          className='ms-bgColor-gray10'
+          styles={taskDetailStyles}
+        >
+          <TaskDetail />
+        </Stack.Item>
+      )}
     </Stack>
   )
 }
 
 const TasksList = () => {
-  return <Stack>
-    <Stack.Item align={'stretch'} className={'px-3'} styles={{ root: { height: '50px' } }}>
-      <TaskInsertField />
-    </Stack.Item>
+  return (
+    <Stack>
+      <Stack.Item align={'stretch'} styles={{ root: { height: '50px' } }}>
+        <TaskInsertField />
+      </Stack.Item>
 
-    <Stack.Item align={'stretch'}>
+      <Stack.Item align={'stretch'}>
+        <InProgressTasksList />
 
-    </Stack.Item>
-  </Stack>
+        <CompletedTasksList />
+      </Stack.Item>
+    </Stack>
+  )
 }
 
 const TaskInsertField = () => {
   const [isFocus, setIsFocus] = useState(false)
-  const { value, setValue, handleOnChange, setCancelActive, isCancelActive } = useText('')
+  const {
+    value,
+    setValue,
+    handleOnChange,
+    setCancelActive,
+    isCancelActive,
+  } = useText('')
 
   function onInputLoseFocus() {
     setValue('')
@@ -168,28 +197,91 @@ const TaskInsertField = () => {
     setIsFocus(true)
   }
 
-  return <FocusZone className={`w-100 h-100 ${isFocus ? 'border-b-azure' : 'border-b-gray'}`}
-                    onFocus={handleOnFocus}
-                    onBlur={onInputLoseFocus}>
-    <Stack horizontal className={'h-100 w-100'}>
-      <Stack.Item grow={0} align={'center'} className={'px-2'}>
-        <Icon iconName="Add" styles={{ root: { color: '#0078D7', fontSize: '16px' } }} />
-      </Stack.Item>
+  return (
+    <FocusZone
+      className={`w-100 h-100 ${isFocus ? 'border-b-azure' : 'border-b-gray'}`}
+      onFocus={handleOnFocus}
+      onBlur={onInputLoseFocus}
+    >
+      <Stack horizontal className={'h-100 w-100'}>
+        <Stack.Item grow={0} align={'center'} className={'px-3'}>
+          <Icon
+            iconName='Add'
+            styles={{ root: { color: '#0078D7', fontSize: '16px' } }}
+          />
+        </Stack.Item>
 
-      <Stack.Item grow={1} align={'stretch'} styles={{ root: { paddingRight: '5px' } }}>
-        <input
-          type='text'
-          style={{ border: 'none' }}
-          className='w-100 h-100 px-2'
-          placeholder={'Add a task'}
-          onChange={handleOnChange}
-          value={value}
+        <Stack.Item
+          grow={1}
+          align={'stretch'}
+          styles={{ root: { paddingRight: '8px' } }}
+        >
+          <input
+            type='text'
+            style={{ border: 'none', fontSize: '14px', paddingLeft: '12px' }}
+            className='w-100 h-100'
+            placeholder={'Add a task'}
+            onChange={handleOnChange}
+            value={value}
+          />
+        </Stack.Item>
+
+        {isCancelActive && (
+          <Stack.Item grow={0} align={'center'}>
+            <DefaultButton
+              text={'Add'}
+              styles={{ root: { border: 'none', color: '#0078D7' } }}
+            />
+          </Stack.Item>
+        )}
+      </Stack>
+    </FocusZone>
+  )
+}
+
+const InProgressTasksList = () => {
+  return (
+    <DetailsList
+      isHeaderVisible={false}
+      checkboxVisibility={CheckboxVisibility.always}
+      layoutMode={DetailsListLayoutMode.fixedColumns}
+      onRenderItemColumn={(item, index) => {
+        return (
+          <Stack
+            horizontal
+            align={'center'}
+            styles={{ root: { height: '100%', fontSize: '14px' } }}
+          >
+            <span>{item.value}</span>
+          </Stack>
+        )
+      }}
+      onRenderRow={props => (
+        <DetailsRow
+          className='cursor-pointer'
+          styles={{
+            root: {
+              width: '100%',
+              borderBottomColor: 'lightgray',
+              borderBottomWidth: '1px',
+              borderBottomStyle: 'solid',
+            },
+          }}
+          {...props}
         />
-      </Stack.Item>
+      )}
+      items={[{ value: 'Do homework' }, { value: 'Do chores' }]}
+    />
+  )
+}
 
-      {isCancelActive && <Stack.Item grow={0} align={'center'}>
-        <DefaultButton text={'Add'} styles={{ root: { border: 'none', color: '#0078D7' } }} />
-      </Stack.Item>}
-    </Stack>
-  </FocusZone>
+const CompletedTasksList = () => {
+  return (
+    <GroupedList
+      items={[{ value: 'Do homework' }, { value: 'Do chores' }]}
+      selectionMode={SelectionMode.none}
+      groups={[{ name: 'Completed', isCollapsed: false }]}
+      CheckboxVisibility={CheckboxVisibility.hidden}
+    />
+  )
 }
