@@ -34,3 +34,18 @@ export const createCollection = async name => {
 
   return undefined
 }
+
+export const retrieveTasks = async taskId => {
+  const token = await authService.getAccessToken()
+
+  if (!token) {
+    console.error('Cannot send GET request without being authenticated.')
+  } else {
+    const response = await fetch(`/api/v1/Task/${taskId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (response.status === 200) return await response.json()
+  }
+
+  return undefined
+}

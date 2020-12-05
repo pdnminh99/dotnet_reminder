@@ -11,8 +11,8 @@ import {
 } from '@fluentui/react'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import './Reminder.css'
-import { InsertField } from './InsertField'
+import '../components/Reminder.css'
+import { InsertField } from '../components/InsertField'
 import { isNotUndefined, isUndefined } from '../utils'
 import { standardCollections } from '../dummy_data'
 import { matchPath } from 'react-router'
@@ -38,7 +38,12 @@ export const CollectionNav = ({ pathname }) => {
       let collections = await retrieveCollections()
 
       if (isNotUndefined(collections)) {
-        setCollections(collections.map(preprocessCollection))
+        setCollections(
+          collections.map(preprocessCollection).map(c => ({
+            ...c,
+            isActive: !!matchPath(pathname, c.url),
+          })),
+        )
       }
     }
 

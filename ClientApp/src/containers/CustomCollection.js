@@ -1,13 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Stack, Text } from '@fluentui/react'
 import '../components/Reminder.css'
 import { TaskDetail } from '../components/TaskDetail'
 import { CollectionHeader } from '../components/CollectionHeader'
-import { sampleCollections } from '../dummy_data'
 import { InsertField } from '../components/InsertField'
 import { TasksContainer } from '../components/TasksContainer'
-import { isUndefined, fromEpochToLocalDatetime } from '../utils'
-import { useLocation } from 'react-router-dom'
+import { fromEpochToLocalDatetime } from '../utils'
+import { useParams } from 'react-router-dom'
+import { retrieveTasks } from '../operations'
 
 const taskDetailStyles = {
   root: {
@@ -21,20 +21,43 @@ const taskDetailStyles = {
 }
 
 export const CustomCollection = () => {
-  const currentRoute = useLocation()
+  const { cid } = useParams()
 
   const [isDetailActive, setDetailActive] = useState(false)
   const [selectedTask, setSelectedTask] = useState(undefined)
 
-  // useEffect(() => {
-  //   console.log(pathname)
-  // }, [pathname])
+  const [name, setName] = useState('')
+  const [creationDate, setCreationDate] = useState(0)
+  const [incompletedTasks, setIncompletedTasks] = useState([])
+  const [completedTasks, setCompletedTasks] = useState([])
 
-  let collection = sampleCollections[currentRoute.pathname]
+  useEffect(() => {
+    async function syncTasks() {
+      const fetchResults = await retrieveTasks(cid)
 
-  if (isUndefined(collection)) return <h1 style={{ color: 'red' }}>Error</h1>
+      if (!fetchResults) {
+        console.error(`Error fetching collection data.`)
+      } else {
+        let {
+          name,
+          creationDate,
+          incompletedTasks,
+          completedTasks,
+        } = fetchResults
 
-  collection.completedTasks.forEach(task => {
+        setName(name)
+        setCreationDate(creationDate)
+        setIncompletedTasks(incompletedTasks || [])
+        setCompletedTasks(completedTasks || [])
+      }
+    }
+
+    syncTasks()
+  }, [cid])
+
+  // let collection = sampleCollections[pathname]
+
+  completedTasks.forEach(task => {
     task.onSelect = () => {
       console.log(`Task id ${task.taskId}; content: ${task.content} on select.`)
       setDetailActive(true)
@@ -47,7 +70,7 @@ export const CustomCollection = () => {
       console.log(`Task id ${task.taskId}; content: ${task.content} on flag.`)
   })
 
-  collection.incompletedTasks.forEach(task => {
+  incompletedTasks.forEach(task => {
     task.onSelect = () => {
       console.log(`Task id ${task.taskId}; content: ${task.content} on select.`)
       setDetailActive(true)
@@ -59,10 +82,11 @@ export const CustomCollection = () => {
       console.log(`Task id ${task.taskId}; content: ${task.content} on flag.`)
   })
 
-  const tasksGroup = [
-    { items: collection.completedTasks },
-    { name: 'Completed tasks', items: collection.incompletedTasks },
-  ]
+  const tasksGroup = [{ items: incompletedTasks }]
+
+  if (completedTasks.length > 0) {
+    tasksGroup.push({ name: 'Completed tasks', items: completedTasks })
+  }
 
   return (
     <Stack horizontal className='h-100 w-100'>
@@ -75,12 +99,12 @@ export const CustomCollection = () => {
       >
         <Stack>
           <Stack.Item align='stretch'>
-            <CollectionHeader name={collection.name} />
+            <CollectionHeader name={name} />
           </Stack.Item>
 
           <Stack.Item align='stretch'>
             <Text variant={'small'} className='px-3'>
-              {fromEpochToLocalDatetime(collection.creationDate).toUTCString()}
+              {fromEpochToLocalDatetime(creationDate).toUTCString()}
             </Text>
           </Stack.Item>
 
