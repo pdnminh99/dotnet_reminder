@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Stack, DefaultPalette, Text, Panel, Checkbox } from '@fluentui/react'
+import { Stack, DefaultPalette, Text, Panel } from '@fluentui/react'
 import './Reminder.css'
 import { useLocation } from 'react-router-dom'
 import { matchPath } from 'react-router'
@@ -8,11 +8,14 @@ import { CollectionNav } from './CollectionNav'
 import { TaskDetail } from './TaskDetail'
 import { TopNav } from './TopNav'
 import { CollectionHeader } from './CollectionHeader'
-import { customCollections, standardCollections } from './dummy_data'
+import {
+  customCollections,
+  standardCollections,
+  sampleCollections,
+} from '../dummy_data'
 import { InsertField } from './InsertField'
 import { TasksContainer } from './TasksContainer'
-import { isUndefined, fromEpochToLocalDatetime } from './utils'
-import { sampleCollections } from './dummy_data'
+import { isUndefined, fromEpochToLocalDatetime } from '../utils'
 
 const bodyStyles = {
   root: {

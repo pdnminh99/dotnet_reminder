@@ -11,7 +11,7 @@ import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import './Reminder.css'
 import { InsertField } from './InsertField'
-import { isNotUndefined } from './utils'
+import { isNotUndefined } from '../utils'
 
 export const CollectionNav = ({ standardCollections, customCollections }) => {
   const [collapsed, setCollapsed] = useState(false)

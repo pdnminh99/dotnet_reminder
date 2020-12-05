@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { invokeOrElse, isNotUndefined, isUndefined } from './utils'
+import { invokeOrElse, isNotUndefined, isUndefined } from '../utils'
 import { Stack, Checkbox, Icon } from '@fluentui/react'
 import './Reminder.css'
 

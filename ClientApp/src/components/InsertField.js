@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Stack, DefaultButton, Icon, FocusZone } from '@fluentui/react'
 import './Reminder.css'
-import { useText } from './custom_hooks'
+import { useText } from '../custom_hooks'
 
 export const InsertField = ({ isTaskInsertField }) => {
   if (isTaskInsertField === undefined) isTaskInsertField = true

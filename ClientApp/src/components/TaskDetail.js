@@ -12,7 +12,7 @@ import {
   DialogType,
 } from '@fluentui/react'
 import React, { useState } from 'react'
-import { invokeOrElse } from './utils'
+import { invokeOrElse } from '../utils'
 
 export const TaskDetail = ({ selectedTask, onCancel, onDelete }) => {
   const [dialogHidden, setDialogHidden] = useState(true)
