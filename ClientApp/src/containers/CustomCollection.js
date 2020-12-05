@@ -1,25 +1,13 @@
 import React, { useState } from 'react'
-import { Stack, DefaultPalette, Text, Panel } from '@fluentui/react'
-import './Reminder.css'
-import { useLocation } from 'react-router-dom'
-import { CollectionNav } from './CollectionNav'
-import { TaskDetail } from './TaskDetail'
-import { TopNav } from './TopNav'
-import { CollectionHeader } from './CollectionHeader'
+import { Stack, Text } from '@fluentui/react'
+import '../components/Reminder.css'
+import { TaskDetail } from '../components/TaskDetail'
+import { CollectionHeader } from '../components/CollectionHeader'
 import { sampleCollections } from '../dummy_data'
-import { InsertField } from './InsertField'
-import { TasksContainer } from './TasksContainer'
+import { InsertField } from '../components/InsertField'
+import { TasksContainer } from '../components/TasksContainer'
 import { isUndefined, fromEpochToLocalDatetime } from '../utils'
-
-const bodyStyles = {
-  root: {
-    alignItems: 'center',
-    color: DefaultPalette.white,
-    display: 'flex',
-    justifyContent: 'center',
-    overflow: 'hidden',
-  },
-}
+import { useLocation } from 'react-router-dom'
 
 const taskDetailStyles = {
   root: {
@@ -32,53 +20,9 @@ const taskDetailStyles = {
   },
 }
 
-// Application root
-export const Reminder = () => {
+export const CustomCollection = () => {
   const currentRoute = useLocation()
 
-  const [collapsed, setCollapsed] = useState(true)
-
-  const onCollapsedClick = () => setCollapsed(!collapsed)
-
-  return (
-    <>
-      <Stack styles={{ root: { height: '100%' } }}>
-        {/* Rendering topnav */}
-        <Stack.Item
-          align='auto'
-          grow={0}
-          styles={{ root: { height: '50px', color: '#FFF' } }}
-          className='bg-azure'
-        >
-          <TopNav onCollapsedClick={onCollapsedClick} />
-        </Stack.Item>
-
-        {/* Rendering body */}
-        <Stack.Item grow={1} align='auto' styles={bodyStyles}>
-          {/* Rendering left nav (or collections list)*/}
-          <CollectionNav pathname={currentRoute.pathname} />
-
-          {/* Rendering main content */}
-          <Stack.Item align='stretch' grow={3} className='ms-depth-4 h-100'>
-            <Content pathname={currentRoute.pathname} />
-          </Stack.Item>
-        </Stack.Item>
-
-        {/* Right panel */}
-        <Panel
-          headerText='Sample panel'
-          isOpen={!collapsed}
-          onDismiss={onCollapsedClick}
-          closeButtonAriaLabel='Close'
-        >
-          <p>Content goes here.</p>
-        </Panel>
-      </Stack>
-    </>
-  )
-}
-
-const Content = ({ pathname }) => {
   const [isDetailActive, setDetailActive] = useState(false)
   const [selectedTask, setSelectedTask] = useState(undefined)
 
@@ -86,7 +30,7 @@ const Content = ({ pathname }) => {
   //   console.log(pathname)
   // }, [pathname])
 
-  let collection = sampleCollections[pathname]
+  let collection = sampleCollections[currentRoute.pathname]
 
   if (isUndefined(collection)) return <h1 style={{ color: 'red' }}>Error</h1>
 
