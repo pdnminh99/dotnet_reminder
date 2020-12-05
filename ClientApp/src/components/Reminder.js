@@ -1,18 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Stack, DefaultPalette, Text, Panel } from '@fluentui/react'
 import './Reminder.css'
 import { useLocation } from 'react-router-dom'
-import { matchPath } from 'react-router'
-import authService from './api-authorization/AuthorizeService'
 import { CollectionNav } from './CollectionNav'
 import { TaskDetail } from './TaskDetail'
 import { TopNav } from './TopNav'
 import { CollectionHeader } from './CollectionHeader'
-import {
-  customCollections,
-  standardCollections,
-  sampleCollections,
-} from '../dummy_data'
+import { sampleCollections } from '../dummy_data'
 import { InsertField } from './InsertField'
 import { TasksContainer } from './TasksContainer'
 import { isUndefined, fromEpochToLocalDatetime } from '../utils'
@@ -38,32 +32,13 @@ const taskDetailStyles = {
   },
 }
 
+// Application root
 export const Reminder = () => {
   const currentRoute = useLocation()
 
   const [collapsed, setCollapsed] = useState(true)
 
-  function onCollapsedClick() {
-    setCollapsed(!collapsed)
-  }
-
-  for (let item of standardCollections)
-    item.isActive = !!matchPath(currentRoute.pathname, item.url)
-
-  async function retrieveCollections() {
-    const token = await authService.getAccessToken()
-    const response = await fetch('/api/v1/Collection?includeTasks=true', {
-      headers: !token ? {} : { Authorization: `Bearer ${token}` },
-    })
-    if (response.status === 200) return await response.json()
-    return undefined
-  }
-
-  useEffect(() => {
-    console.log('Use effect run')
-    // let collections = await retrieveCollections()
-    // if (collections !== undefined) setCollections(collections)
-  }, [])
+  const onCollapsedClick = () => setCollapsed(!collapsed)
 
   return (
     <>
@@ -81,10 +56,7 @@ export const Reminder = () => {
         {/* Rendering body */}
         <Stack.Item grow={1} align='auto' styles={bodyStyles}>
           {/* Rendering left nav (or collections list)*/}
-          <CollectionNav
-            standardCollections={standardCollections}
-            customCollections={customCollections}
-          />
+          <CollectionNav pathname={currentRoute.pathname} />
 
           {/* Rendering main content */}
           <Stack.Item align='stretch' grow={3} className='ms-depth-4 h-100'>
@@ -109,6 +81,11 @@ export const Reminder = () => {
 const Content = ({ pathname }) => {
   const [isDetailActive, setDetailActive] = useState(false)
   const [selectedTask, setSelectedTask] = useState(undefined)
+
+  // useEffect(() => {
+  //   console.log(pathname)
+  // }, [pathname])
+
   let collection = sampleCollections[pathname]
 
   if (isUndefined(collection)) return <h1 style={{ color: 'red' }}>Error</h1>

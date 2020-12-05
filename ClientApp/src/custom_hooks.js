@@ -18,5 +18,12 @@ export const useText = initValue => {
     setCancelActive(false)
   }
 
-  return { value, setValue, handleOnChange, isCancelActive, setCancelActive, handleCancelClick }
+  return {
+    value,
+    setValue,
+    handleOnChange,
+    isCancelActive,
+    setCancelActive,
+    handleCancelClick,
+  }
 }

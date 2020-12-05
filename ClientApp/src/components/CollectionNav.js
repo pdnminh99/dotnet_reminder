@@ -7,18 +7,66 @@ import {
   Stack,
   Text,
 } from '@fluentui/react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import './Reminder.css'
 import { InsertField } from './InsertField'
 import { isNotUndefined } from '../utils'
+import { standardCollections } from '../dummy_data'
+import { matchPath } from 'react-router'
+import authService from './api-authorization/AuthorizeService'
 
-export const CollectionNav = ({ standardCollections, customCollections }) => {
+// These functions are not related to hooks. So I hosted these as module global functions.
+const retrieveCollections = async () => {
+  const token = await authService.getAccessToken()
+  const response = await fetch('/api/v1/Collection', {
+    headers: !token ? {} : { Authorization: `Bearer ${token}` },
+  })
+  if (response.status == 200) return await response.json()
+  return undefined
+}
+
+const preprocessCollection = ({ collectionId, name }) => ({
+  name,
+  url: `/collection/${collectionId}`,
+  icon: 'BulletedList2',
+  color: '#0078d7',
+  defaultColor: '#0078d7',
+})
+
+export const CollectionNav = ({ pathname }) => {
   const [collapsed, setCollapsed] = useState(false)
 
-  function onCollapsedClick() {
-    setCollapsed(!collapsed)
+  const [defaults, setDefaults] = useState(standardCollections)
+
+  const [collections, setCollections] = useState([])
+
+  useEffect(async () => {
+    let collections = await retrieveCollections()
+
+    if (isNotUndefined(collections)) {
+      setCollections(collections.map(preprocessCollection))
+    }
+  }, [])
+
+  const lookAndSetActiveCollection = () => {
+    setDefaults(
+      defaults.map(c => ({
+        ...c,
+        isActive: !!matchPath(pathname, c.url),
+      })),
+    )
+    setCollections(
+      collections.map(c => ({
+        ...c,
+        isActive: !!matchPath(pathname, c.url),
+      })),
+    )
   }
+
+  useEffect(lookAndSetActiveCollection, [pathname])
+
+  const onCollapsedClick = () => setCollapsed(!collapsed)
 
   return (
     <Stack.Item
@@ -42,15 +90,18 @@ export const CollectionNav = ({ standardCollections, customCollections }) => {
           {/* Default collections */}
           <Stack.Item>
             <List
-              items={standardCollections}
-              onRenderCell={OnRenderCollection}
+              items={defaults}
+              onRenderCell={props => OnRenderCollection(props)}
               className='py-3'
             />
           </Stack.Item>
 
           {/* User created collection */}
           <Stack.Item>
-            <List items={customCollections} onRenderCell={OnRenderCollection} />
+            <List
+              items={collections}
+              onRenderCell={props => OnRenderCollection(props)}
+            />
           </Stack.Item>
 
           <Stack.Item
@@ -70,16 +121,12 @@ const OnRenderCollection = ({
   name,
   icon,
   url,
-
   // active color
   color,
-
   // default color when not active
   defaultColor,
   isActive,
 }) => {
-  icon = icon || 'BulletedList2'
-
   let style = 'px-3 cursor-pointer '
   style += isActive ? 'ms-bgColor-gray30' : 'ms-bgColor-white--hover'
 
