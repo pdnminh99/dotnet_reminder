@@ -86,8 +86,8 @@ const OnRenderCollection = ({
     root: { fontSize: '16px', fontWeight: isActive ? '500' : '350' },
   }
   if (isActive) {
-    if (color !== undefined) textStyle.root.color = color
-  } else if (defaultColor !== undefined) textStyle.root.color = defaultColor
+    if (isNotUndefined(defaultColor)) textStyle.root.color = color
+  } else if (isNotUndefined(defaultColor)) textStyle.root.color = defaultColor
   else textStyle.root.color = '#34373d'
 
   return (
