@@ -10,6 +10,7 @@ import {
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import './Reminder.css'
+import { InsertField } from './InsertField'
 
 export const CollectionNav = ({ standardCollections, customCollections }) => {
   const [collapsed, setCollapsed] = useState(false)
@@ -32,20 +33,51 @@ export const CollectionNav = ({ standardCollections, customCollections }) => {
       className='ms-bgColor-gray10 h-100 py-3'
     >
       <FocusZone direction={FocusZoneDirection.vertical}>
-        <CollapseButton onCollapsedClick={onCollapsedClick} />
-        <List
-          items={standardCollections}
-          onRenderCell={OnRenderCollection}
-          className='py-3'
-        />
-        <List items={customCollections} onRenderCell={OnRenderCollection} />
+        <Stack align={'stretch'}>
+          <Stack.Item>
+            <CollapseButton onCollapsedClick={onCollapsedClick} />
+          </Stack.Item>
+
+          {/* Default collections */}
+          <Stack.Item>
+            <List
+              items={standardCollections}
+              onRenderCell={OnRenderCollection}
+              className='py-3'
+            />
+          </Stack.Item>
+
+          {/* User created collection */}
+          <Stack.Item>
+            <List items={customCollections} onRenderCell={OnRenderCollection} />
+          </Stack.Item>
+
+          <Stack.Item
+            className='ms-bgColor-white--hover'
+            align={'stretch'}
+            styles={{ root: { height: '37px' } }}
+          >
+            <InsertField isTaskInsertField={false} />
+          </Stack.Item>
+        </Stack>
       </FocusZone>
     </Stack.Item>
   )
 }
 
-const OnRenderCollection = ({ name, icon, url, color, isActive }) => {
-  icon = icon || 'AllApps'
+const OnRenderCollection = ({
+  name,
+  icon,
+  url,
+
+  // active color
+  color,
+
+  // default color when not active
+  defaultColor,
+  isActive,
+}) => {
+  icon = icon || 'BulletedList2'
 
   let style = 'px-3 cursor-pointer '
   style += isActive ? 'ms-bgColor-gray30' : 'ms-bgColor-white--hover'
@@ -55,7 +87,8 @@ const OnRenderCollection = ({ name, icon, url, color, isActive }) => {
   }
   if (isActive) {
     if (color !== undefined) textStyle.root.color = color
-  } else textStyle.root.color = '#34373d'
+  } else if (defaultColor !== undefined) textStyle.root.color = defaultColor
+  else textStyle.root.color = '#34373d'
 
   return (
     <div className={style}>
@@ -70,7 +103,12 @@ const OnRenderCollection = ({ name, icon, url, color, isActive }) => {
           </Stack.Item>
 
           <Stack.Item horizontal align='center'>
-            <Text nowrap variant={'medium'} styles={textStyle}>
+            <Text
+              nowrap
+              variant={'medium'}
+              styles={textStyle}
+              className='font-sans'
+            >
               {name}
             </Text>
           </Stack.Item>

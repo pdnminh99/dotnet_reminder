@@ -1,20 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import {
-  Stack,
-  DefaultPalette,
-  Text,
-  DefaultButton,
-  DetailsList,
-  CheckboxVisibility,
-  DetailsListLayoutMode,
-  Panel,
-  Icon,
-  FocusZone,
-  SelectionZone,
-  SelectionMode,
-  GroupedList,
-  DetailsRow,
-} from '@fluentui/react'
+import { Stack, DefaultPalette, Text, Panel, Checkbox } from '@fluentui/react'
 import './Reminder.css'
 import { useLocation } from 'react-router-dom'
 import { matchPath } from 'react-router'
@@ -24,7 +9,8 @@ import { TaskDetail } from './TaskDetail'
 import { TopNav } from './TopNav'
 import { TaskHeader } from './TaskHeader'
 import { customCollections, standardCollections } from './dummy_data'
-import { useText } from './custom_hooks'
+import { InsertField } from './InsertField'
+import { TasksContainer } from './TasksContainer'
 
 const bodyStyles = {
   root: {
@@ -89,14 +75,17 @@ export const Reminder = () => {
           <TopNav onCollapsedClick={onCollapsedClick} />
         </Stack.Item>
 
-        {/* Rendering left nav (or collections list)*/}
+        {/* Rendering body */}
         <Stack.Item grow={1} align='auto' styles={bodyStyles}>
+          {/* Rendering left nav (or collections list)*/}
           <CollectionNav
             standardCollections={standardCollections}
             customCollections={customCollections}
           />
+
+          {/* Rendering main content */}
           <Stack.Item align='stretch' grow={3} className='ms-depth-4 h-100'>
-            <TaskContainer pathname={currentRoute.pathname} />
+            <Content pathname={currentRoute.pathname} />
           </Stack.Item>
         </Stack.Item>
 
@@ -114,7 +103,7 @@ export const Reminder = () => {
   )
 }
 
-const TaskContainer = ({ pathname }) => {
+const Content = ({ pathname }) => {
   const [isDetailActive, setDetailActive] = useState(false)
 
   return (
@@ -165,123 +154,146 @@ const TasksList = () => {
   return (
     <Stack>
       <Stack.Item align={'stretch'} styles={{ root: { height: '50px' } }}>
-        <TaskInsertField />
+        <InsertField />
       </Stack.Item>
 
       <Stack.Item align={'stretch'}>
-        <InProgressTasksList />
+        {/* <InProgressTasksList /> */}
+        <TasksContainer
+          tasks={[
+            {
+              name: 'Do chores',
+              isChecked: true,
+              onCheck: () => console.log('Do chores checked'),
+              onSelect: () => console.log('On Select invoked'),
+            },
+            {
+              name: 'Do homework',
+              isChecked: false,
+            },
+          ]}
+        />
 
-        <CompletedTasksList />
+        {/* <ComplatedTasksList /> */}
+        <TasksContainer
+          groupName={'Completed Tasks'}
+          tasks={[
+            {
+              name: 'Do chores',
+              isChecked: true,
+              onCheck: () => console.log('Do chores checked'),
+              onSelect: () => console.log('On Select invoked'),
+            },
+            {
+              name: 'Do homework',
+              isChecked: true,
+            },
+          ]}
+        />
       </Stack.Item>
     </Stack>
   )
 }
 
-const TaskInsertField = () => {
-  const [isFocus, setIsFocus] = useState(false)
-  const {
-    value,
-    setValue,
-    handleOnChange,
-    setCancelActive,
-    isCancelActive,
-  } = useText('')
+// const InProgressTasksList = () => {
+//   return (
+//     <DetailsList
+//       isHeaderVisible={false}
+//       checkboxVisibility={CheckboxVisibility.always}
+//       layoutMode={DetailsListLayoutMode.fixedColumns}
+//       selectionMode={SelectionMode.single}
+//       enableUpdateAnimations={true}
+//       selection={{
+//         canSelectItem: (item, index) => {
+//           console.log(`CanSelectItem => Item: ${item}; index: ${index}`)
+//           return true
+//         },
+//       }}
+//       onRenderItemColumn={item => {
+//         return (
+//           <Stack
+//             horizontal
+//             align={'center'}
+//             styles={{ root: { height: '100%', fontSize: '14px' } }}
+//           >
+//             <span>{item.value}</span>
+//           </Stack>
+//         )
+//       }}
+//       onRenderRow={props => (
+//         <DetailsRow
+//           className='cursor-pointer'
+//           styles={{
+//             root: {
+//               width: '100%',
+//               borderBottomColor: 'lightgray',
+//               borderBottomWidth: '1px',
+//               borderBottomStyle: 'solid',
+//             },
+//           }}
+//           {...props}
+//         />
+//       )}
+//       items={[{ value: 'Do homework' }, { value: 'Do chores' }]}
+//     />
+//   )
+// }
 
-  function onInputLoseFocus() {
-    setValue('')
-    setCancelActive(false)
-    setIsFocus(false)
-  }
-
-  function handleOnFocus() {
-    setIsFocus(true)
-  }
-
-  return (
-    <FocusZone
-      className={`w-100 h-100 ${isFocus ? 'border-b-azure' : 'border-b-gray'}`}
-      onFocus={handleOnFocus}
-      onBlur={onInputLoseFocus}
-    >
-      <Stack horizontal className={'h-100 w-100'}>
-        <Stack.Item grow={0} align={'center'} className={'px-3'}>
-          <Icon
-            iconName='Add'
-            styles={{ root: { color: '#0078D7', fontSize: '16px' } }}
-          />
-        </Stack.Item>
-
-        <Stack.Item
-          grow={1}
-          align={'stretch'}
-          styles={{ root: { paddingRight: '8px' } }}
-        >
-          <input
-            type='text'
-            style={{ border: 'none', fontSize: '14px', paddingLeft: '12px' }}
-            className='w-100 h-100'
-            placeholder={'Add a task'}
-            onChange={handleOnChange}
-            value={value}
-          />
-        </Stack.Item>
-
-        {isCancelActive && (
-          <Stack.Item grow={0} align={'center'}>
-            <DefaultButton
-              text={'Add'}
-              styles={{ root: { border: 'none', color: '#0078D7' } }}
-            />
-          </Stack.Item>
-        )}
-      </Stack>
-    </FocusZone>
-  )
-}
-
-const InProgressTasksList = () => {
-  return (
-    <DetailsList
-      isHeaderVisible={false}
-      checkboxVisibility={CheckboxVisibility.always}
-      layoutMode={DetailsListLayoutMode.fixedColumns}
-      onRenderItemColumn={(item, index) => {
-        return (
-          <Stack
-            horizontal
-            align={'center'}
-            styles={{ root: { height: '100%', fontSize: '14px' } }}
-          >
-            <span>{item.value}</span>
-          </Stack>
-        )
-      }}
-      onRenderRow={props => (
-        <DetailsRow
-          className='cursor-pointer'
-          styles={{
-            root: {
-              width: '100%',
-              borderBottomColor: 'lightgray',
-              borderBottomWidth: '1px',
-              borderBottomStyle: 'solid',
-            },
-          }}
-          {...props}
-        />
-      )}
-      items={[{ value: 'Do homework' }, { value: 'Do chores' }]}
-    />
-  )
-}
-
-const CompletedTasksList = () => {
-  return (
-    <GroupedList
-      items={[{ value: 'Do homework' }, { value: 'Do chores' }]}
-      selectionMode={SelectionMode.none}
-      groups={[{ name: 'Completed', isCollapsed: false }]}
-      CheckboxVisibility={CheckboxVisibility.hidden}
-    />
-  )
-}
+// const CompletedTasksList = () => {
+//   return (
+//     <DetailsList
+//       isHeaderVisible={false}
+//       checkboxVisibility={CheckboxVisibility.always}
+//       layoutMode={DetailsListLayoutMode.fixedColumns}
+//       groups={[
+//         {
+//           key: 'groupred0',
+//           name: 'Completed tasks',
+//           startIndex: 0,
+//           count: 2,
+//           level: 0,
+//           checkboxVisibility: CheckboxVisibility.hidden,
+//         },
+//       ]}
+//       groupProps={{
+//         onRenderHeader: props => {
+//           return (
+//             <GroupHeader
+//               selectionMode={SelectionMode.none}
+//               checkboxVisibility={CheckboxVisibility.hidden}
+//               onRenderTitle={props => <div>{props.group.name}</div>}
+//               onRenderGroupHeaderCheckbox={() => <></>}
+//               {...props}
+//             />
+//           )
+//         },
+//       }}
+//       onRenderItemColumn={(item, index) => {
+//         return (
+//           <Stack
+//             horizontal
+//             align={'center'}
+//             styles={{ root: { height: '100%', fontSize: '14px' } }}
+//           >
+//             <span>{item.value}</span>
+//           </Stack>
+//         )
+//       }}
+//       onRenderRow={props => (
+//         <DetailsRow
+//           className='cursor-pointer'
+//           styles={{
+//             root: {
+//               width: '100%',
+//               borderBottomColor: 'lightgray',
+//               borderBottomWidth: '1px',
+//               borderBottomStyle: 'solid',
+//             },
+//           }}
+//           {...props}
+//         />
+//       )}
+//       items={[{ value: 'Do homework' }, { value: 'Do chores' }]}
+//     />
+//   )
+// }
