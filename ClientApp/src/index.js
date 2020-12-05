@@ -17,6 +17,7 @@ initializeIcons()
 const App = () => {
   return (
     <Switch>
+      {/* ApiAuthorizationPath should take preceding. Do not change these orders. */}
       <Route
         path={ApplicationPaths.ApiAuthorizationPrefix}
         component={ApiAuthorizationRoutes}

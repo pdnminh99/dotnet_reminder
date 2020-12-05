@@ -12,7 +12,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import '../components/Reminder.css'
-import { InsertField } from '../components/InsertField'
+import { InsertField } from '../components'
 import { isNotUndefined, isUndefined } from '../utils'
 import { standardCollections } from '../dummy_data'
 import { matchPath } from 'react-router'
