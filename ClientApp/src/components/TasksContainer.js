@@ -53,55 +53,51 @@ export const TasksContainer = ({ groupName, tasks }) => {
 }
 
 const TasksList = ({ tasks }) =>
-  tasks.map(({ name, isChecked, onSelect, onCheck, onFlag }, index) => (
-    <Stack.Item
-      key={index}
-      className={'cursor-pointer bg-gray-300--hover'}
-      styles={{
-        root: {
-          height: '50px',
-          borderBottomColor: 'lightgray',
-          borderBottomWidth: '1px',
-          borderBottomStyle: 'solid',
-        },
-      }}
-    >
-      <Stack
-        horizontal
-        verticalAlign={'center'}
-        styles={{ root: { height: '100%' } }}
+  tasks.map(
+    ({ content, isCompleted, isFlagged, onSelect, onCheck, onFlag }, index) => (
+      <Stack.Item
+        key={index}
+        className={'cursor-pointer bg-gray-300--hover'}
+        styles={{
+          root: {
+            height: '50px',
+            borderBottomColor: 'lightgray',
+            borderBottomWidth: '1px',
+            borderBottomStyle: 'solid',
+          },
+        }}
       >
-        <Stack.Item
-          grow={0}
-          onClick={() => invokeOrElse(onCheck)}
-          className={'px-3 pt-2'}
-        >
-          <Checkbox checked={isChecked} />
-        </Stack.Item>
-
-        <Stack.Item
-          grow={1}
+        <Stack
+          horizontal
           verticalAlign={'center'}
-          onClick={() => invokeOrElse(onSelect)}
+          styles={{ root: { height: '100%' } }}
         >
-          <Stack
-            horizontal
-            styles={{ root: { height: '100%', fontSize: '14px' } }}
-          >
-            <span>{name}</span>
-          </Stack>
-        </Stack.Item>
+          <Stack.Item grow={0} align={'center'} className={'px-3 pt-2'}>
+            <span onClick={() => invokeOrElse(onCheck)}>
+              <Checkbox checked={isCompleted} />
+            </span>
+          </Stack.Item>
 
-        <Stack.Item
-          grow={0}
-          onClick={() => invokeOrElse(onFlag)}
-          className={'px-3 pt-2'}
-        >
-          <Icon
-            iconName='Flag'
-            styles={{ root: { fontSize: '16px', fontWeight: '500' } }}
-          />
-        </Stack.Item>
-      </Stack>
-    </Stack.Item>
-  ))
+          <Stack.Item grow={1} align={'stretch'}>
+            <Stack
+              horizontal
+              verticalAlign={'center'}
+              onClick={() => invokeOrElse(onSelect)}
+              styles={{ root: { height: '100%', fontSize: '14px' } }}
+            >
+              <span>{content}</span>
+            </Stack>
+          </Stack.Item>
+
+          <Stack.Item grow={0} align={'center'} className={'px-3 pt-2'}>
+            <span onClick={() => invokeOrElse(onFlag)}>
+              <Icon
+                iconName='Flag'
+                styles={{ root: { fontSize: '16px', fontWeight: '500' } }}
+              />
+            </span>
+          </Stack.Item>
+        </Stack>
+      </Stack.Item>
+    ),
+  )

@@ -49,7 +49,7 @@ export const customCollections = [
   },
 ]
 
-export const tasks = [
+const tasks = [
   {
     taskId: 0,
     content: 'Do homework',
@@ -59,21 +59,21 @@ export const tasks = [
   },
   {
     taskId: 1,
-    content: 'Do homework',
+    content: 'Do chores',
     dueDate: 'yesterday',
     isFlagged: false,
     isCompleted: false,
   },
   {
     taskId: 2,
-    content: 'Do homework',
+    content: 'Do Math exams',
     dueDate: 'yesterday',
-    isFlagged: false,
+    isFlagged: true,
     isCompleted: true,
   },
   {
     taskId: 3,
-    content: 'Do homework',
+    content: 'Play League of Legends',
     dueDate: 'yesterday',
     isFlagged: false,
     isCompleted: true,
@@ -86,3 +86,24 @@ export const tasks = [
     isCompleted: false,
   },
 ]
+
+export const sampleCollections = {
+  '/today': {
+    name: 'Today',
+    creationDate: 1605733664182,
+    completedTasks: tasks,
+    incompletedTasks: tasks,
+  },
+  '/planned': {
+    name: 'Planned',
+    creationDate: 1605733664182,
+    completedTasks: tasks,
+    incompletedTasks: tasks,
+  },
+  '/flagged': {
+    name: 'Flags',
+    creationDate: 1605733664182,
+    completedTasks: tasks,
+    incompletedTasks: tasks,
+  },
+}

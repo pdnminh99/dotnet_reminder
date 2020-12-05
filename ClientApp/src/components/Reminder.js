@@ -7,10 +7,12 @@ import authService from './api-authorization/AuthorizeService'
 import { CollectionNav } from './CollectionNav'
 import { TaskDetail } from './TaskDetail'
 import { TopNav } from './TopNav'
-import { TaskHeader } from './TaskHeader'
+import { CollectionHeader } from './CollectionHeader'
 import { customCollections, standardCollections } from './dummy_data'
 import { InsertField } from './InsertField'
 import { TasksContainer } from './TasksContainer'
+import { isUndefined, fromEpochToLocalDatetime } from './utils'
+import { sampleCollections } from './dummy_data'
 
 const bodyStyles = {
   root: {
@@ -35,8 +37,6 @@ const taskDetailStyles = {
 
 export const Reminder = () => {
   const currentRoute = useLocation()
-
-  const [collections, setCollections] = useState([])
 
   const [collapsed, setCollapsed] = useState(true)
 
@@ -105,6 +105,40 @@ export const Reminder = () => {
 
 const Content = ({ pathname }) => {
   const [isDetailActive, setDetailActive] = useState(false)
+  const [selectedTask, setSelectedTask] = useState(undefined)
+  let collection = sampleCollections[pathname]
+
+  if (isUndefined(collection)) return <h1 style={{ color: 'red' }}>Error</h1>
+
+  collection.completedTasks.forEach(task => {
+    task.onSelect = () => {
+      console.log(`Task id ${task.taskId}; content: ${task.content} on select.`)
+      setDetailActive(true)
+      setSelectedTask(task)
+    }
+    task.onCheck = () => {
+      console.log(`Task id ${task.taskId}; content: ${task.content} on check.`)
+    }
+    task.onFlag = () =>
+      console.log(`Task id ${task.taskId}; content: ${task.content} on flag.`)
+  })
+
+  collection.incompletedTasks.forEach(task => {
+    task.onSelect = () => {
+      console.log(`Task id ${task.taskId}; content: ${task.content} on select.`)
+      setDetailActive(true)
+      setSelectedTask(task)
+    }
+    task.onCheck = () =>
+      console.log(`Task id ${task.taskId}; content: ${task.content} on check.`)
+    task.onFlag = () =>
+      console.log(`Task id ${task.taskId}; content: ${task.content} on flag.`)
+  })
+
+  const tasksGroup = [
+    { items: collection.completedTasks },
+    { name: 'Completed tasks', items: collection.incompletedTasks },
+  ]
 
   return (
     <Stack horizontal className='h-100 w-100'>
@@ -117,20 +151,17 @@ const Content = ({ pathname }) => {
       >
         <Stack>
           <Stack.Item align='stretch'>
-            <TaskHeader
-              pathname={pathname}
-              onDetailPanelToggle={() => setDetailActive(!isDetailActive)}
-            />
+            <CollectionHeader name={collection.name} />
           </Stack.Item>
 
           <Stack.Item align='stretch'>
             <Text variant={'small'} className='px-3'>
-              Sunday, September 26th, 2020
+              {fromEpochToLocalDatetime(collection.creationDate).toUTCString()}
             </Text>
           </Stack.Item>
 
           <Stack.Item align='stretch' className='py-3'>
-            <TasksList />
+            <TasksList tasksGroup={tasksGroup} />
           </Stack.Item>
         </Stack>
       </Stack.Item>
@@ -143,14 +174,17 @@ const Content = ({ pathname }) => {
           className='ms-bgColor-gray10'
           styles={taskDetailStyles}
         >
-          <TaskDetail />
+          <TaskDetail
+            selectedTask={selectedTask}
+            onCancel={() => setDetailActive(false)}
+          />
         </Stack.Item>
       )}
     </Stack>
   )
 }
 
-const TasksList = () => {
+const TasksList = ({ tasksGroup }) => {
   return (
     <Stack>
       <Stack.Item align={'stretch'} styles={{ root: { height: '50px' } }}>
@@ -158,38 +192,9 @@ const TasksList = () => {
       </Stack.Item>
 
       <Stack.Item align={'stretch'}>
-        {/* <InProgressTasksList /> */}
-        <TasksContainer
-          tasks={[
-            {
-              name: 'Do chores',
-              isChecked: true,
-              onCheck: () => console.log('Do chores checked'),
-              onSelect: () => console.log('On Select invoked'),
-            },
-            {
-              name: 'Do homework',
-              isChecked: false,
-            },
-          ]}
-        />
-
-        {/* <ComplatedTasksList /> */}
-        <TasksContainer
-          groupName={'Completed Tasks'}
-          tasks={[
-            {
-              name: 'Do chores',
-              isChecked: true,
-              onCheck: () => console.log('Do chores checked'),
-              onSelect: () => console.log('On Select invoked'),
-            },
-            {
-              name: 'Do homework',
-              isChecked: true,
-            },
-          ]}
-        />
+        {tasksGroup.map(({ name, items }, i) => {
+          return <TasksContainer key={i} groupName={name} tasks={items} />
+        })}
       </Stack.Item>
     </Stack>
   )
