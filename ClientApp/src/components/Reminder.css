@@ -1,0 +1,63 @@
+/* Layout */
+*, *:focus, *:hover {
+    outline: none;
+}
+
+/* Customizable */
+
+.underline-off {
+    text-decoration: none;
+}
+
+.bg-gray-300 {
+    background-color: lightgray;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.bg-azure {
+    background-color: #0078D7;
+}
+
+.bg-azure-light {
+    background-color: #c3ddf7;
+}
+
+.border-none {
+    border: none;
+    outline: none;
+}
+
+.rounded-sm {
+    border-radius: 0.125rem;
+}
+
+.rounded {
+    border-radius: 0.25rem;
+}
+
+.circle {
+    border-radius: 50%;
+}
+
+.bg-gray-300--hover:hover {
+    background-color: lightgray;
+}
+
+.bg-azure-dark--hover:hover {
+    background-color: #005a9e;
+}
+
+.border-b-azure {
+    border-bottom-color: #005a9e;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+}
+
+.border-b-gray {
+    border-bottom-color: lightgray;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+}
