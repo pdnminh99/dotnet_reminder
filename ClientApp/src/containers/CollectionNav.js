@@ -65,7 +65,9 @@ export const CollectionNav = ({ pathname }) => {
     )
   }
 
-  useEffect(lookAndSetActiveCollection, [pathname])
+  useEffect(() => {
+    lookAndSetActiveCollection()
+  }, [pathname])
 
   const onCollapsedClick = () => setCollapsed(!collapsed)
 

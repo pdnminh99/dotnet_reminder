@@ -14,15 +14,17 @@ const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href')
 
 initializeIcons()
 
-const App = () => (
-  <Switch>
-    <AuthorizeRoute path={'/'} component={Reminder} />
-    <Route
-      path={ApplicationPaths.ApiAuthorizationPrefix}
-      component={ApiAuthorizationRoutes}
-    />
-  </Switch>
-)
+const App = () => {
+  return (
+    <Switch>
+      <Route
+        path={ApplicationPaths.ApiAuthorizationPrefix}
+        component={ApiAuthorizationRoutes}
+      />
+      <AuthorizeRoute path={''} component={Reminder} />
+    </Switch>
+  )
+}
 
 ReactDOM.render(
   <BrowserRouter basename={baseUrl}>
