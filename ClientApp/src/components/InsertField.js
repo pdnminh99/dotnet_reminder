@@ -3,19 +3,21 @@ import { Stack, DefaultButton, Icon, FocusZone } from '@fluentui/react'
 import './Reminder.css'
 import { useText } from '../custom_hooks'
 
-export const InsertField = ({ isTaskInsertField }) => {
+export const InsertField = ({ isTaskInsertField, onInsert }) => {
   if (isTaskInsertField === undefined) isTaskInsertField = true
 
   const [isFocus, setIsFocus] = useState(false)
+
   const {
     value,
     setValue,
     handleOnChange,
     setCancelActive,
     isCancelActive,
-  } = useText('')
+  } = useText('', onInsert)
 
   function onInputLoseFocus() {
+    if (value.trim().length > 0) onInsert(value)
     setValue('')
     setCancelActive(false)
     setIsFocus(false)
@@ -60,7 +62,8 @@ export const InsertField = ({ isTaskInsertField }) => {
             }}
             className='w-100 h-100'
             placeholder={isTaskInsertField ? 'Add a task' : 'New list'}
-            onChange={handleOnChange}
+            onKeyUp={handleOnChange}
+            onChange={e => setValue(e.target.value)}
             value={value}
           />
         </Stack.Item>

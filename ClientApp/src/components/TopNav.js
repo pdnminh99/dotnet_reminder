@@ -1,8 +1,28 @@
-import { Icon, IconButton, Stack, Text, TextField } from '@fluentui/react'
-import React from 'react'
+import {
+  Icon,
+  IconButton,
+  Stack,
+  Text,
+  TextField,
+  Spinner,
+  SpinnerSize,
+} from '@fluentui/react'
+import React, { useState, useEffect } from 'react'
 import { useText } from '../custom_hooks'
+import authService from './api-authorization/AuthorizeService'
 
 export const TopNav = ({ onCollapsedClick }) => {
+  const [name, setName] = useState(undefined)
+
+  useEffect(() => {
+    async function syncUser() {
+      const { name } = await authService.getUser()
+      setName(name)
+    }
+
+    syncUser()
+  })
+
   return (
     <Stack horizontal className='h-100 w-100'>
       <Stack.Item
@@ -49,10 +69,14 @@ export const TopNav = ({ onCollapsedClick }) => {
           onClick={onCollapsedClick}
         >
           <Stack.Item align='center'>
-            <Text variant={'medium'}>hello@gmail.com</Text>
+            <Text variant={'medium'}>{name || 'Loading...'}</Text>
           </Stack.Item>
           <Stack.Item align='center'>
-            <Icon iconName={'PlayerSettings'} />
+            {!name ? (
+              <Spinner size={SpinnerSize.large} />
+            ) : (
+              <Icon iconName={'PlayerSettings'} />
+            )}
           </Stack.Item>
         </Stack>
       </Stack.Item>
@@ -63,6 +87,7 @@ export const TopNav = ({ onCollapsedClick }) => {
 const Searchbar = () => {
   const { value, handleOnChange, isCancelActive, handleCancelClick } = useText(
     '',
+    console.log,
   )
 
   return (

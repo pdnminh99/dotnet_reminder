@@ -22,33 +22,6 @@ export const standardCollections = [
   },
 ]
 
-export const customCollections = [
-  {
-    name: 'HSU',
-    url: '/collection/1',
-    color: '#0078d7',
-    defaultColor: '#0078d7',
-  },
-  {
-    name: 'Personal',
-    color: '#0078d7',
-    defaultColor: '#0078d7',
-    url: '/collection/2',
-  },
-  {
-    name: 'Shopping',
-    color: '#0078d7',
-    defaultColor: '#0078d7',
-    url: '/collection/3',
-  },
-  {
-    name: 'Study',
-    color: '#0078d7',
-    defaultColor: '#0078d7',
-    url: '/collection/4',
-  },
-]
-
 const tasks = [
   {
     taskId: 0,

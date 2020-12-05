@@ -168,7 +168,7 @@ const TasksList = ({ tasksGroup }) => {
   return (
     <Stack>
       <Stack.Item align={'stretch'} styles={{ root: { height: '50px' } }}>
-        <InsertField />
+        <InsertField onInsert={console.log} />
       </Stack.Item>
 
       <Stack.Item align={'stretch'}>

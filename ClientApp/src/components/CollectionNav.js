@@ -4,6 +4,8 @@ import {
   Icon,
   IconButton,
   List,
+  Spinner,
+  SpinnerSize,
   Stack,
   Text,
 } from '@fluentui/react'
@@ -11,24 +13,14 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import './Reminder.css'
 import { InsertField } from './InsertField'
-import { isNotUndefined } from '../utils'
+import { isNotUndefined, isUndefined } from '../utils'
 import { standardCollections } from '../dummy_data'
 import { matchPath } from 'react-router'
-import authService from './api-authorization/AuthorizeService'
-
-// These functions are not related to hooks. So I hosted these as module global functions.
-const retrieveCollections = async () => {
-  const token = await authService.getAccessToken()
-  const response = await fetch('/api/v1/Collection', {
-    headers: !token ? {} : { Authorization: `Bearer ${token}` },
-  })
-  if (response.status == 200) return await response.json()
-  return undefined
-}
+import { retrieveCollections, createCollection } from '../operations'
 
 const preprocessCollection = ({ collectionId, name }) => ({
   name,
-  url: `/collection/${collectionId}`,
+  url: isNotUndefined(collectionId) ? `/collection/${collectionId}` : undefined,
   icon: 'BulletedList2',
   color: '#0078d7',
   defaultColor: '#0078d7',
@@ -41,12 +33,16 @@ export const CollectionNav = ({ pathname }) => {
 
   const [collections, setCollections] = useState([])
 
-  useEffect(async () => {
-    let collections = await retrieveCollections()
+  useEffect(() => {
+    async function fetchCollections() {
+      let collections = await retrieveCollections()
 
-    if (isNotUndefined(collections)) {
-      setCollections(collections.map(preprocessCollection))
+      if (isNotUndefined(collections)) {
+        setCollections(collections.map(preprocessCollection))
+      }
     }
+
+    fetchCollections()
   }, [])
 
   const lookAndSetActiveCollection = () => {
@@ -68,6 +64,37 @@ export const CollectionNav = ({ pathname }) => {
 
   const onCollapsedClick = () => setCollapsed(!collapsed)
 
+  const onInsert = v => {
+    const creationEpoch = Date.now()
+
+    setCollections(current => [
+      ...current,
+      {
+        name: v,
+        color: '#0078d7',
+        defaultColor: '#0078d7',
+        icon: 'BulletedList2',
+        isSyncing: creationEpoch,
+        isActive: false,
+      },
+    ])
+
+    createCollection(v).then(newCollection => {
+      if (isUndefined(newCollection)) {
+        setCollections(collections.filter(c => c.isSyncing !== creationEpoch))
+      } else {
+        setCollections(current => {
+          return current.map(c => {
+            if (c.isSyncing !== creationEpoch) return c
+            c.url = `/collection/${newCollection.collectionId}`
+            c.isSyncing = undefined
+            return c
+          })
+        })
+      }
+    })
+  }
+
   return (
     <Stack.Item
       styles={{
@@ -83,33 +110,23 @@ export const CollectionNav = ({ pathname }) => {
     >
       <FocusZone direction={FocusZoneDirection.vertical}>
         <Stack align={'stretch'}>
-          <Stack.Item>
-            <CollapseButton onCollapsedClick={onCollapsedClick} />
-          </Stack.Item>
+          <CollapseButton onCollapsedClick={onCollapsedClick} />
 
           {/* Default collections */}
-          <Stack.Item>
-            <List
-              items={defaults}
-              onRenderCell={props => OnRenderCollection(props)}
-              className='py-3'
-            />
-          </Stack.Item>
+          <List
+            items={defaults}
+            onRenderCell={OnRenderCollection}
+            className='py-3'
+          />
 
           {/* User created collection */}
-          <Stack.Item>
-            <List
-              items={collections}
-              onRenderCell={props => OnRenderCollection(props)}
-            />
-          </Stack.Item>
+          <List items={collections} onRenderCell={OnRenderCollection} />
 
           <Stack.Item
             className='ms-bgColor-white--hover'
-            align={'stretch'}
             styles={{ root: { height: '37px' } }}
           >
-            <InsertField isTaskInsertField={false} />
+            <InsertField onInsert={onInsert} isTaskInsertField={false} />
           </Stack.Item>
         </Stack>
       </FocusZone>
@@ -126,6 +143,7 @@ const OnRenderCollection = ({
   // default color when not active
   defaultColor,
   isActive,
+  isSyncing,
 }) => {
   let style = 'px-3 cursor-pointer '
   style += isActive ? 'ms-bgColor-gray30' : 'ms-bgColor-white--hover'
@@ -138,30 +156,42 @@ const OnRenderCollection = ({
   } else if (isNotUndefined(defaultColor)) textStyle.root.color = defaultColor
   else textStyle.root.color = '#34373d'
 
+  const collectionDisplayContent = (
+    <Stack
+      horizontal
+      styles={{ root: { height: '36px' } }}
+      tokens={{ childrenGap: 15 }}
+    >
+      <Stack.Item horizontal align='center'>
+        {isNotUndefined(isSyncing) ? (
+          <Spinner size={SpinnerSize.small} />
+        ) : (
+          <Icon iconName={icon} styles={textStyle} />
+        )}
+      </Stack.Item>
+
+      <Stack.Item horizontal align='center'>
+        <Text
+          nowrap
+          variant={'medium'}
+          styles={textStyle}
+          className='font-sans'
+        >
+          {name}
+        </Text>
+      </Stack.Item>
+    </Stack>
+  )
+
   return (
     <div className={style}>
-      <Link to={url} style={{ textDecoration: 'none' }}>
-        <Stack
-          horizontal
-          styles={{ root: { height: '36px' } }}
-          tokens={{ childrenGap: 15 }}
-        >
-          <Stack.Item horizontal align='center'>
-            <Icon iconName={icon} styles={textStyle} />
-          </Stack.Item>
-
-          <Stack.Item horizontal align='center'>
-            <Text
-              nowrap
-              variant={'medium'}
-              styles={textStyle}
-              className='font-sans'
-            >
-              {name}
-            </Text>
-          </Stack.Item>
-        </Stack>
-      </Link>
+      {isNotUndefined(url) ? (
+        <Link to={url} style={{ textDecoration: 'none' }}>
+          {collectionDisplayContent}
+        </Link>
+      ) : (
+        <>{collectionDisplayContent}</>
+      )}
     </div>
   )
 }

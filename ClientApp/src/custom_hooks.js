@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export const useText = initValue => {
+export const useText = (initValue, onEnter) => {
   initValue = initValue || ''
 
   const [value, setValue] = useState(initValue)
@@ -8,8 +8,12 @@ export const useText = initValue => {
 
   function handleOnChange(evt) {
     const newValue = evt.target.value
-    if (evt.key === 'Enter') setValue('')
-    else setValue(newValue)
+    setValue(newValue)
+
+    if (evt.key === 'Enter') {
+      if (value.trim().length > 0) onEnter(value)
+      setValue('')
+    } else setValue(newValue)
     setCancelActive(newValue.length > 0)
   }
 
