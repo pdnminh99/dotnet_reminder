@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react'
 import { Stack, Text } from '@fluentui/react'
 import '../components/Reminder.css'
 import { CollectionHeader, InsertField, TaskDetail, TasksContainer } from '../components'
-import { fromEpochToLocalDatetime, isUndefined } from '../utils'
-import { useParams } from 'react-router-dom'
-import { retrieveTasks, updateCollection } from '../operations'
+import { fromEpochToLocalDatetime, isNotUndefined, isUndefined } from '../utils'
+import { useHistory, useParams } from 'react-router-dom'
+import { deleteCollection, retrieveTasks, updateCollection } from '../operations'
 import { TaskSortType } from '../enums'
 
 const taskDetailStyles = {
@@ -20,6 +20,8 @@ const taskDetailStyles = {
 
 export const CustomCollection = () => {
   const { cid } = useParams()
+
+  const history = useHistory()
 
   const [isDetailActive, setDetailActive] = useState(false)
   const [selectedTask, setSelectedTask] = useState(undefined)
@@ -88,6 +90,35 @@ export const CustomCollection = () => {
     return tasks
   }
 
+  const handleCollectionNameEdit = value => {
+    const oldName = name
+
+    setName(value)
+    setIsProcessing(true)
+
+    updateCollection(cid, value).then(result => {
+      if (isUndefined(result)) {
+        setName(oldName)
+      }
+      // TODO rerender collection nav
+    }).finally(_ => {
+      setIsProcessing(false)
+    })
+  }
+
+  const handleCollectionDelete = _ => {
+    setIsProcessing(true)
+
+    deleteCollection(cid).then(result => {
+      if (isNotUndefined(result)) {
+        history.push('/today')
+        // TODO rerender collection nav
+      }
+    }).finally(_ => {
+      setIsProcessing(false)
+    })
+  }
+
   const tasksGroup = [{ items: rearrangeTasks(incompletedTasks) }]
 
   if (completedTasks.length > 0) {
@@ -108,24 +139,8 @@ export const CustomCollection = () => {
             <CollectionHeader
               name={name}
               isLoading={isProcessing}
-              onEdit={value => {
-                const oldName = name
-
-                setName(value)
-                setIsProcessing(true)
-
-                updateCollection(cid, value).then(result => {
-                  if (isUndefined(result)) {
-                    setName(oldName)
-                  }
-                }).finally(_ => {
-                  setIsProcessing(false)
-                })
-              }}
-              onDelete={_ => {
-                // TODO implement this
-                console.log('Delete invoked')
-              }}
+              onEdit={handleCollectionNameEdit}
+              onDelete={handleCollectionDelete}
               onSort={newSortType => {
                 if (newSortType !== sortType) setSortType(newSortType)
               }}
