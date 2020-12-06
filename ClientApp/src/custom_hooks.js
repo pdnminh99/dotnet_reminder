@@ -21,7 +21,7 @@ export const useText = (initValue, onEnter, clearValueOnEnter) => {
       }
 
       if (clearValueOnEnter) {
-        setValue('')
+        setValue(initValue)
       }
     }
   }
@@ -30,16 +30,16 @@ export const useText = (initValue, onEnter, clearValueOnEnter) => {
     const { value } = target
 
     if (value.trim().length === 0) {
-      onEnter('')
+      onEnter(initValue)
     }
     setValue(value)
     setCancelActive(value.trim().length > 0)
   }
 
   function handleCancelClick() {
-    setValue('')
+    setValue(initValue)
     setCancelActive(false)
-    onEnter('')
+    onEnter(initValue)
   }
 
   return {

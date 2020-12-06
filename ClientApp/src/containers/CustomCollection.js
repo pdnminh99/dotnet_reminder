@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { Stack, Text } from '@fluentui/react'
 import '../components/Reminder.css'
 import { CollectionHeader, InsertField, TaskDetail, TasksContainer } from '../components'
-import { fromEpochToLocalDatetime } from '../utils'
+import { fromEpochToLocalDatetime, isUndefined } from '../utils'
 import { useParams } from 'react-router-dom'
-import { retrieveTasks } from '../operations'
+import { retrieveTasks, updateCollection } from '../operations'
+import { TaskSortType } from '../enums'
 
 const taskDetailStyles = {
   root: {
@@ -25,8 +26,11 @@ export const CustomCollection = () => {
 
   const [name, setName] = useState('')
   const [creationDate, setCreationDate] = useState(0)
+  const [sortType, setSortType] = useState(TaskSortType.Default)
   const [incompletedTasks, setIncompletedTasks] = useState([])
   const [completedTasks, setCompletedTasks] = useState([])
+
+  const [isProcessing, setIsProcessing] = useState(false)
 
   useEffect(() => {
     async function syncTasks() {
@@ -79,10 +83,15 @@ export const CustomCollection = () => {
       console.log(`Task id ${task.taskId}; content: ${task.content} on flag.`)
   })
 
-  const tasksGroup = [{ items: incompletedTasks }]
+  const rearrangeTasks = (tasks) => {
+    // TODO implement this
+    return tasks
+  }
+
+  const tasksGroup = [{ items: rearrangeTasks(incompletedTasks) }]
 
   if (completedTasks.length > 0) {
-    tasksGroup.push({ name: 'Completed tasks', items: completedTasks })
+    tasksGroup.push({ name: 'Completed tasks', items: rearrangeTasks(completedTasks) })
   }
 
   return (
@@ -96,7 +105,32 @@ export const CustomCollection = () => {
       >
         <Stack>
           <Stack.Item align='stretch'>
-            <CollectionHeader name={name} />
+            <CollectionHeader
+              name={name}
+              isLoading={isProcessing}
+              onEdit={value => {
+                const oldName = name
+
+                setName(value)
+                setIsProcessing(true)
+
+                updateCollection(cid, value).then(result => {
+                  if (isUndefined(result)) {
+                    setName(oldName)
+                  }
+                }).finally(_ => {
+                  setIsProcessing(false)
+                })
+              }}
+              onDelete={_ => {
+                // TODO implement this
+                console.log('Delete invoked')
+              }}
+              onSort={newSortType => {
+                if (newSortType !== sortType) setSortType(newSortType)
+              }}
+              sortType={sortType}
+            />
           </Stack.Item>
 
           <Stack.Item align='stretch'>

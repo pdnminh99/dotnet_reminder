@@ -35,6 +35,45 @@ export const createCollection = async name => {
   return undefined
 }
 
+export const updateCollection = async (collectionId, name) => {
+  const token = await authService.getAccessToken()
+
+  if (!token) {
+    console.error('Cannot send PATCH request without being authenticated.')
+  } else {
+    const response = await fetch(`/api/v1/Collection/${collectionId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ name }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    if (response.status === 200) return await response.json()
+  }
+
+  return undefined
+}
+
+export const deleteCollection = async collectionId => {
+  const token = await authService.getAccessToken()
+
+  if (!token) {
+    console.error('Cannot send DELETE request without being authenticated.')
+  } else {
+    const response = await fetch(`/api/v1/Collection/${collectionId}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    if (response.status === 200) return await response.json()
+  }
+
+  return undefined
+}
+
 export const retrieveTasks = async taskId => {
   const token = await authService.getAccessToken()
 
