@@ -1,17 +1,9 @@
-import {
-  Icon,
-  IconButton,
-  Stack,
-  Text,
-  TextField,
-  Spinner,
-  SpinnerSize,
-} from '@fluentui/react'
-import React, { useState, useEffect } from 'react'
+import { Icon, IconButton, Spinner, SpinnerSize, Stack, Text, TextField } from '@fluentui/react'
+import React, { useEffect, useState } from 'react'
 import { useText } from '../custom_hooks'
 import authService from './api-authorization/AuthorizeService'
 
-export const TopNav = ({ onCollapsedClick }) => {
+export const TopNav = ({ onCollapsedClick, onSearchValueChange }) => {
   const [name, setName] = useState(undefined)
 
   useEffect(() => {
@@ -52,7 +44,7 @@ export const TopNav = ({ onCollapsedClick }) => {
           horizontalAlign='center'
         >
           <Stack.Item align='stretch'>
-            <Searchbar />
+            <Searchbar onSearchValueChange={onSearchValueChange} />
           </Stack.Item>
         </Stack>
       </Stack.Item>
@@ -84,11 +76,22 @@ export const TopNav = ({ onCollapsedClick }) => {
   )
 }
 
-const Searchbar = () => {
-  const { value, handleOnChange, isCancelActive, handleCancelClick } = useText(
-    '',
-    console.log,
-  )
+const Searchbar = ({ onSearchValueChange }) => {
+  const {
+    value,
+    setValue,
+    handleOnChange,
+    isCancelActive,
+    handleCancelClick,
+  } = useText('', onSearchValueChange, false)
+
+  const handleOnSearchChange = e => {
+    const value = e.target.value
+    if (value.trim().length === 0) {
+      onSearchValueChange('')
+    }
+    setValue(value)
+  }
 
   return (
     <Stack horizontal className={'bg-azure-light mx-auto w-50 rounded-sm'}>
@@ -98,7 +101,8 @@ const Searchbar = () => {
       <Stack.Item grow={1} styles={{ root: { paddingRight: '5px' } }}>
         <TextField
           inputClassName='w-100 bg-azure-light'
-          onChange={handleOnChange}
+          onChange={handleOnSearchChange}
+          onKeyUp={handleOnChange}
           value={value}
           borderless
         />

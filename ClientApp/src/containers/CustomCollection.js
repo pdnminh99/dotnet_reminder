@@ -1,12 +1,7 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Stack, Text } from '@fluentui/react'
 import '../components/Reminder.css'
-import {
-  TaskDetail,
-  CollectionHeader,
-  InsertField,
-  TasksContainer,
-} from '../components'
+import { CollectionHeader, InsertField, TaskDetail, TasksContainer } from '../components'
 import { fromEpochToLocalDatetime } from '../utils'
 import { useParams } from 'react-router-dom'
 import { retrieveTasks } from '../operations'

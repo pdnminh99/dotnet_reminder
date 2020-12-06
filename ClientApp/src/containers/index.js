@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { Stack, DefaultPalette, Panel } from '@fluentui/react'
+import { DefaultPalette, Panel, Stack } from '@fluentui/react'
 import '../components/Reminder.css'
-import { Route, Switch, Redirect, useLocation } from 'react-router-dom'
+import { Redirect, Route, Switch, useLocation } from 'react-router-dom'
 import { CollectionNav } from './CollectionNav'
 import { TopNav } from '../components'
 import { CustomCollection } from './CustomCollection'
@@ -9,6 +9,7 @@ import { FlaggedCollection } from './FlaggedCollection'
 import { PlannedCollection } from './PlannedCollection'
 import { TasksCollection } from './TasksCollection'
 import { TodayCollection } from './TodayCollection'
+import { SearchContainer } from './SearchContainer'
 
 const bodyStyles = {
   root: {
@@ -26,28 +27,34 @@ export const Reminder = () => {
 
   const [collapsed, setCollapsed] = useState(true)
 
+  const [searchValue, setSearchValue] = useState('')
+
   const onCollapsedClick = () => setCollapsed(!collapsed)
 
   return (
-    <>
-      <Stack styles={{ root: { height: '100%' } }}>
-        {/* Rendering topnav */}
-        <Stack.Item
-          align='auto'
-          grow={0}
-          styles={{ root: { height: '50px', color: '#FFF' } }}
-          className='bg-azure'
-        >
-          <TopNav onCollapsedClick={onCollapsedClick} />
-        </Stack.Item>
+    <Stack styles={{ root: { height: '100%' } }}>
+      {/* Rendering topnav */}
+      <Stack.Item
+        align='auto'
+        grow={0}
+        styles={{ root: { height: '50px', color: '#FFF' } }}
+        className='bg-azure'
+      >
+        <TopNav
+          onSearchValueChange={setSearchValue}
+          onCollapsedClick={onCollapsedClick}
+        />
+      </Stack.Item>
 
-        {/* Rendering body */}
-        <Stack.Item grow={1} align='auto' styles={bodyStyles}>
-          {/* Rendering left nav (or collections list)*/}
-          <CollectionNav pathname={currentRoute.pathname} />
+      {/* Rendering body */}
+      <Stack.Item grow={1} align='auto' styles={bodyStyles}>
+        {/* Rendering left nav (or collections list)*/}
+        <CollectionNav pathname={currentRoute.pathname} />
 
-          {/* Rendering main content */}
-          <Stack.Item align='stretch' grow={3} className='ms-depth-4 h-100'>
+        {/* Rendering main content */}
+        <Stack.Item align='stretch' grow={3} className='ms-depth-4 h-100'>
+          {searchValue.trim().length > 0 ?
+            <SearchContainer searchValue={searchValue} /> :
             <Switch>
               <Route exact path={'/'}>
                 <Redirect to='/today' />
@@ -61,20 +68,19 @@ export const Reminder = () => {
                 path={'/collection/:cid'}
                 component={CustomCollection}
               />
-            </Switch>
-          </Stack.Item>
+            </Switch>}
         </Stack.Item>
+      </Stack.Item>
 
-        {/* Right panel */}
-        <Panel
-          headerText='Sample panel'
-          isOpen={!collapsed}
-          onDismiss={onCollapsedClick}
-          closeButtonAriaLabel='Close'
-        >
-          <p>Content goes here.</p>
-        </Panel>
-      </Stack>
-    </>
+      {/* Right panel */}
+      <Panel
+        headerText='Sample panel'
+        isOpen={!collapsed}
+        onDismiss={onCollapsedClick}
+        closeButtonAriaLabel='Close'
+      >
+        <p>Content goes here.</p>
+      </Panel>
+    </Stack>
   )
 }
