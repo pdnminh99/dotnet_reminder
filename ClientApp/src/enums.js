@@ -4,3 +4,8 @@ export const TaskSortType = {
   Alphabetically: 'alphabetically',
   CreationDate: 'creation date',
 }
+
+export const NotifierType = {
+  Delete: 0,
+  Update: 1,
+}

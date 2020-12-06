@@ -10,6 +10,7 @@ import { PlannedCollection } from './PlannedCollection'
 import { TasksCollection } from './TasksCollection'
 import { TodayCollection } from './TodayCollection'
 import { SearchContainer } from './SearchContainer'
+import { CollectionUpdateNotifierContext } from '../utils'
 
 const bodyStyles = {
   root: {
@@ -28,6 +29,8 @@ export const Reminder = () => {
   const [collapsed, setCollapsed] = useState(true)
 
   const [searchValue, setSearchValue] = useState('')
+
+  const [notifier, setNotifier] = useState(undefined)
 
   const onCollapsedClick = () => setCollapsed(!collapsed)
 
@@ -48,28 +51,34 @@ export const Reminder = () => {
 
       {/* Rendering body */}
       <Stack.Item grow={1} align='auto' styles={bodyStyles}>
-        {/* Rendering left nav (or collections list)*/}
-        <CollectionNav pathname={currentRoute.pathname} />
+        <CollectionUpdateNotifierContext.Provider
+          value={{ notifier, setNotifier }}
+        >
+          {/* Rendering left nav (or collections list)*/}
+          <CollectionNav pathname={currentRoute.pathname} />
 
-        {/* Rendering main content */}
-        <Stack.Item align='stretch' grow={3} className='ms-depth-4 h-100'>
-          {searchValue.trim().length > 0 ?
-            <SearchContainer searchValue={searchValue} /> :
-            <Switch>
-              <Route exact path={'/'}>
-                <Redirect to='/today' />
-              </Route>
-              <Route exact path={'/today'} component={TodayCollection} />
-              <Route exact path={'/planned'} component={PlannedCollection} />
-              <Route exact path={'/flagged'} component={FlaggedCollection} />
-              <Route exact path={'/tasks'} component={TasksCollection} />
-              <Route
-                exact
-                path={'/collection/:cid'}
-                component={CustomCollection}
-              />
-            </Switch>}
-        </Stack.Item>
+          {/* Rendering main content */}
+          <Stack.Item align='stretch' grow={3} className='ms-depth-4 h-100'>
+            {searchValue.trim().length > 0 ? (
+              <SearchContainer searchValue={searchValue} />
+            ) : (
+              <Switch>
+                <Route exact path={'/'}>
+                  <Redirect to='/today' />
+                </Route>
+                <Route exact path={'/today'} component={TodayCollection} />
+                <Route exact path={'/planned'} component={PlannedCollection} />
+                <Route exact path={'/flagged'} component={FlaggedCollection} />
+                <Route exact path={'/tasks'} component={TasksCollection} />
+                <Route
+                  exact
+                  path={'/collection/:cid'}
+                  component={CustomCollection}
+                />
+              </Switch>
+            )}
+          </Stack.Item>
+        </CollectionUpdateNotifierContext.Provider>
       </Stack.Item>
 
       {/* Right panel */}

@@ -1,3 +1,7 @@
+import React from 'react'
+
+export const CollectionUpdateNotifierContext = React.createContext()
+
 export const isNull = value => value === null
 
 export const isNotNull = value => !isNull(value)

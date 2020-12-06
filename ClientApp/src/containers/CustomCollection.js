@@ -1,11 +1,25 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { Stack, Text } from '@fluentui/react'
 import '../components/Reminder.css'
-import { CollectionHeader, InsertField, TaskDetail, TasksContainer } from '../components'
-import { fromEpochToLocalDatetime, isNotUndefined, isUndefined } from '../utils'
+import {
+  CollectionHeader,
+  InsertField,
+  TaskDetail,
+  TasksContainer,
+} from '../components'
+import {
+  CollectionUpdateNotifierContext,
+  fromEpochToLocalDatetime,
+  isNotUndefined,
+  isUndefined,
+} from '../utils'
 import { useHistory, useParams } from 'react-router-dom'
-import { deleteCollection, retrieveTasks, updateCollection } from '../operations'
-import { TaskSortType } from '../enums'
+import {
+  deleteCollection,
+  retrieveTasks,
+  updateCollection,
+} from '../operations'
+import { NotifierType, TaskSortType } from '../enums'
 
 const taskDetailStyles = {
   root: {
@@ -19,6 +33,8 @@ const taskDetailStyles = {
 }
 
 export const CustomCollection = () => {
+  const { setNotifier } = useContext(CollectionUpdateNotifierContext)
+
   const { cid } = useParams()
 
   const history = useHistory()
@@ -85,7 +101,7 @@ export const CustomCollection = () => {
       console.log(`Task id ${task.taskId}; content: ${task.content} on flag.`)
   })
 
-  const rearrangeTasks = (tasks) => {
+  const rearrangeTasks = tasks => {
     // TODO implement this
     return tasks
   }
@@ -96,33 +112,53 @@ export const CustomCollection = () => {
     setName(value)
     setIsProcessing(true)
 
-    updateCollection(cid, value).then(result => {
-      if (isUndefined(result)) {
-        setName(oldName)
-      }
-      // TODO rerender collection nav
-    }).finally(_ => {
-      setIsProcessing(false)
-    })
+    updateCollection(cid, value)
+      .then(result => {
+        if (isUndefined(result)) {
+          setName(oldName)
+        } else {
+          setNotifier({
+            collection: {
+              collectionId: parseInt(cid),
+              name: value,
+            },
+            type: NotifierType.Update,
+          })
+        }
+      })
+      .finally(_ => {
+        setIsProcessing(false)
+      })
   }
 
   const handleCollectionDelete = _ => {
     setIsProcessing(true)
 
-    deleteCollection(cid).then(result => {
-      if (isNotUndefined(result)) {
-        history.push('/today')
-        // TODO rerender collection nav
-      }
-    }).finally(_ => {
-      setIsProcessing(false)
-    })
+    deleteCollection(cid)
+      .then(result => {
+        if (isNotUndefined(result)) {
+          setNotifier({
+            collection: {
+              collectionId: parseInt(cid),
+              name,
+            },
+            type: NotifierType.Delete,
+          })
+          history.push('/today')
+        }
+      })
+      .finally(_ => {
+        setIsProcessing(false)
+      })
   }
 
   const tasksGroup = [{ items: rearrangeTasks(incompletedTasks) }]
 
   if (completedTasks.length > 0) {
-    tasksGroup.push({ name: 'Completed tasks', items: rearrangeTasks(completedTasks) })
+    tasksGroup.push({
+      name: 'Completed tasks',
+      items: rearrangeTasks(completedTasks),
+    })
   }
 
   return (

@@ -9,16 +9,22 @@ import {
   Stack,
   Text,
 } from '@fluentui/react'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useContext } from 'react'
 import { Link } from 'react-router-dom'
 import '../components/Reminder.css'
 import { InsertField } from '../components'
-import { isNotUndefined, isUndefined } from '../utils'
+import {
+  CollectionUpdateNotifierContext,
+  isNotUndefined,
+  isUndefined,
+} from '../utils'
 import { standardCollections } from '../dummy_data'
 import { matchPath } from 'react-router'
 import { createCollection, retrieveCollections } from '../operations'
+import { NotifierType } from '../enums'
 
 const preprocessCollection = ({ collectionId, name }) => ({
+  collectionId: collectionId,
   name,
   url: isNotUndefined(collectionId) ? `/collection/${collectionId}` : undefined,
   icon: 'BulletedList2',
@@ -27,6 +33,45 @@ const preprocessCollection = ({ collectionId, name }) => ({
 })
 
 export const CollectionNav = ({ pathname }) => {
+  // Use Context API to communicate with CustomCollection.
+  const { notifier, setNotifier } = useContext(CollectionUpdateNotifierContext)
+
+  useEffect(() => {
+    if (isNotUndefined(notifier)) {
+      const { type, collection } = notifier
+
+      if (type === NotifierType.Delete) {
+        setCollections(
+          collections
+            .filter(c => c.collectionId !== collection.collectionId)
+            .map(c => ({
+              ...c,
+              isActive: !!matchPath(pathname, c.url),
+            })),
+        )
+      }
+
+      if (type === NotifierType.Update) {
+        setCollections(
+          collections.map(c => {
+            let result = {
+              ...c,
+              isActive: !!matchPath(pathname, c.url),
+            }
+
+            if (result.collectionId === collection.collectionId) {
+              result.name = collection.name
+            }
+
+            return result
+          }),
+        )
+      }
+
+      setNotifier(undefined)
+    }
+  }, [notifier])
+
   const [collapsed, setCollapsed] = useState(false)
 
   const [defaults, setDefaults] = useState(standardCollections)
@@ -143,18 +188,17 @@ export const CollectionNav = ({ pathname }) => {
   )
 }
 
-const OnRenderCollection = (
-  {
-    name,
-    icon,
-    url,
-    // active color
-    color,
-    // default color when not active
-    defaultColor,
-    isActive,
-    isSyncing,
-  }) => {
+const OnRenderCollection = ({
+  name,
+  icon,
+  url,
+  // active color
+  color,
+  // default color when not active
+  defaultColor,
+  isActive,
+  isSyncing,
+}) => {
   let style = 'px-3 cursor-pointer '
   style += isActive ? 'ms-bgColor-gray30' : 'ms-bgColor-white--hover'
 
