@@ -1,5 +1,6 @@
 import { IconButton, Stack, Text } from '@fluentui/react'
 import React from 'react'
+import '../components/Reminder.css'
 
 export const CollectionHeader = ({ name }) => {
   return (
@@ -12,6 +13,7 @@ export const CollectionHeader = ({ name }) => {
 
       <Stack.Item align='center' grow={0}>
         <IconButton
+          className={'outline-none'}
           iconProps={{
             iconName: 'More',
             styles: { root: { color: '#000', fontSize: '16px' } },
@@ -26,6 +28,7 @@ export const CollectionHeader = ({ name }) => {
       <Stack.Item grow={1} horizontalAlign='end'>
         <Stack horizontalAlign='end'>
           <IconButton
+            className={'outline-none'}
             iconProps={{
               iconName: 'More',
               styles: { root: { color: '#000', fontSize: '16px' } },

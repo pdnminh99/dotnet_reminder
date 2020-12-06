@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Stack, DefaultButton, Icon, FocusZone } from '@fluentui/react'
+import { DefaultButton, FocusZone, Icon, Stack } from '@fluentui/react'
 import './Reminder.css'
 import { useText } from '../custom_hooks'
 
@@ -11,6 +11,7 @@ export const InsertField = ({ isTaskInsertField, onInsert }) => {
   const {
     value,
     setValue,
+    handleOnKeyUp,
     handleOnChange,
     setCancelActive,
     isCancelActive,
@@ -62,8 +63,8 @@ export const InsertField = ({ isTaskInsertField, onInsert }) => {
             }}
             className='w-100 h-100'
             placeholder={isTaskInsertField ? 'Add a task' : 'New list'}
-            onKeyUp={handleOnChange}
-            onChange={e => setValue(e.target.value)}
+            onKeyUp={handleOnKeyUp}
+            onChange={handleOnChange}
             value={value}
           />
         </Stack.Item>

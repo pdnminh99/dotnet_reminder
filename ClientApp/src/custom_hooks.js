@@ -3,6 +3,7 @@ import { isUndefined } from './utils'
 
 export const useText = (initValue, onEnter, clearValueOnEnter) => {
   initValue = initValue || ''
+
   if (isUndefined(clearValueOnEnter)) {
     clearValueOnEnter = true
   }
@@ -10,17 +11,29 @@ export const useText = (initValue, onEnter, clearValueOnEnter) => {
   const [value, setValue] = useState(initValue)
   const [isCancelActive, setCancelActive] = useState(initValue.length > 0)
 
-  function handleOnChange(evt) {
-    const newValue = evt.target.value
-    setValue(newValue)
+  // Note: Do not call set value on every key up. Call in handleOnChange instead.
+  function handleOnKeyUp({ target, key }) {
+    const { value } = target
 
-    if (evt.key === 'Enter') {
-      if (value.trim().length > 0) onEnter(value)
-      if (clearValueOnEnter) setValue('')
-    } else {
-      setValue(newValue)
+    if (key === 'Enter') {
+      if (value.trim().length > 0) {
+        onEnter(value)
+      }
+
+      if (clearValueOnEnter) {
+        setValue('')
+      }
     }
-    setCancelActive(newValue.length > 0)
+  }
+
+  function handleOnChange({ target }) {
+    const { value } = target
+
+    if (value.trim().length === 0) {
+      onEnter('')
+    }
+    setValue(value)
+    setCancelActive(value.trim().length > 0)
   }
 
   function handleCancelClick() {
@@ -32,6 +45,7 @@ export const useText = (initValue, onEnter, clearValueOnEnter) => {
   return {
     value,
     setValue,
+    handleOnKeyUp,
     handleOnChange,
     isCancelActive,
     setCancelActive,

@@ -16,7 +16,7 @@ import { InsertField } from '../components'
 import { isNotUndefined, isUndefined } from '../utils'
 import { standardCollections } from '../dummy_data'
 import { matchPath } from 'react-router'
-import { retrieveCollections, createCollection } from '../operations'
+import { createCollection, retrieveCollections } from '../operations'
 
 const preprocessCollection = ({ collectionId, name }) => ({
   name,
@@ -72,6 +72,8 @@ export const CollectionNav = ({ pathname }) => {
   const onCollapsedClick = () => setCollapsed(!collapsed)
 
   const onInsert = v => {
+    if (v.trim().length === 0) return
+
     const creationEpoch = Date.now()
 
     setCollections(current => [
@@ -141,17 +143,18 @@ export const CollectionNav = ({ pathname }) => {
   )
 }
 
-const OnRenderCollection = ({
-  name,
-  icon,
-  url,
-  // active color
-  color,
-  // default color when not active
-  defaultColor,
-  isActive,
-  isSyncing,
-}) => {
+const OnRenderCollection = (
+  {
+    name,
+    icon,
+    url,
+    // active color
+    color,
+    // default color when not active
+    defaultColor,
+    isActive,
+    isSyncing,
+  }) => {
   let style = 'px-3 cursor-pointer '
   style += isActive ? 'ms-bgColor-gray30' : 'ms-bgColor-white--hover'
 
@@ -209,6 +212,7 @@ const CollapseButton = ({ onCollapsedClick }) => {
       <Stack horizontal styles={{ root: { height: '36px' } }}>
         <Stack.Item align='center'>
           <IconButton
+            className={'outline-none'}
             iconProps={{
               iconName: 'CollapseMenu',
               styles: { root: { color: '#000', fontSize: '14px' } },
