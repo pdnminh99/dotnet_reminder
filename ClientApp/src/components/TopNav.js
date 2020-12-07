@@ -1,4 +1,12 @@
-import { Icon, IconButton, Spinner, SpinnerSize, Stack, Text, TextField } from '@fluentui/react'
+import {
+  FontIcon,
+  IconButton,
+  Spinner,
+  SpinnerSize,
+  Stack,
+  Text,
+  TextField,
+} from '@fluentui/react'
 import React, { useEffect, useState } from 'react'
 import { useText } from '../custom_hooks'
 import authService from './api-authorization/AuthorizeService'
@@ -25,7 +33,7 @@ export const TopNav = ({ onCollapsedClick, onSearchValueChange }) => {
       >
         <Stack horizontal className='h-100 w-100'>
           <Stack.Item align='center'>
-            <Icon iconName={'WaffleOffice365'} />
+            <FontIcon iconName={'WaffleOffice365'} />
           </Stack.Item>
         </Stack>
       </Stack.Item>
@@ -68,7 +76,10 @@ export const TopNav = ({ onCollapsedClick, onSearchValueChange }) => {
             {!name ? (
               <Spinner size={SpinnerSize.large} />
             ) : (
-              <Icon iconName={'PlayerSettings'} />
+              <FontIcon
+                iconName={'PlayerSettings'}
+                iconProps={{ shouldFadeIn: true }}
+              />
             )}
           </Stack.Item>
         </Stack>
@@ -89,7 +100,10 @@ const Searchbar = ({ onSearchValueChange }) => {
   return (
     <Stack horizontal className={'bg-azure-light mx-auto w-50 rounded-sm'}>
       <Stack.Item grow={0} align={'center'} className={'px-2'}>
-        <Icon iconName='Search' styles={{ root: { color: '#0078D7' } }} />
+        <FontIcon
+          iconName='Search'
+          iconProps={{ styles: { root: { color: '#0078D7' } } }}
+        />
       </Stack.Item>
       <Stack.Item grow={1} styles={{ root: { paddingRight: '5px' } }}>
         <TextField

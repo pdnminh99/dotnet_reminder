@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-
 
 [Route("api/v1/[controller]")]
 public class TaskController : GenericController
@@ -36,7 +37,29 @@ public class TaskController : GenericController
     {
         await StartAuthenticate("get today's tasks");
 
-        Collection collection = await Context.Collections.FindAsync(collectionId);
+        Collection collection = await Context.Collections
+            .Where(c => c.CollectionId == collectionId)
+            .Select(c => new Collection
+            {
+                CollectionId = c.CollectionId,
+                Name = c.Name,
+                Owner = c.Owner,
+                CreationDate = c.CreationDate,
+                LastEdited = c.LastEdited,
+                Tasks = c.Tasks.Select(t => new AppTask
+                {
+                    TaskId = t.TaskId,
+                    Content = t.Content,
+                    DueDate = t.DueDate,
+                    CompletedAt = t.CompletedAt,
+                    IsFlagged = t.IsFlagged,
+                    Note = t.Note,
+                    CreationDate = t.CreationDate,
+                    LastEdited = t.LastEdited,
+                    Collection = null
+                }).ToList()
+            })
+            .FirstOrDefaultAsync();
         if (collection == null) return NotFound($"Collection with id [{collectionId}] is not found.");
 
         Utils.CheckIfBelongToCurrentUser(collection.Owner, CurrentUser, Logger,

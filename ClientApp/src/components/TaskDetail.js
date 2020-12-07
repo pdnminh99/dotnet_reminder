@@ -2,7 +2,7 @@ import {
   CommandBarButton,
   Stack,
   TextField,
-  Icon,
+  FontIcon,
   IconButton,
   Dialog,
   DialogFooter,
@@ -82,26 +82,21 @@ export const TaskDetail = ({ selectedTask, onCancel, onDelete }) => {
       <Stack.Item align={'stretch'}>
         <Stack horizontal horizontalAlign={'space-between'}>
           <IconButton
-            iconProps={{
-              iconName: 'ClosePane',
-              styles: {
-                root: {
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  color: '#000',
-                },
+            iconProps={{ iconName: 'ClosePane' }}
+            styles={{
+              root: {
+                fontSize: '16px',
+                fontWeight: '500',
+                color: '#000',
               },
             }}
             onClick={() => invokeOrElse(onCancel)}
-            borderless={true}
           />
 
           <IconButton
-            iconProps={{
-              iconName: 'Delete',
-              styles: {
-                root: { fontSize: '16px', fontWeight: '500', color: 'red' },
-              },
+            iconProps={{ iconName: 'Delete' }}
+            styles={{
+              root: { fontSize: '16px', fontWeight: '500', color: 'red' },
             }}
             onClick={() => setDialogHidden(false)}
             borderless={true}
@@ -166,7 +161,7 @@ const Button = ({ content, iconName, hasDivider }) => {
       onRenderChildren={() => (
         <Stack horizontal className={'h-100 w-100'}>
           <Stack.Item className='px-2 h-100'>
-            <Icon iconName={iconName} />
+            <FontIcon iconName={iconName} />
           </Stack.Item>
 
           <Stack.Item className='px-2 h-100'>

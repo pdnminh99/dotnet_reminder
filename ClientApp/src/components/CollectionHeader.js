@@ -16,7 +16,14 @@ import { useText } from '../custom_hooks'
 import { invokeOrElse, isNotUndefined } from '../utils'
 import { TaskSortType } from '../enums'
 
-export const CollectionHeader = ({ name, onDelete, onEdit, onSort, sortType, isLoading }) => {
+export const CollectionHeader = ({
+  name,
+  onDelete,
+  onEdit,
+  onSort,
+  sortType,
+  isLoading,
+}) => {
   const [focus, setFocus] = useState(false)
 
   const [dialogHidden, setDialogHidden] = useState(true)
@@ -31,7 +38,11 @@ export const CollectionHeader = ({ name, onDelete, onEdit, onSort, sortType, isL
     }
   }
 
-  const { value, setValue, handleOnChange, handleOnKeyUp } = useText(name, handleNameChange, false)
+  const { value, setValue, handleOnChange, handleOnKeyUp } = useText(
+    name,
+    handleNameChange,
+    false,
+  )
 
   useEffect(() => {
     if (focus) {
@@ -42,16 +53,22 @@ export const CollectionHeader = ({ name, onDelete, onEdit, onSort, sortType, isL
   return (
     <Stack horizontal>
       <Stack.Item align='center' grow={0}>
-        {focus ?
+        {focus ? (
           <input
             type={'text'}
             ref={headerRef}
-            style={{ paddingLeft: '16px', fontSize: '20px', fontWeight: '600', border: 'none' }}
+            style={{
+              paddingLeft: '16px',
+              fontSize: '20px',
+              fontWeight: '600',
+              border: 'none',
+            }}
             onBlur={e => handleNameChange(e.target.value)}
             onChange={handleOnChange}
             onKeyUp={handleOnKeyUp}
             value={value}
-          /> :
+          />
+        ) : (
           <DefaultButton
             className={'outline-none'}
             styles={{ root: { border: 'none', padding: '5px 0' } }}
@@ -62,23 +79,27 @@ export const CollectionHeader = ({ name, onDelete, onEdit, onSort, sortType, isL
               }
             }}
             onRenderChildren={_ => {
-              return <Text variant={'xLarge'} className='px-3'>
-                {name}
-              </Text>
+              return (
+                <Text variant={'xLarge'} className='px-3'>
+                  {name}
+                </Text>
+              )
             }}
-          />}
+          />
+        )}
       </Stack.Item>
 
       <Stack.Item align='center' grow={0}>
-        {isLoading ?
-          <Spinner size={SpinnerSize.small} /> :
-          (<>
+        {isLoading ? (
+          <Spinner size={SpinnerSize.small} />
+        ) : (
+          <>
             <IconButton
               className={'outline-none'}
               iconProps={{
                 iconName: 'More',
-                styles: { root: { color: '#000', fontSize: '16px' } },
               }}
+              styles={{ root: { color: '#000', fontSize: '16px' } }}
               title='CollapseMenu'
               ariaLabel='CollapseMenu'
               onRenderMenuIcon={_ => <></>}
@@ -87,7 +108,10 @@ export const CollectionHeader = ({ name, onDelete, onEdit, onSort, sortType, isL
                   {
                     key: 'delete',
                     onClick: () => setDialogHidden(false),
-                    iconProps: { iconName: 'Delete', style: { color: 'red', fontWeight: '400' } },
+                    iconProps: {
+                      iconName: 'Delete',
+                      style: { color: 'red', fontWeight: '400' },
+                    },
                     text: 'Delete',
                     title: 'Delete collection',
                   },
@@ -112,67 +136,84 @@ export const CollectionHeader = ({ name, onDelete, onEdit, onSort, sortType, isL
                   }}
                   text='Confirm'
                 />
-                <DefaultButton onClick={() => setDialogHidden(true)} text='Cancel' />
+                <DefaultButton
+                  onClick={() => setDialogHidden(true)}
+                  text='Cancel'
+                />
               </DialogFooter>
             </Dialog>
-          </>)}
+          </>
+        )}
       </Stack.Item>
 
-      {isNotUndefined(sortType) && <Stack.Item grow={1} horizontalAlign='end'>
-        <Stack horizontalAlign='end'>
-          <DefaultButton
-            className={'outline-none'}
-            styles={{ root: { border: 'none' } }}
-            iconProps={{
-              iconName: 'Sort',
-              styles: { root: { color: '#000', fontSize: '16px' } },
-            }}
-            text={`Sort by ${sortType}`}
-            disabled={isLoading}
-            onRenderMenuIcon={_ => <></>}
-            menuProps={{
-              items: [
-                {
-                  key: 'default',
-                  onClick: _ => {
-                    onSort(TaskSortType.Default)
+      {isNotUndefined(sortType) && (
+        <Stack.Item grow={1} horizontalAlign='end'>
+          <Stack horizontalAlign='end'>
+            <DefaultButton
+              className={'outline-none'}
+              iconProps={{ iconName: 'Sort' }}
+              styles={{
+                root: { color: '#000', border: 'none', fontSize: '16px' },
+              }}
+              text={`Sort by ${sortType}`}
+              disabled={isLoading}
+              onRenderMenuIcon={_ => <></>}
+              menuProps={{
+                items: [
+                  {
+                    key: 'default',
+                    onClick: _ => {
+                      onSort(TaskSortType.Default)
+                    },
+                    iconProps: {
+                      iconName: 'AppIconDefault',
+                      styles: { root: { color: 'black', fontWeight: '400' } },
+                    },
+                    text: 'Default',
+                    title: 'Default',
                   },
-                  iconProps: { iconName: 'AppIconDefault', style: { color: 'black', fontWeight: '400' } },
-                  text: 'Default',
-                  title: 'Default',
-                },
-                {
-                  key: 'due_date',
-                  onClick: _ => {
-                    onSort(TaskSortType.DueDate)
+                  {
+                    key: 'due_date',
+                    onClick: _ => {
+                      onSort(TaskSortType.DueDate)
+                    },
+                    iconProps: {
+                      iconName: 'Calendar',
+                      style: { color: 'black', fontWeight: '400' },
+                    },
+                    text: 'Due Date',
+                    title: 'Sort by due date',
                   },
-                  iconProps: { iconName: 'Calendar', style: { color: 'black', fontWeight: '400' } },
-                  text: 'Due Date',
-                  title: 'Sort by due date',
-                },
-                {
-                  key: 'alphabetically',
-                  onClick: _ => {
-                    onSort(TaskSortType.Alphabetically)
+                  {
+                    key: 'alphabetically',
+                    onClick: _ => {
+                      onSort(TaskSortType.Alphabetically)
+                    },
+                    iconProps: {
+                      iconName: 'Sort',
+                      style: { color: 'black', fontWeight: '400' },
+                    },
+                    text: 'Alphabetically',
+                    title: 'Sort by alphabets',
                   },
-                  iconProps: { iconName: 'Sort', style: { color: 'black', fontWeight: '400' } },
-                  text: 'Alphabetically',
-                  title: 'Sort by alphabets',
-                },
-                {
-                  key: 'creation_date',
-                  onClick: _ => {
-                    onSort(TaskSortType.CreationDate)
+                  {
+                    key: 'creation_date',
+                    onClick: _ => {
+                      onSort(TaskSortType.CreationDate)
+                    },
+                    iconProps: {
+                      iconName: 'AddEvent',
+                      style: { color: 'black', fontWeight: '400' },
+                    },
+                    text: 'Creation Date',
+                    title: 'Sort by creation date',
                   },
-                  iconProps: { iconName: 'AddEvent', style: { color: 'black', fontWeight: '400' } },
-                  text: 'Creation Date',
-                  title: 'Sort by creation date',
-                },
-              ],
-            }}
-          />
-        </Stack>
-      </Stack.Item>}
+                ],
+              }}
+            />
+          </Stack>
+        </Stack.Item>
+      )}
     </Stack>
   )
 }

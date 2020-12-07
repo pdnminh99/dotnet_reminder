@@ -74,32 +74,47 @@ export const CustomCollection = () => {
     syncTasks()
   }, [cid])
 
-  // let collection = sampleCollections[pathname]
-
-  completedTasks.forEach(task => {
+  const assignTaskMethod = task => {
     task.onSelect = () => {
-      console.log(`Task id ${task.taskId}; content: ${task.content} on select.`)
       setDetailActive(true)
       setSelectedTask(task)
     }
     task.onCheck = () => {
-      console.log(`Task id ${task.taskId}; content: ${task.content} on check.`)
-    }
-    task.onFlag = () =>
-      console.log(`Task id ${task.taskId}; content: ${task.content} on flag.`)
-  })
+      let { taskId, isCompleted } = task
 
-  incompletedTasks.forEach(task => {
-    task.onSelect = () => {
-      console.log(`Task id ${task.taskId}; content: ${task.content} on select.`)
-      setDetailActive(true)
-      setSelectedTask(task)
+      if (isCompleted) {
+        // Move to incompleted tasks list
+        setIncompletedTasks(tasks => {
+          task.isCompleted = false
+          task.completedAt = undefined
+
+          tasks.unshift(task)
+          return tasks
+        })
+
+        // Remove from completed tasks list
+        setCompletedTasks(tasks => tasks.filter(t => t.taskId !== taskId))
+      } else {
+        // Move to completed tasks list
+        setCompletedTasks(tasks => {
+          task.isCompleted = true
+          task.completedAt = new Date().getMilliseconds()
+
+          tasks.unshift(task)
+          return tasks
+        })
+
+        // Remove from incompleted tasks list
+        setIncompletedTasks(tasks => tasks.filter(t => t.taskId !== taskId))
+      }
     }
-    task.onCheck = () =>
-      console.log(`Task id ${task.taskId}; content: ${task.content} on check.`)
     task.onFlag = () =>
       console.log(`Task id ${task.taskId}; content: ${task.content} on flag.`)
-  })
+  }
+
+  completedTasks.forEach(assignTaskMethod)
+
+  incompletedTasks.forEach(assignTaskMethod)
 
   const rearrangeTasks = tasks => {
     // TODO implement this

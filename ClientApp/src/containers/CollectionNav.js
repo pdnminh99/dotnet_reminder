@@ -1,7 +1,7 @@
 import {
   FocusZone,
   FocusZoneDirection,
-  Icon,
+  FontIcon,
   IconButton,
   List,
   Spinner,
@@ -220,7 +220,7 @@ const OnRenderCollection = ({
         {isNotUndefined(isSyncing) ? (
           <Spinner size={SpinnerSize.small} />
         ) : (
-          <Icon iconName={icon} styles={textStyle} />
+          <FontIcon iconName={icon} styles={textStyle} />
         )}
       </Stack.Item>
 
@@ -257,16 +257,10 @@ const CollapseButton = ({ onCollapsedClick }) => {
         <Stack.Item align='center'>
           <IconButton
             className={'outline-none'}
-            iconProps={{
-              iconName: 'CollapseMenu',
-              styles: { root: { color: '#000', fontSize: '14px' } },
-            }}
-            title='CollapseMenu'
-            secondaryText='collapsed'
-            ariaLabel='CollapseMenu'
+            iconProps={{ iconName: 'CollapseMenu' }}
+            styles={{ root: { color: '#000' } }}
             onClick={onCollapsedClick}
             disabled={false}
-            borderless={true}
             checked={false}
           />
         </Stack.Item>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { invokeOrElse, isNotUndefined, isUndefined } from '../utils'
-import { Stack, Checkbox, Icon } from '@fluentui/react'
+import { Stack, Checkbox, FontIcon } from '@fluentui/react'
 import './Reminder.css'
 
 export const TasksContainer = ({ groupName, tasks }) => {
@@ -22,7 +22,7 @@ export const TasksContainer = ({ groupName, tasks }) => {
               onClick={() => setCollapsed(!isCollapsed)}
             >
               <Stack.Item align={'center'}>
-                <Icon
+                <FontIcon
                   className={'px-3'}
                   iconName={isCollapsed ? 'ChevronDown' : 'ChevronUp'}
                   styles={{ root: { fontSize: '16px', fontWeight: '500' } }}
@@ -91,7 +91,7 @@ const TasksList = ({ tasks }) =>
 
           <Stack.Item grow={0} align={'center'} className={'px-3 pt-2'}>
             <span onClick={() => invokeOrElse(onFlag)}>
-              <Icon
+              <FontIcon
                 iconName='Flag'
                 styles={{ root: { fontSize: '16px', fontWeight: '500' } }}
               />

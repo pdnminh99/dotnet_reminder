@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { DefaultButton, FocusZone, Icon, Stack } from '@fluentui/react'
+import { DefaultButton, FocusZone, FontIcon, Stack } from '@fluentui/react'
 import './Reminder.css'
 import { useText } from '../custom_hooks'
 
@@ -40,7 +40,7 @@ export const InsertField = ({ isTaskInsertField, onInsert }) => {
     >
       <Stack horizontal className={'h-100 w-100'}>
         <Stack.Item grow={0} align={'center'} className={'px-3'}>
-          <Icon
+          <FontIcon
             iconName='Add'
             styles={{ root: { color: '#0078D7', fontSize: '16px' } }}
           />
