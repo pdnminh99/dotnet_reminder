@@ -110,6 +110,7 @@ const useCustomTasks = _ => {
         if (!result) return
 
         // Move to incompleted tasks list
+        assignTaskMethod(result)
         incompletedTasks.unshift(result)
 
         // Remove from completed tasks list
@@ -139,10 +140,12 @@ const useCustomTasks = _ => {
       setIncompletedTasks(incompletedTasks)
       setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
 
-      if (!!selectedTask && task.taskId === selectedTask.taskId) {
-        setSelectedTask(result)
-        setDetailActive(false)
-      }
+      setSelectedTask(t => {
+        if (!!t && task.taskId === t.taskId) {
+          return result
+        }
+        return t
+      })
     }
 
     // Flag button is clicked
