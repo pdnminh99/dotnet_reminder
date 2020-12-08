@@ -1,12 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react'
 import { Stack, Text } from '@fluentui/react'
 import '../components/Reminder.css'
-import {
-  CollectionHeader,
-  InsertField,
-  TaskDetail,
-  TasksContainer,
-} from '../components'
+import { CollectionHeader, TaskDetail } from '../components'
 import {
   CollectionUpdateNotifierContext,
   fromEpochToLocalDatetime,
@@ -284,7 +279,11 @@ const useCustomTasks = _ => {
   }
 
   function parseGroups(incompletedTasks, completedTasks) {
-    let tasksByGroups = [{ items: incompletedTasks }]
+    let tasksByGroups = []
+
+    if (incompletedTasks.length > 0) {
+      tasksByGroups.push({ items: incompletedTasks })
+    }
 
     if (completedTasks.length > 0) {
       tasksByGroups.push({

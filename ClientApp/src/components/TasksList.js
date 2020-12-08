@@ -1,6 +1,7 @@
 import React from 'react'
 import { InsertField, TasksContainer } from '../components'
 import { Stack } from '@fluentui/react'
+import { EmptyTasksList } from './EmptyTasksList'
 
 export const TasksList = ({ tasksGroup, onInsert, sortType }) => {
   return (
@@ -12,17 +13,21 @@ export const TasksList = ({ tasksGroup, onInsert, sortType }) => {
       )}
 
       <Stack.Item align={'stretch'}>
-        {tasksGroup.map(({ name, items, shouldCollapsed }, i) => {
-          return (
-            <TasksContainer
-              key={i}
-              groupName={name}
-              tasks={items}
-              sortType={sortType}
-              shouldCollapsed={shouldCollapsed}
-            />
-          )
-        })}
+        {tasksGroup.length > 0 ? (
+          tasksGroup.map(({ name, items, shouldCollapsed }, i) => {
+            return (
+              <TasksContainer
+                key={i}
+                groupName={name}
+                tasks={items}
+                sortType={sortType}
+                shouldCollapsed={shouldCollapsed}
+              />
+            )
+          })
+        ) : (
+          <EmptyTasksList />
+        )}
       </Stack.Item>
     </Stack>
   )

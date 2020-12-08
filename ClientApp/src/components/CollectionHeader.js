@@ -14,7 +14,6 @@ import {
 import React, { useEffect, useRef, useState } from 'react'
 import '../components/Reminder.css'
 import { useText } from '../custom_hooks'
-import { isNotUndefined } from '../utils'
 import { TaskSortType } from '../enums'
 
 export const CollectionHeader = ({

@@ -4,6 +4,7 @@ import '../components/Reminder.css'
 import { CollectionHeader, TaskDetail } from '../components'
 import { deleteTask, getPlannedTasks, updateTask } from '../operations'
 import { TasksList } from '../components/TasksList'
+import { EmptyTasksList, LoadingScreen } from '../components/EmptyTasksList'
 
 const taskDetailStyles = {
   root: {
@@ -47,7 +48,9 @@ const usePlannedTasks = _ => {
           else setDetailActive(false)
         }
         setTasksByGroups(parseGroups(collections))
-        setProcessing(false)
+        setTimeout(() => {
+          setProcessing(false)
+        }, 1000)
       }
     }
 
@@ -166,6 +169,7 @@ const usePlannedTasks = _ => {
 
       let result = await updateTask({ ...task, content, dueDate, note })
       if (!result) return
+      assignTaskMethod(result)
 
       collections.forEach(c => {
         c.completedTasks = c.completedTasks.map(t => {
@@ -180,6 +184,7 @@ const usePlannedTasks = _ => {
       })
 
       setCollections(collections)
+      setSelectedTask(result)
       setTasksByGroups(parseGroups(collections))
     }
 
@@ -257,7 +262,9 @@ export const PlannedCollection = _ => {
     selectedTask,
   } = usePlannedTasks()
 
-  if (isProcessing) return <h1 style={{ color: 'black' }}>Processing ...</h1>
+  if (isProcessing) return <LoadingScreen />
+
+  if (tasksByGroups.length === 0) return <EmptyTasksList />
 
   return (
     <Stack horizontal className='h-100 w-100'>
