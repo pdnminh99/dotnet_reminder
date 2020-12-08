@@ -23,6 +23,7 @@ import {
   updateTask,
 } from '../operations'
 import { NotifierType, TaskSortType } from '../enums'
+import { TasksList } from '../components/TasksList'
 
 const taskDetailStyles = {
   root: {
@@ -430,29 +431,6 @@ export const CustomCollection = () => {
           />
         </Stack.Item>
       )}
-    </Stack>
-  )
-}
-
-const TasksList = ({ tasksGroup, onInsert, sortType }) => {
-  return (
-    <Stack>
-      <Stack.Item align={'stretch'} styles={{ root: { height: '50px' } }}>
-        <InsertField onInsert={onInsert} />
-      </Stack.Item>
-
-      <Stack.Item align={'stretch'}>
-        {tasksGroup.map(({ name, items }, i) => {
-          return (
-            <TasksContainer
-              key={i}
-              groupName={name}
-              tasks={items}
-              sortType={sortType}
-            />
-          )
-        })}
-      </Stack.Item>
     </Stack>
   )
 }

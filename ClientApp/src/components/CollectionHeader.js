@@ -54,7 +54,7 @@ export const CollectionHeader = ({
   return (
     <Stack horizontal>
       <Stack.Item align='center' grow={0}>
-        {focus ? (
+        {focus && !!onEdit ? (
           <input
             type={'text'}
             ref={headerRef}
@@ -80,7 +80,7 @@ export const CollectionHeader = ({
               },
             }}
             onClick={_ => {
-              if (!isLoading) {
+              if (!!onEdit && !isLoading) {
                 setFocus(true)
                 setValue(name)
               }
@@ -96,64 +96,66 @@ export const CollectionHeader = ({
         )}
       </Stack.Item>
 
-      <Stack.Item align='center' grow={0}>
-        {isLoading ? (
-          <Spinner size={SpinnerSize.small} />
-        ) : (
-          <>
-            <IconButton
-              className={'outline-none'}
-              iconProps={{
-                iconName: 'More',
-              }}
-              styles={{ root: { color: '#000', fontSize: '16px' } }}
-              title='CollapseMenu'
-              ariaLabel='CollapseMenu'
-              onRenderMenuIcon={_ => <></>}
-              menuProps={{
-                items: [
-                  {
-                    key: 'delete',
-                    onClick: () => setDialogHidden(false),
-                    iconProps: {
-                      iconName: 'Delete',
-                      style: { color: 'red', fontWeight: '400' },
+      {!!onDelete && (
+        <Stack.Item align='center' grow={0}>
+          {isLoading ? (
+            <Spinner size={SpinnerSize.small} />
+          ) : (
+            <>
+              <IconButton
+                className={'outline-none'}
+                iconProps={{
+                  iconName: 'More',
+                }}
+                styles={{ root: { color: '#000', fontSize: '16px' } }}
+                title='CollapseMenu'
+                ariaLabel='CollapseMenu'
+                onRenderMenuIcon={_ => <></>}
+                menuProps={{
+                  items: [
+                    {
+                      key: 'delete',
+                      onClick: () => setDialogHidden(false),
+                      iconProps: {
+                        iconName: 'Delete',
+                        style: { color: 'red', fontWeight: '400' },
+                      },
+                      text: 'Delete',
+                      title: 'Delete collection',
                     },
-                    text: 'Delete',
-                    title: 'Delete collection',
-                  },
-                ],
-              }}
-              borderless
-            />
-            <Dialog
-              hidden={dialogHidden}
-              dialogContentProps={{
-                type: DialogType.largeHeader,
-                title: 'Delete confirm',
-                subText: `Are you sure to delete collection "${name}"?`,
-              }}
-              onDismiss={() => setDialogHidden(true)}
-            >
-              <DialogFooter>
-                <PrimaryButton
-                  onClick={() => {
-                    setDialogHidden(true)
-                    onDelete()
-                  }}
-                  text='Confirm'
-                />
-                <DefaultButton
-                  onClick={() => setDialogHidden(true)}
-                  text='Cancel'
-                />
-              </DialogFooter>
-            </Dialog>
-          </>
-        )}
-      </Stack.Item>
+                  ],
+                }}
+                borderless
+              />
+              <Dialog
+                hidden={dialogHidden}
+                dialogContentProps={{
+                  type: DialogType.largeHeader,
+                  title: 'Delete confirm',
+                  subText: `Are you sure to delete collection "${name}"?`,
+                }}
+                onDismiss={() => setDialogHidden(true)}
+              >
+                <DialogFooter>
+                  <PrimaryButton
+                    onClick={() => {
+                      setDialogHidden(true)
+                      onDelete()
+                    }}
+                    text='Confirm'
+                  />
+                  <DefaultButton
+                    onClick={() => setDialogHidden(true)}
+                    text='Cancel'
+                  />
+                </DialogFooter>
+              </Dialog>
+            </>
+          )}
+        </Stack.Item>
+      )}
 
-      {isNotUndefined(sortType) && (
+      {!!sortType && (
         <Stack.Item grow={1} horizontalAlign='end'>
           <Stack horizontalAlign='end'>
             <DefaultButton

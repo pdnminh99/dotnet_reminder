@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { invokeOrElse, isNotUndefined, isUndefined } from '../utils'
 import {
   Stack,
@@ -11,8 +11,19 @@ import './Reminder.css'
 import { TaskSortType } from '../enums'
 import { Checkbox } from './Checkbox'
 
-export const TasksContainer = ({ groupName, tasks, sortType }) => {
-  const [isCollapsed, setCollapsed] = useState(true)
+export const TasksContainer = ({
+  groupName,
+  tasks,
+  sortType,
+  shouldCollapsed,
+}) => {
+  const [isCollapsed, setCollapsed] = useState(
+    isNotUndefined(shouldCollapsed) ? shouldCollapsed : true,
+  )
+
+  useEffect(() => {
+    setCollapsed(isNotUndefined(shouldCollapsed) ? shouldCollapsed : true)
+  }, [shouldCollapsed])
 
   return (
     <Stack align={'stretch'}>

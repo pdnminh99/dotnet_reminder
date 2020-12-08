@@ -166,3 +166,18 @@ export const deleteTask = async taskId => {
 
   return undefined
 }
+
+export const getFlaggedTasks = async _ => {
+  const token = await authService.getAccessToken()
+
+  if (!token) {
+    console.error('Cannot send GET request without being authenticated.')
+  } else {
+    const response = await fetch(`/api/v1/Task/Flagged`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (response.status === 200) return await response.json()
+  }
+
+  return undefined
+}
