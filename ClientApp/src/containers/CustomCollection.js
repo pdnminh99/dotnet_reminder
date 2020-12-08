@@ -290,17 +290,13 @@ export const CustomCollection = () => {
             />
           </Stack.Item>
 
-          <Stack.Item align='stretch'>
+          <Stack.Item align='stretch' className={'pb-3'}>
             <Text variant={'small'} className='px-3'>
               {fromEpochToLocalDatetime(creationDate).toUTCString()}
             </Text>
           </Stack.Item>
 
-          <Stack.Item
-            align='stretch'
-            className='py-3'
-            styles={{ root: { overflow: 'auto' } }}
-          >
+          <Stack.Item align='stretch' styles={{ root: { overflow: 'auto' } }}>
             <TasksList
               tasksGroup={tasksByGroups}
               onInsert={createTask}

@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { invokeOrElse, isNotUndefined, isUndefined } from '../utils'
 import {
   Stack,
-  Checkbox,
   FontIcon,
   IconButton,
   Spinner,
@@ -10,6 +9,7 @@ import {
 } from '@fluentui/react'
 import './Reminder.css'
 import { TaskSortType } from '../enums'
+import { Checkbox } from './Checkbox'
 
 export const TasksContainer = ({ groupName, tasks, sortType }) => {
   const [isCollapsed, setCollapsed] = useState(true)
@@ -111,11 +111,7 @@ const TasksList = ({ tasks, sortType }) => {
           verticalAlign={'center'}
           styles={{ root: { height: '100%' } }}
         >
-          <Stack.Item
-            grow={0}
-            align={'center'}
-            className={!taskId ? 'px-3' : 'px-3 pt-2'}
-          >
+          <Stack.Item grow={0} align={'center'} className={'px-3'}>
             {!taskId ? (
               <Spinner size={SpinnerSize.medium} />
             ) : (
