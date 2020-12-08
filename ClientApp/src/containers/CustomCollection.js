@@ -290,6 +290,7 @@ const useCustomTasks = _ => {
       tasksByGroups.push({
         name: 'Completed tasks',
         items: completedTasks,
+        shouldCollapsed: incompletedTasks.length < 5 ? false : true,
       })
     }
 

@@ -65,8 +65,6 @@ const useFlaggedTasks = _ => {
 
     // Checkbox is clicked. TODO giant bug here :(
     task.onCheck = async () => {
-      console.log(collections)
-
       if (!task.taskId) return
       let result = undefined
 
@@ -222,9 +220,13 @@ const useFlaggedTasks = _ => {
 
   function parseGroups(collections) {
     return collections.map(({ name, incompletedTasks, completedTasks }) => {
+      let items = [...incompletedTasks, ...completedTasks].sort(
+        (a, b) => a.taskId - b.taskId,
+      )
+
       return {
         name,
-        items: [...incompletedTasks, ...completedTasks],
+        items,
         shouldCollapsed: false,
       }
     })

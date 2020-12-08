@@ -181,3 +181,48 @@ export const getFlaggedTasks = async _ => {
 
   return undefined
 }
+
+export const getPlannedTasks = async _ => {
+  const token = await authService.getAccessToken()
+
+  if (!token) {
+    console.error('Cannot send GET request without being authenticated.')
+  } else {
+    const response = await fetch(`/api/v1/Task/Planned`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (response.status === 200) return await response.json()
+  }
+
+  return undefined
+}
+
+export const getTodayTasks = async _ => {
+  const token = await authService.getAccessToken()
+
+  if (!token) {
+    console.error('Cannot send GET request without being authenticated.')
+  } else {
+    const response = await fetch(`/api/v1/Task/Today`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (response.status === 200) return await response.json()
+  }
+
+  return undefined
+}
+
+export const getAllTasks = async () => {
+  const token = await authService.getAccessToken()
+
+  if (!token) {
+    console.error('Cannot send GET request without being authenticated.')
+  } else {
+    const response = await fetch('/api/v1/Collection?includeTasks=true', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (response.status === 200) return await response.json()
+  }
+
+  return undefined
+}

@@ -23,7 +23,7 @@ export const TasksContainer = ({
 
   useEffect(() => {
     setCollapsed(isNotUndefined(shouldCollapsed) ? shouldCollapsed : true)
-  }, [shouldCollapsed])
+  }, [])
 
   return (
     <Stack align={'stretch'}>
