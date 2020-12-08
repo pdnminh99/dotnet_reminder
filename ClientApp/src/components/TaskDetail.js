@@ -11,7 +11,7 @@ import {
   Text,
   DialogType,
 } from '@fluentui/react'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { invokeOrElse } from '../utils'
 import { Checkbox } from './Checkbox'
 
@@ -24,13 +24,18 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
   const [content, setContent] = useState(selectedTask.content)
   const [note, setNote] = useState(selectedTask.note)
   const [dueDate, setDueDate] = useState(selectedTask.dueDate)
+  const [isCompleted, setIsCompleted] = useState(selectedTask.isCompleted)
+  const [isFlagged, setFlag] = useState(selectedTask.isFlagged)
+
+  useEffect(() => {
+    setContent(selectedTask.content)
+    setNote(selectedTask.note)
+    setDueDate(selectedTask.dueDate)
+    setIsCompleted(selectedTask.isCompleted)
+    setFlag(selectedTask.isFlagged)
+  }, [selectedTask])
 
   const {
-    // Fields
-    taskId,
-    isCompleted,
-    isFlagged,
-
     // Methods
     onCheck,
     onFlag,
@@ -166,12 +171,11 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
         <DialogFooter>
           <PrimaryButton
             className={'outline-none'}
-            onClick={() => {
-              setDialogHidden(true)
+            onClick={async () => {
               setProcessing(true)
-              onDelete()
-                .then(_ => {})
-                .finally(_ => setProcessing(false))
+              await onDelete()
+              setDialogHidden(true)
+              setProcessing(false)
             }}
             text='Save'
           />

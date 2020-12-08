@@ -132,6 +132,7 @@ const TasksList = ({ tasks, sortType }) => {
 
           <Stack.Item grow={0} align={'center'} className={'px-3'}>
             <IconButton
+              className={'outline-none'}
               onClick={() => invokeOrElse(onFlag)}
               iconProps={{ iconName: 'Flag' }}
               styles={{

@@ -20,6 +20,7 @@ import {
   deleteTask,
   retrieveTasks,
   updateCollection,
+  updateTask,
 } from '../operations'
 import { NotifierType, TaskSortType } from '../enums'
 
@@ -94,25 +95,39 @@ const useCustomTasks = _ => {
       setSelectedTask(task)
     }
 
-    // Checkbox is clicked
-    task.onCheck = () => {
+    // Checkbox is clicked. TODO giant bug here :(
+    task.onCheck = async () => {
       if (isUndefined(task.taskId)) return
+      let result = undefined
 
       if (task.isCompleted) {
-        // Move to incompleted tasks list
-        task.isCompleted = false
-        task.completedAt = undefined
+        // Call server api
+        result = await updateTask({
+          ...task,
+          completedAt: undefined,
+        })
 
-        incompletedTasks.unshift(task)
+        if (!result) return
+
+        // Move to incompleted tasks list
+        incompletedTasks.unshift(result)
 
         // Remove from completed tasks list
         completedTasks = completedTasks.filter(t => t.taskId !== task.taskId)
       } else {
-        // Move to completed tasks list
-        task.isCompleted = true
-        task.completedAt = new Date().getMilliseconds()
+        let now = new Date().getMilliseconds()
 
-        completedTasks.unshift(task)
+        // Call server api
+        result = await updateTask({
+          ...task,
+          completedAt: now,
+        })
+
+        if (!result) return
+
+        // Move to completed tasks list
+        assignTaskMethod(result)
+        completedTasks.unshift(result)
 
         // Remove from incompleted tasks list
         incompletedTasks = incompletedTasks.filter(
@@ -123,18 +138,73 @@ const useCustomTasks = _ => {
       setCompletedTasks(completedTasks)
       setIncompletedTasks(incompletedTasks)
       setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
+
+      if (!!selectedTask && task.taskId === selectedTask.taskId) {
+        setSelectedTask(result)
+        setDetailActive(false)
+      }
     }
 
     // Flag button is clicked
-    task.onFlag = () => {
+    task.onFlag = async () => {
       if (isUndefined(task.taskId)) return
-      console.log(`Task id ${task.taskId}; content: ${task.content} on flag.`)
+
+      // Call server api
+      let result = await updateTask({ ...task, isFlagged: !task.isFlagged })
+
+      if (!result) return
+
+      // Apply changes
+      assignTaskMethod(result)
+
+      if (task.isCompleted) {
+        completedTasks = completedTasks.map(c => {
+          if (c.taskId === task.taskId) {
+            return result
+          }
+          return c
+        })
+        setCompletedTasks(completedTasks)
+      } else {
+        incompletedTasks = incompletedTasks.map(c => {
+          if (c.taskId === task.taskId) {
+            return result
+          }
+          return c
+        })
+
+        setIncompletedTasks(incompletedTasks)
+      }
+
+      setSelectedTask(result)
+      setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
     }
 
-    task.onEdit = ({ content, dueDate, note }) => {
-      console.log(
-        `Edit with new content: ${content}; dueDate: ${dueDate} and note: ${note}`,
-      )
+    task.onEdit = async ({ content, dueDate, note }) => {
+      if (!task.taskId) return
+
+      let result = await updateTask({ ...task, content, dueDate, note })
+      if (!result) return
+
+      if (task.isCompleted) {
+        completedTasks = completedTasks.map(c => {
+          if (c.taskId === task.taskId) {
+            return result
+          }
+          return c
+        })
+        setCompletedTasks(completedTasks)
+      } else {
+        incompletedTasks = incompletedTasks.map(c => {
+          if (c.taskId === task.taskId) {
+            return result
+          }
+          return c
+        })
+
+        setIncompletedTasks(incompletedTasks)
+      }
+      setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
     }
 
     task.onDelete = async () => {
@@ -153,11 +223,9 @@ const useCustomTasks = _ => {
 
       setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
 
-      if (isDetailActive) {
-        if (incompletedTasks.length > 0) setSelectedTask(incompletedTasks[0])
-        else if (completedTasks.length > 0) setSelectedTask(completedTasks[0])
-        else setDetailActive(false)
-      }
+      if (incompletedTasks.length > 0) setSelectedTask(incompletedTasks[0])
+      else if (completedTasks.length > 0) setSelectedTask(completedTasks[0])
+      else setDetailActive(false)
 
       return true
     }
@@ -246,8 +314,6 @@ const useCustomTasks = _ => {
   }
 
   async function handleDeleteCollection() {
-    console.log(`Delete collection [${cid}]`)
-
     setIsProcessing(true)
 
     let result = await deleteCollection(cid)
@@ -259,6 +325,9 @@ const useCustomTasks = _ => {
         },
         type: NotifierType.Delete,
       })
+
+      setSelectedTask(undefined)
+      setDetailActive(false)
       history.push('/today')
     }
 
