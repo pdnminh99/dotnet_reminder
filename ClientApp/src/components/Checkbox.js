@@ -1,11 +1,12 @@
 import React from 'react'
 import { FontIcon, Stack } from '@fluentui/react'
 import './Checkbox.css'
+import './Reminder.css'
 
 export const Checkbox = ({ checked, onChange }) => {
   return (
     <Stack
-      className={'circle'}
+      className={'circle cursor-pointer'}
       onClick={onChange}
       verticalAlign={'center'}
       styles={{

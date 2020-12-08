@@ -13,11 +13,67 @@ import {
 } from '@fluentui/react'
 import React, { useState } from 'react'
 import { invokeOrElse } from '../utils'
+import { Checkbox } from './Checkbox'
 
-export const TaskDetail = ({ selectedTask, onCancel, onDelete }) => {
+let syncId = undefined
+
+export const TaskDetail = ({ selectedTask, onCancel }) => {
+  const [isProcessing, setProcessing] = useState(false)
   const [dialogHidden, setDialogHidden] = useState(true)
 
-  const { taskId, content, description, isCompleted, isFlagged } = selectedTask
+  const [content, setContent] = useState(selectedTask.content)
+  const [note, setNote] = useState(selectedTask.note)
+  const [dueDate, setDueDate] = useState(selectedTask.dueDate)
+
+  const {
+    // Fields
+    taskId,
+    isCompleted,
+    isFlagged,
+
+    // Methods
+    onCheck,
+    onFlag,
+    onEdit,
+    onDelete,
+  } = selectedTask
+
+  function requestChanges({ content, note, dueDate }) {
+    let hasChanges = false
+
+    hasChanges = hasChanges || content !== selectedTask.content
+    hasChanges = hasChanges || note !== selectedTask.note
+    hasChanges = hasChanges || dueDate !== selectedTask.dueDate
+
+    if (hasChanges) {
+      console.log(`Changes detected`)
+      onEdit({ content, dueDate, note })
+    }
+
+    syncId = undefined
+  }
+
+  function handleNameChange({ target }) {
+    setContent(target.value)
+    if (!!syncId) {
+      clearTimeout(syncId)
+    }
+    syncId = setTimeout(
+      () => requestChanges({ content: target.value, note, dueDate }),
+      1000,
+    )
+  }
+
+  function handleNoteChange({ target }) {
+    setNote(target.value)
+    if (!!syncId) {
+      clearTimeout(syncId)
+    }
+    syncId = setTimeout(
+      () => requestChanges({ content, note: target.value, dueDate }),
+      1000,
+    )
+  }
 
   return (
     <Stack tokens={{ childrenGap: 10 }}>
@@ -25,17 +81,14 @@ export const TaskDetail = ({ selectedTask, onCancel, onDelete }) => {
         <Stack className='ms-bgColor-white ms-depth-4'>
           <Stack.Item align='stretch'>
             <Stack horizontal className={'px-3 py-2'}>
-              <Stack.Item align='center' grow={0}>
-                <input
-                  type='checkbox'
-                  onChange={() => {}}
-                  checked={isCompleted}
-                  style={{ borderRadius: '9999px' }}
-                />
+              <Stack.Item align={'center'} grow={0}>
+                <Checkbox onChange={onCheck} checked={isCompleted} />
               </Stack.Item>
 
               <Stack.Item align='stretch' grow={1}>
                 <TextField
+                  onChange={handleNameChange}
+                  disabled={isProcessing}
                   borderless
                   className={'px-2'}
                   placeholder={'Task content...'}
@@ -47,13 +100,15 @@ export const TaskDetail = ({ selectedTask, onCancel, onDelete }) => {
           </Stack.Item>
           <Stack.Item>
             <TextField
+              onChange={handleNoteChange}
               multiline
+              disabled={isProcessing}
               borderless
               className='p-2'
               row={3}
               resizable={true}
-              value={description}
-              placeholder={'Task description'}
+              value={note}
+              placeholder={'Task note'}
               styles={{ root: { border: 'none' } }}
             />
           </Stack.Item>
@@ -63,21 +118,13 @@ export const TaskDetail = ({ selectedTask, onCancel, onDelete }) => {
       <Stack.Item align={'stretch'}>
         <Stack className={'ms-bgColor-white ms-depth-4'}>
           <ControlWrapper>
-            <Button content={'Remind me'} iconName={'Ringer'} hasDivider />
-          </ControlWrapper>
-
-          <ControlWrapper>
             <Button content={'Add due date'} iconName={'DateTime'} hasDivider />
-          </ControlWrapper>
-
-          <ControlWrapper>
-            <Button content={'Repeat'} iconName={'RepeatAll'} />
           </ControlWrapper>
         </Stack>
       </Stack.Item>
 
       <ControlWrapper hasDepth>
-        <Button content={'Flag'} iconName={'Flag'} />
+        <Button content={'Flag'} iconName={'Flag'} onClick={onFlag} />
       </ControlWrapper>
 
       <Stack.Item align={'stretch'}>
@@ -118,13 +165,21 @@ export const TaskDetail = ({ selectedTask, onCancel, onDelete }) => {
       >
         <DialogFooter>
           <PrimaryButton
+            className={'outline-none'}
             onClick={() => {
               setDialogHidden(true)
-              invokeOrElse(onDelete)
+              setProcessing(true)
+              onDelete()
+                .then(_ => {})
+                .finally(_ => setProcessing(false))
             }}
             text='Save'
           />
-          <DefaultButton onClick={() => setDialogHidden(true)} text='Cancel' />
+          <DefaultButton
+            className={'outline-none'}
+            onClick={() => setDialogHidden(true)}
+            text='Cancel'
+          />
         </DialogFooter>
       </Dialog>
     </Stack>
@@ -146,7 +201,7 @@ const ControlWrapper = ({ children, hasDepth }) => {
   )
 }
 
-const Button = ({ content, iconName, hasDivider }) => {
+const Button = ({ content, iconName, hasDivider, onClick }) => {
   const customStyles = { root: { border: 'none', height: '50px' } }
 
   if (typeof hasDivider === 'boolean' && hasDivider) {
@@ -157,6 +212,7 @@ const Button = ({ content, iconName, hasDivider }) => {
 
   return (
     <CommandBarButton
+      onClick={onClick}
       borderless
       className={'outline-none w-100 px-2 py-3'}
       allowDisabledFocus={false}

@@ -17,6 +17,7 @@ import { useHistory, useParams } from 'react-router-dom'
 import {
   createTask as createTaskCall,
   deleteCollection,
+  deleteTask,
   retrieveTasks,
   updateCollection,
 } from '../operations'
@@ -71,6 +72,12 @@ const useCustomTasks = _ => {
 
         setCompletedTasks(completedTasks)
         setIncompletedTasks(incompletedTasks)
+
+        if (isDetailActive) {
+          if (incompletedTasks.length > 0) setSelectedTask(incompletedTasks[0])
+          else if (completedTasks.length > 0) setSelectedTask(completedTasks[0])
+          else setDetailActive(false)
+        }
         setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
       }
     }
@@ -122,6 +129,37 @@ const useCustomTasks = _ => {
     task.onFlag = () => {
       if (isUndefined(task.taskId)) return
       console.log(`Task id ${task.taskId}; content: ${task.content} on flag.`)
+    }
+
+    task.onEdit = ({ content, dueDate, note }) => {
+      console.log(
+        `Edit with new content: ${content}; dueDate: ${dueDate} and note: ${note}`,
+      )
+    }
+
+    task.onDelete = async () => {
+      let result = await deleteTask(task.taskId)
+
+      if (!result) return false
+      if (task.isCompleted) {
+        completedTasks = completedTasks.filter(t => t.taskId !== task.taskId)
+        setCompletedTasks(completedTasks)
+      } else {
+        incompletedTasks = incompletedTasks.filter(
+          t => t.taskId !== task.taskId,
+        )
+        setIncompletedTasks(incompletedTasks)
+      }
+
+      setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
+
+      if (isDetailActive) {
+        if (incompletedTasks.length > 0) setSelectedTask(incompletedTasks[0])
+        else if (completedTasks.length > 0) setSelectedTask(completedTasks[0])
+        else setDetailActive(false)
+      }
+
+      return true
     }
   }
 
