@@ -15,7 +15,7 @@ import {
 } from '../utils'
 import { useHistory, useParams } from 'react-router-dom'
 import {
-  createTask,
+  createTask as createTaskCall,
   deleteCollection,
   retrieveTasks,
   updateCollection,
@@ -125,30 +125,52 @@ const useCustomTasks = _ => {
     }
   }
 
-  function createTask(content) {
+  async function createTask(content) {
     if (content.trim().length === 0) return
+
+    const syncTimestamp = new Date().getMilliseconds()
 
     let newTask = {
       taskId: undefined,
       content,
-      isFlagged: false,
+      isFlagged: true,
       isCompleted: false,
       note: '',
+      syncTimestamp,
     }
 
     assignTaskMethod(newTask)
 
     incompletedTasks.unshift(newTask)
 
-    setCompletedTasks(completedTasks)
     setIncompletedTasks(incompletedTasks)
     setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
-    // createTask({ content, isFlagged: false, note: '' }).then(t => {
-    //   setIncompletedTasks(tasks => {
-    //     tasks.unshift(t)
-    //     return tasks
-    //   })
-    // })
+
+    let createdTask = await createTaskCall(cid, { content })
+
+    if (!createdTask) {
+      setTimeout(() => {
+        incompletedTasks = incompletedTasks.filter(
+          t => t.syncTimestamp !== syncTimestamp,
+        )
+
+        setIncompletedTasks(incompletedTasks)
+        setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
+      }, 2000)
+    } else {
+      setTimeout(() => {
+        incompletedTasks = incompletedTasks.map(t => {
+          if (t.syncTimestamp === syncTimestamp) {
+            assignTaskMethod(createdTask)
+            return createdTask
+          }
+          return t
+        })
+
+        setIncompletedTasks(incompletedTasks)
+        setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
+      }, 2000)
+    }
   }
 
   function parseGroups(incompletedTasks, completedTasks) {
@@ -253,10 +275,10 @@ export const CustomCollection = () => {
       <Stack.Item
         grow={1}
         align='stretch'
-        className='px-2 py-3'
+        className='pl-2 pt-3'
         styles={{ root: { color: '#000', background: '#FFF' } }}
       >
-        <Stack>
+        <Stack className='h-100'>
           <Stack.Item align='stretch'>
             <CollectionHeader
               name={name}
@@ -274,7 +296,11 @@ export const CustomCollection = () => {
             </Text>
           </Stack.Item>
 
-          <Stack.Item align='stretch' className='py-3'>
+          <Stack.Item
+            align='stretch'
+            className='py-3'
+            styles={{ root: { overflow: 'auto' } }}
+          >
             <TasksList
               tasksGroup={tasksByGroups}
               onInsert={createTask}

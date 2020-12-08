@@ -138,7 +138,15 @@ const TasksList = ({ tasks, sortType }) => {
             <IconButton
               onClick={() => invokeOrElse(onFlag)}
               iconProps={{ iconName: 'Flag' }}
-              styles={{ root: { fontSize: '16px', fontWeight: '500' } }}
+              styles={{
+                root: {
+                  borderRadius: '0.125rem;',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  color: isFlagged ? '#FFF' : '#0078d7',
+                  backgroundColor: isFlagged ? '#0078d7' : 'transparent',
+                },
+              }}
             />
           </Stack.Item>
         </Stack>

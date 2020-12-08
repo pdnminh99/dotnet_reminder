@@ -159,7 +159,7 @@ export const CollectionNav = ({ pathname }) => {
         root: {
           color: '#000',
           width: collapsed ? '48px' : '290px',
-          overflow: 'hidden',
+          overflow: 'auto',
         },
       }}
       align='stretch'
@@ -168,14 +168,16 @@ export const CollectionNav = ({ pathname }) => {
     >
       <FocusZone direction={FocusZoneDirection.vertical}>
         <Stack align={'stretch'}>
-          <CollapseButton onCollapsedClick={onCollapsedClick} />
+          <CollapseButton onCollapsedClick={onCollapsedClick} grow={0} />
 
           {/* Default collections */}
-          <List
-            items={defaults}
-            onRenderCell={OnRenderCollection}
-            className='py-3'
-          />
+          <Stack.Item grow={0}>
+            <List
+              items={defaults}
+              onRenderCell={OnRenderCollection}
+              className='py-3'
+            />
+          </Stack.Item>
 
           {/* User created collection */}
           <List items={collections} onRenderCell={OnRenderCollection} />

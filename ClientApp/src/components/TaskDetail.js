@@ -84,6 +84,7 @@ export const TaskDetail = ({ selectedTask, onCancel, onDelete }) => {
         <Stack horizontal horizontalAlign={'space-between'}>
           <IconButton
             iconProps={{ iconName: 'ClosePane' }}
+            className={'outline-none'}
             styles={{
               root: {
                 fontSize: '16px',
@@ -96,6 +97,7 @@ export const TaskDetail = ({ selectedTask, onCancel, onDelete }) => {
 
           <IconButton
             iconProps={{ iconName: 'Delete' }}
+            className={'outline-none'}
             styles={{
               root: { fontSize: '16px', fontWeight: '500', color: 'red' },
             }}
@@ -156,7 +158,7 @@ const Button = ({ content, iconName, hasDivider }) => {
   return (
     <CommandBarButton
       borderless
-      className={'w-100 px-2 py-3'}
+      className={'outline-none w-100 px-2 py-3'}
       allowDisabledFocus={false}
       styles={customStyles}
       onRenderChildren={() => (

@@ -74,13 +74,16 @@ export const deleteCollection = async collectionId => {
   return undefined
 }
 
-export const createTask = async ({ content, isFlagged, note }) => {
+export const createTask = async (
+  collectionId,
+  { content, isFlagged, note },
+) => {
   const token = await authService.getAccessToken()
 
   if (!token) {
     console.error('Cannot send POST request without being authenticated.')
   } else {
-    const response = await fetch('/api/v1/Task', {
+    const response = await fetch(`/api/v1/Task/${collectionId}`, {
       method: 'POST',
       body: JSON.stringify({ content, isFlagged, note }),
       headers: {
@@ -89,6 +92,10 @@ export const createTask = async ({ content, isFlagged, note }) => {
       },
     })
     if (response.status === 200) return await response.json()
+    else {
+      console.log(response.status)
+      console.log(response.text())
+    }
   }
 
   return undefined
