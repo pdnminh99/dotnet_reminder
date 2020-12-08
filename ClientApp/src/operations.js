@@ -74,6 +74,26 @@ export const deleteCollection = async collectionId => {
   return undefined
 }
 
+export const createTask = async ({ content, isFlagged, note }) => {
+  const token = await authService.getAccessToken()
+
+  if (!token) {
+    console.error('Cannot send POST request without being authenticated.')
+  } else {
+    const response = await fetch('/api/v1/Task', {
+      method: 'POST',
+      body: JSON.stringify({ content, isFlagged, note }),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    if (response.status === 200) return await response.json()
+  }
+
+  return undefined
+}
+
 export const retrieveTasks = async taskId => {
   const token = await authService.getAccessToken()
 

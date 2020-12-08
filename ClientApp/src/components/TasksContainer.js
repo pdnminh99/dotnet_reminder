@@ -1,14 +1,24 @@
 import React, { useState } from 'react'
 import { invokeOrElse, isNotUndefined, isUndefined } from '../utils'
-import { Stack, Checkbox, FontIcon } from '@fluentui/react'
+import {
+  Stack,
+  Checkbox,
+  FontIcon,
+  IconButton,
+  Spinner,
+  SpinnerSize,
+} from '@fluentui/react'
 import './Reminder.css'
+import { TaskSortType } from '../enums'
 
-export const TasksContainer = ({ groupName, tasks }) => {
+export const TasksContainer = ({ groupName, tasks, sortType }) => {
   const [isCollapsed, setCollapsed] = useState(true)
 
   return (
     <Stack align={'stretch'}>
-      {isUndefined(groupName) && <TasksList tasks={tasks} />}
+      {isUndefined(groupName) && (
+        <TasksList tasks={tasks} sortType={sortType} />
+      )}
 
       {isNotUndefined(groupName) && (
         <>
@@ -43,7 +53,7 @@ export const TasksContainer = ({ groupName, tasks }) => {
           {/* Group content */}
           {!isCollapsed && (
             <Stack.Item>
-              <TasksList tasks={tasks} />
+              <TasksList tasks={tasks} sortType={sortType} />
             </Stack.Item>
           )}
         </>
@@ -52,12 +62,41 @@ export const TasksContainer = ({ groupName, tasks }) => {
   )
 }
 
-const TasksList = ({ tasks }) =>
-  tasks.map(
-    ({ content, isCompleted, isFlagged, onSelect, onCheck, onFlag }, index) => (
+const TasksList = ({ tasks, sortType }) => {
+  function rearrangeTasks(tasks) {
+    switch (sortType) {
+      case TaskSortType.Alphabetically:
+        return tasks.sort((before, after) => {
+          if (before.content > after.content) return 1
+          if (before.content < after.content) return -1
+          return 0
+        })
+      case TaskSortType.CreationDate:
+        return tasks.sort((before, after) => {
+          if (before.creationDate > after.creationDate) return -1
+          if (before.creationDate < after.creationDate) return 1
+          return 0
+        })
+      case TaskSortType.DueDate:
+        return tasks.sort((before, after) => {
+          if (before.dueDate > after.dueDate) return -1
+          if (before.dueDate < after.dueDate) return 1
+          return 0
+        })
+      case TaskSortType.Default:
+      default:
+        return tasks
+    }
+  }
+
+  return rearrangeTasks(tasks).map(
+    (
+      { taskId, content, isCompleted, isFlagged, onSelect, onCheck, onFlag },
+      index,
+    ) => (
       <Stack.Item
         key={index}
-        className={'cursor-pointer bg-gray-300--hover'}
+        className={'cursor-pointer ms-bgColor-gray20--hover'}
         styles={{
           root: {
             height: '50px',
@@ -72,10 +111,16 @@ const TasksList = ({ tasks }) =>
           verticalAlign={'center'}
           styles={{ root: { height: '100%' } }}
         >
-          <Stack.Item grow={0} align={'center'} className={'px-3 pt-2'}>
-            <span onClick={() => invokeOrElse(onCheck)}>
-              <Checkbox checked={isCompleted} />
-            </span>
+          <Stack.Item
+            grow={0}
+            align={'center'}
+            className={!taskId ? 'px-3' : 'px-3 pt-2'}
+          >
+            {!taskId ? (
+              <Spinner size={SpinnerSize.medium} />
+            ) : (
+              <Checkbox onChange={onCheck} checked={isCompleted} />
+            )}
           </Stack.Item>
 
           <Stack.Item grow={1} align={'stretch'}>
@@ -89,15 +134,15 @@ const TasksList = ({ tasks }) =>
             </Stack>
           </Stack.Item>
 
-          <Stack.Item grow={0} align={'center'} className={'px-3 pt-2'}>
-            <span onClick={() => invokeOrElse(onFlag)}>
-              <FontIcon
-                iconName='Flag'
-                styles={{ root: { fontSize: '16px', fontWeight: '500' } }}
-              />
-            </span>
+          <Stack.Item grow={0} align={'center'} className={'px-3'}>
+            <IconButton
+              onClick={() => invokeOrElse(onFlag)}
+              iconProps={{ iconName: 'Flag' }}
+              styles={{ root: { fontSize: '16px', fontWeight: '500' } }}
+            />
           </Stack.Item>
         </Stack>
       </Stack.Item>
     ),
   )
+}

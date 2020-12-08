@@ -19,7 +19,7 @@ import {
   isUndefined,
 } from '../utils'
 import { standardCollections } from '../dummy_data'
-import { matchPath } from 'react-router'
+import { matchPath, useHistory } from 'react-router'
 import { createCollection, retrieveCollections } from '../operations'
 import { NotifierType } from '../enums'
 
@@ -35,6 +35,8 @@ const preprocessCollection = ({ collectionId, name }) => ({
 export const CollectionNav = ({ pathname }) => {
   // Use Context API to communicate with CustomCollection.
   const { notifier, setNotifier } = useContext(CollectionUpdateNotifierContext)
+
+  const history = useHistory()
 
   useEffect(() => {
     if (isNotUndefined(notifier)) {
@@ -145,6 +147,8 @@ export const CollectionNav = ({ pathname }) => {
             return c
           })
         })
+
+        history.push(`/collection/${newCollection.collectionId}`)
       }
     })
   }

@@ -15,6 +15,7 @@ import {
 } from '../utils'
 import { useHistory, useParams } from 'react-router-dom'
 import {
+  createTask,
   deleteCollection,
   retrieveTasks,
   updateCollection,
@@ -32,21 +33,24 @@ const taskDetailStyles = {
   },
 }
 
-export const CustomCollection = () => {
+const useCustomTasks = _ => {
   const { setNotifier } = useContext(CollectionUpdateNotifierContext)
 
   const { cid } = useParams()
 
   const history = useHistory()
 
-  const [isDetailActive, setDetailActive] = useState(false)
-  const [selectedTask, setSelectedTask] = useState(undefined)
-
   const [name, setName] = useState('')
   const [creationDate, setCreationDate] = useState(0)
-  const [sortType, setSortType] = useState(TaskSortType.Default)
-  const [incompletedTasks, setIncompletedTasks] = useState([])
-  const [completedTasks, setCompletedTasks] = useState([])
+
+  // Tasks related states
+  let [incompletedTasks, setIncompletedTasks] = useState([])
+  let [completedTasks, setCompletedTasks] = useState([])
+  const [tasksByGroups, setTasksByGroups] = useState([])
+
+  // Right panel states
+  const [isDetailActive, setDetailActive] = useState(false)
+  const [selectedTask, setSelectedTask] = useState(undefined)
 
   const [isProcessing, setIsProcessing] = useState(false)
 
@@ -54,126 +58,193 @@ export const CustomCollection = () => {
     async function syncTasks() {
       const fetchResults = await retrieveTasks(cid)
 
-      if (!fetchResults) {
-        console.error(`Error fetching collection data.`)
-      } else {
-        let {
-          name,
-          creationDate,
-          incompletedTasks,
-          completedTasks,
-        } = fetchResults
+      if (isNotUndefined(fetchResults)) {
+        incompletedTasks = fetchResults.incompletedTasks
+        completedTasks = fetchResults.completedTasks
 
-        setName(name)
-        setCreationDate(creationDate)
-        setIncompletedTasks(incompletedTasks || [])
-        setCompletedTasks(completedTasks || [])
+        setName(fetchResults.name)
+        setCreationDate(fetchResults.creationDate)
+
+        // Assign methods.
+        completedTasks.forEach(t => assignTaskMethod(t))
+        incompletedTasks.forEach(t => assignTaskMethod(t))
+
+        setCompletedTasks(completedTasks)
+        setIncompletedTasks(incompletedTasks)
+        setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
       }
     }
 
     syncTasks()
   }, [cid])
 
-  const assignTaskMethod = task => {
+  function assignTaskMethod(task) {
+    // Task if clicked
     task.onSelect = () => {
+      if (isUndefined(task.taskId)) return
+
       setDetailActive(true)
       setSelectedTask(task)
     }
+
+    // Checkbox is clicked
     task.onCheck = () => {
-      let { taskId, isCompleted } = task
+      if (isUndefined(task.taskId)) return
 
-      if (isCompleted) {
+      if (task.isCompleted) {
         // Move to incompleted tasks list
-        setIncompletedTasks(tasks => {
-          task.isCompleted = false
-          task.completedAt = undefined
+        task.isCompleted = false
+        task.completedAt = undefined
 
-          tasks.unshift(task)
-          return tasks
-        })
+        incompletedTasks.unshift(task)
 
         // Remove from completed tasks list
-        setCompletedTasks(tasks => tasks.filter(t => t.taskId !== taskId))
+        completedTasks = completedTasks.filter(t => t.taskId !== task.taskId)
       } else {
         // Move to completed tasks list
-        setCompletedTasks(tasks => {
-          task.isCompleted = true
-          task.completedAt = new Date().getMilliseconds()
+        task.isCompleted = true
+        task.completedAt = new Date().getMilliseconds()
 
-          tasks.unshift(task)
-          return tasks
-        })
+        completedTasks.unshift(task)
 
         // Remove from incompleted tasks list
-        setIncompletedTasks(tasks => tasks.filter(t => t.taskId !== taskId))
+        incompletedTasks = incompletedTasks.filter(
+          t => t.taskId !== task.taskId,
+        )
       }
+
+      setCompletedTasks(completedTasks)
+      setIncompletedTasks(incompletedTasks)
+      setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
     }
-    task.onFlag = () =>
+
+    // Flag button is clicked
+    task.onFlag = () => {
+      if (isUndefined(task.taskId)) return
       console.log(`Task id ${task.taskId}; content: ${task.content} on flag.`)
+    }
   }
 
-  completedTasks.forEach(assignTaskMethod)
+  function createTask(content) {
+    if (content.trim().length === 0) return
 
-  incompletedTasks.forEach(assignTaskMethod)
+    let newTask = {
+      taskId: undefined,
+      content,
+      isFlagged: false,
+      isCompleted: false,
+      note: '',
+    }
 
-  const rearrangeTasks = tasks => {
-    // TODO implement this
-    return tasks
+    assignTaskMethod(newTask)
+
+    incompletedTasks.unshift(newTask)
+
+    setCompletedTasks(completedTasks)
+    setIncompletedTasks(incompletedTasks)
+    setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
+    // createTask({ content, isFlagged: false, note: '' }).then(t => {
+    //   setIncompletedTasks(tasks => {
+    //     tasks.unshift(t)
+    //     return tasks
+    //   })
+    // })
   }
 
-  const handleCollectionNameEdit = value => {
+  function parseGroups(incompletedTasks, completedTasks) {
+    let tasksByGroups = [{ items: incompletedTasks }]
+
+    if (completedTasks.length > 0) {
+      tasksByGroups.push({
+        name: 'Completed tasks',
+        items: completedTasks,
+      })
+    }
+
+    return tasksByGroups
+  }
+
+  async function handleEditollectionName(value) {
     const oldName = name
 
     setName(value)
     setIsProcessing(true)
 
-    updateCollection(cid, value)
-      .then(result => {
-        if (isUndefined(result)) {
-          setName(oldName)
-        } else {
-          setNotifier({
-            collection: {
-              collectionId: parseInt(cid),
-              name: value,
-            },
-            type: NotifierType.Update,
-          })
-        }
+    let result = await updateCollection(cid, value)
+
+    if (isUndefined(result)) setName(oldName)
+    else {
+      setNotifier({
+        collection: {
+          collectionId: parseInt(cid),
+          name: value,
+        },
+        type: NotifierType.Update,
       })
-      .finally(_ => {
-        setIsProcessing(false)
-      })
+    }
+    setIsProcessing(false)
   }
 
-  const handleCollectionDelete = _ => {
+  async function handleDeleteCollection() {
+    console.log(`Delete collection [${cid}]`)
+
     setIsProcessing(true)
 
-    deleteCollection(cid)
-      .then(result => {
-        if (isNotUndefined(result)) {
-          setNotifier({
-            collection: {
-              collectionId: parseInt(cid),
-              name,
-            },
-            type: NotifierType.Delete,
-          })
-          history.push('/today')
-        }
+    let result = await deleteCollection(cid)
+    if (isNotUndefined(result)) {
+      setNotifier({
+        collection: {
+          collectionId: parseInt(cid),
+          name,
+        },
+        type: NotifierType.Delete,
       })
-      .finally(_ => {
-        setIsProcessing(false)
-      })
+      history.push('/today')
+    }
+
+    setIsProcessing(false)
   }
 
-  const tasksGroup = [{ items: rearrangeTasks(incompletedTasks) }]
+  return {
+    name,
+    creationDate,
+    tasksByGroups,
+    createTask,
 
-  if (completedTasks.length > 0) {
-    tasksGroup.push({
-      name: 'Completed tasks',
-      items: rearrangeTasks(completedTasks),
-    })
+    isDetailActive,
+    setDetailActive,
+
+    handleEditollectionName,
+    handleDeleteCollection,
+
+    isProcessing,
+    selectedTask,
+  }
+}
+
+export const CustomCollection = () => {
+  const {
+    name,
+    creationDate,
+
+    tasksByGroups,
+    createTask,
+
+    // Attributes for right panel.
+    isDetailActive,
+    setDetailActive,
+
+    handleEditollectionName,
+    handleDeleteCollection,
+
+    isProcessing,
+    selectedTask,
+  } = useCustomTasks()
+
+  const [sortType, setSortType] = useState(TaskSortType.Default)
+
+  function changeSortType(newSortType) {
+    if (newSortType !== sortType) setSortType(newSortType)
   }
 
   return (
@@ -190,11 +261,9 @@ export const CustomCollection = () => {
             <CollectionHeader
               name={name}
               isLoading={isProcessing}
-              onEdit={handleCollectionNameEdit}
-              onDelete={handleCollectionDelete}
-              onSort={newSortType => {
-                if (newSortType !== sortType) setSortType(newSortType)
-              }}
+              onEdit={handleEditollectionName}
+              onDelete={handleDeleteCollection}
+              onSort={changeSortType}
               sortType={sortType}
             />
           </Stack.Item>
@@ -206,7 +275,11 @@ export const CustomCollection = () => {
           </Stack.Item>
 
           <Stack.Item align='stretch' className='py-3'>
-            <TasksList tasksGroup={tasksGroup} />
+            <TasksList
+              tasksGroup={tasksByGroups}
+              onInsert={createTask}
+              sortType={sortType}
+            />
           </Stack.Item>
         </Stack>
       </Stack.Item>
@@ -229,16 +302,23 @@ export const CustomCollection = () => {
   )
 }
 
-const TasksList = ({ tasksGroup }) => {
+const TasksList = ({ tasksGroup, onInsert, sortType }) => {
   return (
     <Stack>
       <Stack.Item align={'stretch'} styles={{ root: { height: '50px' } }}>
-        <InsertField onInsert={console.log} />
+        <InsertField onInsert={onInsert} />
       </Stack.Item>
 
       <Stack.Item align={'stretch'}>
         {tasksGroup.map(({ name, items }, i) => {
-          return <TasksContainer key={i} groupName={name} tasks={items} />
+          return (
+            <TasksContainer
+              key={i}
+              groupName={name}
+              tasks={items}
+              sortType={sortType}
+            />
+          )
         })}
       </Stack.Item>
     </Stack>

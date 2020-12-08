@@ -28,6 +28,7 @@ export const TaskDetail = ({ selectedTask, onCancel, onDelete }) => {
               <Stack.Item align='center' grow={0}>
                 <input
                   type='checkbox'
+                  onChange={() => {}}
                   checked={isCompleted}
                   style={{ borderRadius: '9999px' }}
                 />

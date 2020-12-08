@@ -13,7 +13,7 @@ import {
 import React, { useEffect, useRef, useState } from 'react'
 import '../components/Reminder.css'
 import { useText } from '../custom_hooks'
-import { invokeOrElse, isNotUndefined } from '../utils'
+import { isNotUndefined } from '../utils'
 import { TaskSortType } from '../enums'
 
 export const CollectionHeader = ({
@@ -132,7 +132,7 @@ export const CollectionHeader = ({
                 <PrimaryButton
                   onClick={() => {
                     setDialogHidden(true)
-                    invokeOrElse(onDelete)
+                    onDelete()
                   }}
                   text='Confirm'
                 />
