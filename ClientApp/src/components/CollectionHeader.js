@@ -1,4 +1,5 @@
 import {
+  ActionButton,
   DefaultButton,
   Dialog,
   DialogFooter,
@@ -61,6 +62,7 @@ export const CollectionHeader = ({
               paddingLeft: '16px',
               fontSize: '20px',
               fontWeight: '600',
+              height: '40px',
               border: 'none',
             }}
             onBlur={e => handleNameChange(e.target.value)}
@@ -69,9 +71,14 @@ export const CollectionHeader = ({
             value={value}
           />
         ) : (
-          <DefaultButton
+          <ActionButton
             className={'outline-none'}
-            styles={{ root: { border: 'none', padding: '5px 0' } }}
+            styles={{
+              root: {
+                border: 'none',
+                padding: '5px 0',
+              },
+            }}
             onClick={_ => {
               if (!isLoading) {
                 setFocus(true)

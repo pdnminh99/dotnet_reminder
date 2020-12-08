@@ -21,27 +21,29 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
   const [isProcessing, setProcessing] = useState(false)
   const [dialogHidden, setDialogHidden] = useState(true)
 
-  const [content, setContent] = useState(selectedTask.content)
-  const [note, setNote] = useState(selectedTask.note)
-  const [dueDate, setDueDate] = useState(selectedTask.dueDate)
-  const [isCompleted, setIsCompleted] = useState(selectedTask.isCompleted)
-  const [isFlagged, setFlag] = useState(selectedTask.isFlagged)
+  const [content, setContent] = useState(
+    !!selectedTask ? selectedTask.content : '',
+  )
+  const [note, setNote] = useState(!!selectedTask ? selectedTask.note : '')
+  const [dueDate, setDueDate] = useState(
+    !!selectedTask ? selectedTask.dueDate : 0,
+  )
+  const [isCompleted, setIsCompleted] = useState(
+    !!selectedTask ? selectedTask.isCompleted : false,
+  )
+  const [isFlagged, setFlag] = useState(
+    !!selectedTask ? selectedTask.isFlagged : false,
+  )
 
   useEffect(() => {
+    if (!selectedTask) return
+
     setContent(selectedTask.content)
     setNote(selectedTask.note)
     setDueDate(selectedTask.dueDate)
     setIsCompleted(selectedTask.isCompleted)
     setFlag(selectedTask.isFlagged)
   }, [selectedTask])
-
-  const {
-    // Methods
-    onCheck,
-    onFlag,
-    onEdit,
-    onDelete,
-  } = selectedTask
 
   function requestChanges({ content, note, dueDate }) {
     let hasChanges = false
@@ -52,7 +54,7 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
 
     if (hasChanges) {
       console.log(`Changes detected`)
-      onEdit({ content, dueDate, note })
+      selectedTask.onEdit({ content, dueDate, note })
     }
 
     syncId = undefined
@@ -80,6 +82,8 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
     )
   }
 
+  if (!selectedTask) return <h1>Empty</h1>
+
   return (
     <Stack tokens={{ childrenGap: 10 }}>
       <Stack.Item align='stretch'>
@@ -87,7 +91,10 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
           <Stack.Item align='stretch'>
             <Stack horizontal className={'px-3 py-2'}>
               <Stack.Item align={'center'} grow={0}>
-                <Checkbox onChange={onCheck} checked={isCompleted} />
+                <Checkbox
+                  onChange={selectedTask.onCheck}
+                  checked={isCompleted}
+                />
               </Stack.Item>
 
               <Stack.Item align='stretch' grow={1}>
@@ -129,7 +136,12 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
       </Stack.Item>
 
       <ControlWrapper hasDepth>
-        <Button content={'Flag'} iconName={'Flag'} onClick={onFlag} />
+        <Button
+          content={isFlagged ? 'Remove flag' : 'Flag this task'}
+          iconName={'Flag'}
+          color={isFlagged ? '#0078d7' : '#000'}
+          onClick={selectedTask.onFlag}
+        />
       </ControlWrapper>
 
       <Stack.Item align={'stretch'}>
@@ -173,7 +185,7 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
             className={'outline-none'}
             onClick={async () => {
               setProcessing(true)
-              await onDelete()
+              await selectedTask.onDelete()
               setDialogHidden(true)
               setProcessing(false)
             }}
@@ -205,7 +217,7 @@ const ControlWrapper = ({ children, hasDepth }) => {
   )
 }
 
-const Button = ({ content, iconName, hasDivider, onClick }) => {
+const Button = ({ content, iconName, hasDivider, onClick, color }) => {
   const customStyles = { root: { border: 'none', height: '50px' } }
 
   if (typeof hasDivider === 'boolean' && hasDivider) {
@@ -222,13 +234,25 @@ const Button = ({ content, iconName, hasDivider, onClick }) => {
       allowDisabledFocus={false}
       styles={customStyles}
       onRenderChildren={() => (
-        <Stack horizontal className={'h-100 w-100'}>
+        <Stack horizontal verticalAlign={'center'} className={'h-100 w-100'}>
           <Stack.Item className='px-2 h-100'>
-            <FontIcon iconName={iconName} />
+            <FontIcon
+              iconName={iconName}
+              styles={{
+                root: {
+                  borderRadius: '0.125rem',
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  color,
+                },
+              }}
+            />
           </Stack.Item>
 
           <Stack.Item className='px-2 h-100'>
-            <Text variant={'medium'}>{content}</Text>
+            <Text styles={{ root: { color } }} variant={'medium'}>
+              {content}
+            </Text>
           </Stack.Item>
         </Stack>
       )}

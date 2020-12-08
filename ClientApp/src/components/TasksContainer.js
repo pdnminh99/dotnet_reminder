@@ -137,7 +137,7 @@ const TasksList = ({ tasks, sortType }) => {
               iconProps={{ iconName: 'Flag' }}
               styles={{
                 root: {
-                  borderRadius: '0.125rem;',
+                  borderRadius: '0.125rem',
                   fontSize: '16px',
                   fontWeight: '500',
                   color: isFlagged ? '#FFF' : '#0078d7',
