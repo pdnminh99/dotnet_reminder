@@ -101,24 +101,30 @@ const useCustomTasks = _ => {
       setSelectedTask(task)
     }
 
-    // Checkbox is clicked. TODO giant bug here :(
-    task.onCheck = async () => {
-      if (isUndefined(task.taskId)) return
-      let result = undefined
-      let dueDate = !!task.dueDate ? task.dueDate.split(' ')[0] : undefined
+    // Checkbox is clicked.
+    task.onCheck = async props => {
+      if (!task.taskId || !props) return
+
+      let result, dueDate
+
+      if (!!props.dueDate) {
+        dueDate = props.dueDate.split(' ')[0]
+      }
 
       if (task.isCompleted) {
         // Call server api
         result = await updateTask({
-          ...task,
+          ...props,
+          taskId: props.taskId,
           dueDate,
           completedAt: undefined,
         })
 
         if (!result) return
-
-        // Move to incompleted tasks list
         assignTaskMethod(result)
+
+        // -- Apply changes to virtual DOM tree --
+        // Move to incompleted tasks list
         incompletedTasks.unshift(result)
 
         // Remove from completed tasks list
@@ -128,15 +134,16 @@ const useCustomTasks = _ => {
 
         // Call server api
         result = await updateTask({
-          ...task,
+          ...props,
           dueDate,
+          taskId: props.taskId,
           completedAt: now,
         })
 
         if (!result) return
+        assignTaskMethod(result)
 
         // Move to completed tasks list
-        assignTaskMethod(result)
         completedTasks.unshift(result)
 
         // Remove from incompleted tasks list
@@ -158,14 +165,19 @@ const useCustomTasks = _ => {
     }
 
     // Flag button is clicked
-    task.onFlag = async () => {
-      if (isUndefined(task.taskId)) return
+    task.onFlag = async props => {
+      if (!task.taskId || !props) return
 
-      let dueDate = !!task.dueDate ? task.dueDate.split(' ')[0] : undefined
+      let dueDate
+
+      if (!!props.dueDate) {
+        dueDate = props.dueDate.split(' ')[0]
+      }
 
       // Call server api
       let result = await updateTask({
-        ...task,
+        ...props,
+        taskId: props.taskId,
         dueDate,
         isFlagged: !task.isFlagged,
       })
