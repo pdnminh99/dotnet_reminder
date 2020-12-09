@@ -14,6 +14,7 @@ import {
 import React, { useState, useEffect } from 'react'
 import { invokeOrElse } from '../utils'
 import { Checkbox } from './Checkbox'
+import { CalendarPicker } from './CalendarPicker'
 
 let syncId = undefined
 
@@ -34,6 +35,8 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
   const [isFlagged, setFlag] = useState(
     !!selectedTask ? selectedTask.isFlagged : false,
   )
+
+  const [showCalendarPicker, setShowCalendarPicker] = useState(false)
 
   useEffect(() => {
     if (!selectedTask) return
@@ -78,6 +81,17 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
     }
     syncId = setTimeout(
       () => requestChanges({ content, note: target.value, dueDate }),
+      1000,
+    )
+  }
+
+  function handleDueDateChange(value) {
+    setDueDate(value)
+    if (!!syncId) {
+      clearTimeout(syncId)
+    }
+    syncId = setTimeout(
+      () => requestChanges({ content, note, dueDate: value }),
       1000,
     )
   }
@@ -130,8 +144,23 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
       <Stack.Item align={'stretch'}>
         <Stack className={'ms-bgColor-white ms-depth-4'}>
           <ControlWrapper>
-            <Button content={'Add due date'} iconName={'DateTime'} hasDivider />
+            <Button
+              content={'Add due date'}
+              iconName={'DateTime'}
+              hasDivider
+              onClick={() => setShowCalendarPicker(!showCalendarPicker)}
+            />
           </ControlWrapper>
+
+          {showCalendarPicker && (
+            <ControlWrapper align={'center'}>
+              <CalendarPicker
+                selectedDate={dueDate}
+                minDate={new Date()}
+                onPick={handleDueDateChange}
+              />
+            </ControlWrapper>
+          )}
         </Stack>
       </Stack.Item>
 
@@ -202,12 +231,12 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
   )
 }
 
-const ControlWrapper = ({ children, hasDepth }) => {
+const ControlWrapper = ({ children, hasDepth, align }) => {
   if (hasDepth === undefined) hasDepth = false
 
   return (
     <Stack.Item
-      align={'stretch'}
+      align={align || 'stretch'}
       className={`ms-bgColor-white ${
         hasDepth ? 'ms-depth-4' : ''
       } bg-gray-300--hover:hover`}

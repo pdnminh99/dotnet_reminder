@@ -11,6 +11,7 @@ import { TasksCollection } from './TasksCollection'
 import { TodayCollection } from './TodayCollection'
 import { SearchContainer } from './SearchContainer'
 import { CollectionUpdateNotifierContext } from '../utils'
+import { NoContent } from '../components/EmptyTasksList'
 
 const bodyStyles = {
   root: {
@@ -83,12 +84,12 @@ export const Reminder = () => {
 
       {/* Right panel */}
       <Panel
-        headerText='Sample panel'
+        headerText='Profile'
         isOpen={!collapsed}
         onDismiss={onCollapsedClick}
         closeButtonAriaLabel='Close'
       >
-        <p>Content goes here.</p>
+        <NoContent />
       </Panel>
     </Stack>
   )

@@ -3,6 +3,7 @@ import loadingPic from '../assets/images/please-be-patient.png'
 import goalSuccess from '../assets/images/awards.png'
 import error from '../assets/images/error.png'
 import empty from '../assets/images/no-messages.png'
+import build from '../assets/images/build.png'
 import React from 'react'
 
 export const Error = () => {
@@ -140,6 +141,41 @@ export const LoadingScreen = () => {
         variant={'mediumPlus'}
       >
         We are fetching some data
+      </Text>
+    </Stack>
+  )
+}
+
+export const NoContent = () => {
+  return (
+    <Stack
+      verticalAlign={'center'}
+      horizontalAlign={'center'}
+      className={'h-100 w-100'}
+    >
+      <Stack.Item grow={0}>
+        <Image
+          imageFit={ImageFit.contain}
+          width={300}
+          height={300}
+          src={build}
+          alt={'Not ready!'}
+        />
+      </Stack.Item>
+
+      <Text
+        styles={{ root: { color: '#0078d7', fontWeight: 600 } }}
+        variant={'xxLarge'}
+      >
+        No content!
+      </Text>
+
+      <Text
+        className={'pb-10'}
+        styles={{ root: { color: '#0078d7' } }}
+        variant={'mediumPlus'}
+      >
+        This feature is not ready!
       </Text>
     </Stack>
   )
