@@ -18,25 +18,28 @@ import { CalendarPicker } from './CalendarPicker'
 
 let syncId = undefined
 
+function toMDYDateObject(value) {
+  let dateParts = value.split(' ')[0].split('/')
+  // month is 0-based, that's why we need dataParts[1] - 1
+  return new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0])
+}
+
+function toDateMonthYearString(value) {
+  if (!value) return undefined
+  return `${value.getDate()}/${value.getMonth() + 1}/${value.getFullYear()}`
+}
+
 export const TaskDetail = ({ selectedTask, onCancel }) => {
   const [isProcessing, setProcessing] = useState(false)
   const [dialogHidden, setDialogHidden] = useState(true)
 
+  const [taskId, setTaskId] = useState(
+    !!selectedTask ? selectedTask.taskId : undefined,
+  )
   const [content, setContent] = useState(
     !!selectedTask ? selectedTask.content : '',
   )
   const [note, setNote] = useState(!!selectedTask ? selectedTask.note : '')
-
-  function toMMddYY(value) {
-    let dateParts = value.split(' ')[0].split('/')
-    // month is 0-based, that's why we need dataParts[1] - 1
-    return new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0])
-  }
-
-  function toDDmmYY(value) {
-    if (!value) return undefined
-    return `${value.getDate()}/${value.getMonth() + 1}/${value.getFullYear()}`
-  }
 
   const [dueDate, setDueDate] = useState(undefined)
   const [isCompleted, setIsCompleted] = useState(
@@ -51,11 +54,12 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
   useEffect(() => {
     if (!selectedTask) return
 
+    setTaskId(selectedTask.taskId)
     setContent(selectedTask.content)
     setNote(selectedTask.note)
 
     if (!!selectedTask.dueDate) {
-      setDueDate(new Date(toMMddYY(selectedTask.dueDate)))
+      setDueDate(toMDYDateObject(selectedTask.dueDate))
     } else {
       setDueDate(undefined)
     }
@@ -74,7 +78,7 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
     if (hasChanges) {
       selectedTask.onEdit({
         content,
-        dueDate: toDDmmYY(dueDate),
+        dueDate: toDateMonthYearString(dueDate),
         note,
       })
     }
@@ -116,7 +120,37 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
     )
   }
 
-  if (!selectedTask) return <h1>Empty</h1>
+  function handleOnCheck() {
+    if (!!syncId) {
+      clearTimeout(syncId)
+      syncId = undefined
+    }
+
+    selectedTask.onCheck({
+      taskId,
+      content,
+      note,
+      dueDate: toDateMonthYearString(dueDate),
+    })
+  }
+
+  function handleOnFlag() {
+    if (!!syncId) {
+      clearTimeout(syncId)
+      syncId = undefined
+    }
+
+    selectedTask.onFlag({
+      taskId,
+      content,
+      note,
+      dueDate: toDateMonthYearString(dueDate),
+    })
+  }
+
+  if (!selectedTask) {
+    return <h1>Empty</h1>
+  }
 
   return (
     <Stack tokens={{ childrenGap: 10 }}>
@@ -125,10 +159,7 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
           <Stack.Item align='stretch'>
             <Stack horizontal className={'px-3 py-2'}>
               <Stack.Item align={'center'} grow={0}>
-                <Checkbox
-                  onChange={selectedTask.onCheck}
-                  checked={isCompleted}
-                />
+                <Checkbox onChange={handleOnCheck} checked={isCompleted} />
               </Stack.Item>
 
               <Stack.Item align='stretch' grow={1}>
@@ -191,7 +222,7 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
           content={isFlagged ? 'Remove flag' : 'Flag this task'}
           iconName={'Flag'}
           color={'#000'}
-          onClick={selectedTask.onFlag}
+          onClick={handleOnFlag}
         />
       </ControlWrapper>
 

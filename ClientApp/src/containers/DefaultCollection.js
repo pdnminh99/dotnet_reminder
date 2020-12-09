@@ -36,8 +36,8 @@ const useDefaultTasks = fetchAPI => {
         collections = fetchResults
 
         collections.forEach(c => {
-          c.incompletedTasks.forEach(i => assignTaskMethod(i))
-          c.completedTasks.forEach(i => assignTaskMethod(i))
+          c.incompletedTasks.forEach(i => assignTaskMethods(i))
+          c.completedTasks.forEach(i => assignTaskMethods(i))
         })
 
         setCollections(collections)
@@ -57,31 +57,36 @@ const useDefaultTasks = fetchAPI => {
     syncTasks()
   }, [])
 
-  function assignTaskMethod(task) {
+  function assignTaskMethods(task) {
     // Task if clicked
-    task.onSelect = () => {
+    task.onSelect = function () {
       if (!task.taskId) return
 
       setDetailActive(true)
       setSelectedTask(task)
     }
 
-    // Checkbox is clicked. TODO giant bug here :(
-    task.onCheck = async () => {
-      if (!task.taskId) return
-      let result = undefined
-      let dueDate = !!task.dueDate ? task.dueDate.split(' ')[0] : undefined
+    // Checkbox is clicked event handler.
+    task.onCheck = async function (props) {
+      if (!task.taskId || !props) return
+
+      let result, dueDate
+
+      if (!!props.dueDate) {
+        dueDate = props.dueDate.split(' ')[0]
+      }
 
       if (task.isCompleted) {
         // Call server api
         result = await updateTask({
-          ...task,
+          ...props,
+          taskId: props.taskId,
           dueDate,
           completedAt: undefined,
         })
 
         if (!result) return
-        assignTaskMethod(result)
+        assignTaskMethods(result)
 
         setCollections(cs => {
           cs.forEach(c => {
@@ -99,13 +104,14 @@ const useDefaultTasks = fetchAPI => {
 
         // Call server api
         result = await updateTask({
-          ...task,
+          ...props,
           dueDate,
+          taskId: props.taskId,
           completedAt: now,
         })
 
         if (!result) return
-        assignTaskMethod(result)
+        assignTaskMethods(result)
 
         setCollections(cs => {
           cs.forEach(c => {
@@ -131,14 +137,19 @@ const useDefaultTasks = fetchAPI => {
     }
 
     // Flag button is clicked
-    task.onFlag = async () => {
-      if (!task.taskId) return
+    task.onFlag = async function (props) {
+      if (!task.taskId || !props) return
 
-      let dueDate = !!task.dueDate ? task.dueDate.split(' ')[0] : undefined
+      let result, dueDate
+
+      if (!!props.dueDate) {
+        dueDate = props.dueDate.split(' ')[0]
+      }
 
       // Call server api
-      let result = await updateTask({
-        ...task,
+      result = await updateTask({
+        ...props,
+        taskId: props.taskId,
         dueDate,
         isFlagged: !task.isFlagged,
       })
@@ -146,7 +157,7 @@ const useDefaultTasks = fetchAPI => {
       if (!result) return
 
       // Apply changes
-      assignTaskMethod(result)
+      assignTaskMethods(result)
 
       collections.forEach(c => {
         c.completedTasks = c.completedTasks.map(t => {
@@ -171,14 +182,15 @@ const useDefaultTasks = fetchAPI => {
       setTasksByGroups(parseGroups(collections))
     }
 
-    task.onEdit = async ({ content, dueDate, note }) => {
+    // On Fields changes
+    task.onEdit = async function ({ content, dueDate, note }) {
       if (!task.taskId) return
 
       dueDate = !!dueDate ? dueDate.split(' ')[0] : undefined
 
       let result = await updateTask({ ...task, content, dueDate, note })
       if (!result) return
-      assignTaskMethod(result)
+      assignTaskMethods(result)
 
       collections.forEach(c => {
         c.completedTasks = c.completedTasks.map(t => {
@@ -197,7 +209,8 @@ const useDefaultTasks = fetchAPI => {
       setTasksByGroups(parseGroups(collections))
     }
 
-    task.onDelete = async () => {
+    // On Delete button clicked
+    task.onDelete = async function () {
       let result = await deleteTask(task.taskId)
 
       if (!result) return false

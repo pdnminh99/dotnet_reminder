@@ -98,7 +98,17 @@ const TasksList = ({ tasks, sortType }) => {
 
   return rearrangeTasks(tasks).map(
     (
-      { taskId, content, isCompleted, isFlagged, onSelect, onCheck, onFlag },
+      {
+        taskId,
+        content,
+        dueDate,
+        note,
+        isCompleted,
+        isFlagged,
+        onSelect,
+        onCheck,
+        onFlag,
+      },
       index,
     ) => (
       <Stack.Item
@@ -122,7 +132,12 @@ const TasksList = ({ tasks, sortType }) => {
             {!taskId ? (
               <Spinner size={SpinnerSize.medium} />
             ) : (
-              <Checkbox onChange={onCheck} checked={isCompleted} />
+              <Checkbox
+                onChange={() =>
+                  onCheck({ taskId, content, content, note, dueDate })
+                }
+                checked={isCompleted}
+              />
             )}
           </Stack.Item>
 
@@ -144,7 +159,9 @@ const TasksList = ({ tasks, sortType }) => {
                   ? 'outline-none flag-icon'
                   : 'outline-none unflag-icon'
               }
-              onClick={onFlag}
+              onClick={() =>
+                onFlag({ taskId, content, content, note, dueDate })
+              }
               iconProps={{ iconName: 'Flag' }}
             />
           </Stack.Item>
