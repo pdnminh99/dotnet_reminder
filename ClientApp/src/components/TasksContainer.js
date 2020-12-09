@@ -75,29 +75,25 @@ export const TasksContainer = ({
 
 const TasksList = ({ tasks, sortType }) => {
   function rearrangeTasks(tasks) {
+    let result = undefined
+
     switch (sortType) {
       case TaskSortType.Alphabetically:
-        return tasks.sort((before, after) => {
-          if (before.content > after.content) return 1
-          if (before.content < after.content) return -1
-          return 0
-        })
-      case TaskSortType.CreationDate:
-        return tasks.sort((before, after) => {
-          if (before.creationDate > after.creationDate) return -1
-          if (before.creationDate < after.creationDate) return 1
-          return 0
-        })
+        result = tasks.sort((before, after) =>
+          after.content.localeCompare(before.content),
+        )
+        break
       case TaskSortType.DueDate:
-        return tasks.sort((before, after) => {
-          if (before.dueDate > after.dueDate) return -1
-          if (before.dueDate < after.dueDate) return 1
-          return 0
-        })
+        result = tasks.sort((before, after) => before.dueDate - after.dueDate)
+        break
       case TaskSortType.Default:
+      case TaskSortType.CreationDate:
       default:
-        return tasks
+        result = tasks.sort((before, after) => after.taskId - before.taskId)
+        break
     }
+
+    return result
   }
 
   return rearrangeTasks(tasks).map(

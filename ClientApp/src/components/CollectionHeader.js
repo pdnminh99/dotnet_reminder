@@ -1,5 +1,6 @@
 import {
   ActionButton,
+  CommandButton,
   DefaultButton,
   Dialog,
   DialogFooter,
@@ -111,6 +112,22 @@ export const CollectionHeader = ({
                 ariaLabel='CollapseMenu'
                 onRenderMenuIcon={_ => <></>}
                 menuProps={{
+                  onRenderMenuList: props => {
+                    return props.items.map(p => {
+                      let { key, iconProps, text, onClick } = p
+
+                      return (
+                        <CommandButton
+                          key={key}
+                          className={'outline-none'}
+                          styles={{ root: { width: '100%' } }}
+                          iconProps={iconProps}
+                          text={text}
+                          onClick={onClick}
+                        />
+                      )
+                    })
+                  },
                   items: [
                     {
                       key: 'delete',
@@ -167,16 +184,29 @@ export const CollectionHeader = ({
               disabled={isLoading}
               onRenderMenuIcon={_ => <></>}
               menuProps={{
+                onRenderMenuList: props => {
+                  return props.items.map(p => {
+                    let { key, iconProps, text, onClick } = p
+
+                    return (
+                      <CommandButton
+                        key={key}
+                        className={'outline-none'}
+                        styles={{ root: { width: '100%' } }}
+                        iconProps={iconProps}
+                        text={text}
+                        onClick={onClick}
+                      />
+                    )
+                  })
+                },
                 items: [
                   {
                     key: 'default',
                     onClick: _ => {
                       onSort(TaskSortType.Default)
                     },
-                    iconProps: {
-                      iconName: 'AppIconDefault',
-                      styles: { root: { color: 'black', fontWeight: '400' } },
-                    },
+                    iconProps: { iconName: 'AppIconDefault' },
                     text: 'Default',
                     title: 'Default',
                   },
@@ -185,10 +215,7 @@ export const CollectionHeader = ({
                     onClick: _ => {
                       onSort(TaskSortType.DueDate)
                     },
-                    iconProps: {
-                      iconName: 'Calendar',
-                      style: { color: 'black', fontWeight: '400' },
-                    },
+                    iconProps: { iconName: 'Calendar' },
                     text: 'Due Date',
                     title: 'Sort by due date',
                   },
@@ -197,24 +224,9 @@ export const CollectionHeader = ({
                     onClick: _ => {
                       onSort(TaskSortType.Alphabetically)
                     },
-                    iconProps: {
-                      iconName: 'Sort',
-                      style: { color: 'black', fontWeight: '400' },
-                    },
+                    iconProps: { iconName: 'Sort' },
                     text: 'Alphabetically',
                     title: 'Sort by alphabets',
-                  },
-                  {
-                    key: 'creation_date',
-                    onClick: _ => {
-                      onSort(TaskSortType.CreationDate)
-                    },
-                    iconProps: {
-                      iconName: 'AddEvent',
-                      style: { color: 'black', fontWeight: '400' },
-                    },
-                    text: 'Creation Date',
-                    title: 'Sort by creation date',
                   },
                 ],
               }}

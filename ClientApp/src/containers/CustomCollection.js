@@ -19,6 +19,7 @@ import {
 } from '../operations'
 import { NotifierType, TaskSortType } from '../enums'
 import { TasksList } from '../components/TasksList'
+import { LoadingScreen } from '../components/EmptyTasksList'
 
 const taskDetailStyles = {
   root: {
@@ -52,8 +53,12 @@ const useCustomTasks = _ => {
 
   const [isProcessing, setIsProcessing] = useState(false)
 
+  const [isFetching, setFetchingState] = useState(true)
+
   useEffect(() => {
     async function syncTasks() {
+      setFetchingState(true)
+
       const fetchResults = await retrieveTasks(cid)
 
       if (isNotUndefined(fetchResults)) {
@@ -75,6 +80,11 @@ const useCustomTasks = _ => {
           else if (completedTasks.length > 0) setSelectedTask(completedTasks[0])
           else setDetailActive(false)
         }
+
+        setTimeout(() => {
+          setFetchingState(false)
+        }, 1000)
+
         setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
       }
     }
@@ -350,6 +360,7 @@ const useCustomTasks = _ => {
     handleEditollectionName,
     handleDeleteCollection,
 
+    isFetching,
     isProcessing,
     selectedTask,
   }
@@ -371,6 +382,7 @@ export const CustomCollection = () => {
     handleDeleteCollection,
 
     isProcessing,
+    isFetching,
     selectedTask,
   } = useCustomTasks()
 
@@ -379,6 +391,8 @@ export const CustomCollection = () => {
   function changeSortType(newSortType) {
     if (newSortType !== sortType) setSortType(newSortType)
   }
+
+  if (isFetching) return <LoadingScreen />
 
   return (
     <Stack horizontal className='h-100 w-100'>
