@@ -248,17 +248,19 @@ const useDefaultTasks = fetchAPI => {
   }
 
   function parseGroups(collections) {
-    return collections.map(({ name, incompletedTasks, completedTasks }) => {
-      let items = [...incompletedTasks, ...completedTasks].sort(
-        (a, b) => a.taskId - b.taskId,
-      )
+    return collections
+      .map(({ name, incompletedTasks, completedTasks }) => {
+        let items = [...incompletedTasks, ...completedTasks].sort(
+          (a, b) => a.taskId - b.taskId,
+        )
 
-      return {
-        name,
-        items,
-        shouldCollapsed: false,
-      }
-    })
+        return {
+          name,
+          items,
+          shouldCollapsed: false,
+        }
+      })
+      .filter(c => c.items.length > 0)
   }
 
   return {
