@@ -178,7 +178,11 @@ export const CollectionHeader = ({
               className={'outline-none'}
               iconProps={{ iconName: 'Sort' }}
               styles={{
-                root: { color: '#000', border: 'none', fontSize: '16px' },
+                root: {
+                  color: '#000',
+                  border: 'none',
+                  fontSize: '16px',
+                },
               }}
               text={`Sort by ${sortType}`}
               disabled={isLoading}

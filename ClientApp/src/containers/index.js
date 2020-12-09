@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { DefaultPalette, Panel, Stack } from '@fluentui/react'
+import { DefaultPalette, Panel, PrimaryButton, Stack } from '@fluentui/react'
 import '../components/Reminder.css'
-import { Redirect, Route, Switch, useLocation } from 'react-router-dom'
+import { Link, Redirect, Route, Switch, useLocation } from 'react-router-dom'
 import { CollectionNav } from './CollectionNav'
 import { TopNav } from '../components'
 import { CustomCollection } from './CustomCollection'
@@ -12,6 +12,7 @@ import { TodayCollection } from './TodayCollection'
 import { SearchContainer } from './SearchContainer'
 import { CollectionUpdateNotifierContext } from '../utils'
 import { NoContent } from '../components/EmptyTasksList'
+import { ApplicationPaths } from '../components/api-authorization/ApiAuthorizationConstants'
 
 const bodyStyles = {
   root: {
@@ -86,10 +87,20 @@ export const Reminder = () => {
       <Panel
         headerText='Profile'
         isOpen={!collapsed}
+        className={'px-2'}
         onDismiss={onCollapsedClick}
         closeButtonAriaLabel='Close'
       >
         <NoContent />
+
+        <Link
+          to={{
+            pathname: `${ApplicationPaths.LogOut}`,
+            state: { local: true },
+          }}
+        >
+          <PrimaryButton className={'w-100 mt-3'} text={'Sign out'} />
+        </Link>
       </Panel>
     </Stack>
   )

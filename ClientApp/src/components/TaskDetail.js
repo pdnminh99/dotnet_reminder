@@ -170,7 +170,7 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
         <Button
           content={isFlagged ? 'Remove flag' : 'Flag this task'}
           iconName={'Flag'}
-          color={isFlagged ? '#0078d7' : '#000'}
+          color={'#000'}
           onClick={selectedTask.onFlag}
         />
       </ControlWrapper>
