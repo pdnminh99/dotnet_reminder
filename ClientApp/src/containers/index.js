@@ -68,15 +68,18 @@ export const Reminder = () => {
                 <Route exact path={'/'}>
                   <Redirect to='/today' />
                 </Route>
-                <Route exact path={'/today'} component={TodayCollection} />
-                <Route exact path={'/planned'} component={PlannedCollection} />
-                <Route exact path={'/flagged'} component={FlaggedCollection} />
-                <Route exact path={'/tasks'} component={TasksCollection} />
+                <Route path={'/today'} component={TodayCollection} />
+                <Route path={'/planned'} component={PlannedCollection} />
+                <Route path={'/flagged'} component={FlaggedCollection} />
+                <Route path={'/tasks'} component={TasksCollection} />
                 <Route
                   exact
                   path={'/collection/:cid'}
                   component={CustomCollection}
                 />
+                <Route path={'*'}>
+                  <Redirect to='/today' />
+                </Route>
               </Switch>
             )}
           </Stack.Item>
