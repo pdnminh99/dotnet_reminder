@@ -79,8 +79,8 @@ const TasksList = ({ tasks, sortType }) => {
 
     switch (sortType) {
       case TaskSortType.Alphabetically:
-        result = tasks.sort((before, after) =>
-          after.content.localeCompare(before.content),
+        result = tasks.sort(
+          (before, after) => -after.content.localeCompare(before.content),
         )
         break
       case TaskSortType.DueDate:
