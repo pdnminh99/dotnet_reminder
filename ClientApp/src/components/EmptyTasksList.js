@@ -137,7 +137,7 @@ export const LoadingScreen = () => {
 
       <Text
         className={'pb-10'}
-        styles={{ root: { color: '#0078d7' } }}
+        styles={{ root: { color: 'gray' } }}
         variant={'mediumPlus'}
       >
         We are fetching some data
@@ -146,7 +146,7 @@ export const LoadingScreen = () => {
   )
 }
 
-export const NoContent = () => {
+export const NoContent = ({ width, height }) => {
   return (
     <Stack
       verticalAlign={'center'}
@@ -156,8 +156,8 @@ export const NoContent = () => {
       <Stack.Item grow={0}>
         <Image
           imageFit={ImageFit.contain}
-          width={300}
-          height={300}
+          width={width || 300}
+          height={height || 300}
           src={build}
           alt={'Not ready!'}
         />
@@ -172,7 +172,7 @@ export const NoContent = () => {
 
       <Text
         className={'pb-10'}
-        styles={{ root: { color: '#0078d7' } }}
+        styles={{ root: { color: 'gray' } }}
         variant={'mediumPlus'}
       >
         This feature is not ready!
