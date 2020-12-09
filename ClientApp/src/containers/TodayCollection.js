@@ -9,13 +9,25 @@ export const TodayCollection = _ => {
 }
 
 export const PlannedCollection = _ => {
-  return <DefaultCollection fetchAPI={getPlannedTasks} />
+  return (
+    <DefaultCollection
+      fetchAPI={getPlannedTasks}
+      collectionName={'Planned tasks'}
+    />
+  )
 }
 
 export const TasksCollection = _ => {
-  return <DefaultCollection fetchAPI={getAllTasks} />
+  return (
+    <DefaultCollection fetchAPI={getAllTasks} collectionName={'All Tasks'} />
+  )
 }
 
 export const FlaggedCollection = _ => {
-  return <DefaultCollection fetchAPI={getFlaggedTasks} />
+  return (
+    <DefaultCollection
+      fetchAPI={getFlaggedTasks}
+      collectionName={'Flagged tasks'}
+    />
+  )
 }

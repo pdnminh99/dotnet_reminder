@@ -272,7 +272,7 @@ const useDefaultTasks = fetchAPI => {
   }
 }
 
-export const DefaultCollection = ({ fetchAPI }) => {
+export const DefaultCollection = ({ fetchAPI, collectionName }) => {
   const {
     isProcessing,
     tasksByGroups,
@@ -299,7 +299,7 @@ export const DefaultCollection = ({ fetchAPI }) => {
       >
         <Stack className='h-100'>
           <Stack.Item align='stretch' className={'pb-3'}>
-            <CollectionHeader name={'Flagged'} />
+            <CollectionHeader name={collectionName} />
           </Stack.Item>
 
           <Stack.Item align='stretch' styles={{ root: { overflow: 'auto' } }}>
