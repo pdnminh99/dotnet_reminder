@@ -224,17 +224,23 @@ const useAllTasks = _ => {
   }
 
   function parseGroups(collections) {
-    return collections.map(({ name, incompletedTasks, completedTasks }) => {
-      let items = [...incompletedTasks, ...completedTasks].sort(
-        (a, b) => a.taskId - b.taskId,
+    return collections
+      .sort((before, after) => -after.name.localeCompare(before.name))
+      .filter(
+        ({ incompletedTasks, completedTasks }) =>
+          incompletedTasks.length > 0 || completedTasks.length > 0,
       )
+      .map(({ name, incompletedTasks, completedTasks }) => {
+        let items = [...incompletedTasks, ...completedTasks].sort(
+          (a, b) => a.taskId - b.taskId,
+        )
 
-      return {
-        name,
-        items,
-        shouldCollapsed: false,
-      }
-    })
+        return {
+          name,
+          items,
+          shouldCollapsed: false,
+        }
+      })
   }
 
   return {
@@ -279,11 +285,7 @@ export const TasksCollection = _ => {
           </Stack.Item>
 
           <Stack.Item align='stretch' styles={{ root: { overflow: 'auto' } }}>
-            {tasksByGroups.length > 0 ? (
-              <TasksList tasksGroup={tasksByGroups} />
-            ) : (
-              <h1>Empty</h1>
-            )}
+            <TasksList tasksGroup={tasksByGroups} />
           </Stack.Item>
         </Stack>
       </Stack.Item>

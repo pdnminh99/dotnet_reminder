@@ -5,7 +5,7 @@ import { EmptyTasksList } from './EmptyTasksList'
 
 export const TasksList = ({ tasksGroup, onInsert, sortType }) => {
   return (
-    <Stack>
+    <Stack className={'pb-5'}>
       {!!onInsert && (
         <Stack.Item align={'stretch'} styles={{ root: { height: '50px' } }}>
           <InsertField onInsert={onInsert} />
