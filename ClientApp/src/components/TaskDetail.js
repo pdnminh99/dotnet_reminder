@@ -26,9 +26,19 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
     !!selectedTask ? selectedTask.content : '',
   )
   const [note, setNote] = useState(!!selectedTask ? selectedTask.note : '')
-  const [dueDate, setDueDate] = useState(
-    !!selectedTask ? selectedTask.dueDate : 0,
-  )
+
+  function toMMddYY(value) {
+    let dateParts = value.split(' ')[0].split('/')
+    // month is 0-based, that's why we need dataParts[1] - 1
+    return new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0])
+  }
+
+  function toDDmmYY(value) {
+    if (!value) return undefined
+    return `${value.getDate()}/${value.getMonth() + 1}/${value.getFullYear()}`
+  }
+
+  const [dueDate, setDueDate] = useState(undefined)
   const [isCompleted, setIsCompleted] = useState(
     !!selectedTask ? selectedTask.isCompleted : false,
   )
@@ -43,7 +53,13 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
 
     setContent(selectedTask.content)
     setNote(selectedTask.note)
-    setDueDate(selectedTask.dueDate)
+
+    if (!!selectedTask.dueDate) {
+      setDueDate(new Date(toMMddYY(selectedTask.dueDate)))
+    } else {
+      setDueDate(undefined)
+    }
+
     setIsCompleted(selectedTask.isCompleted)
     setFlag(selectedTask.isFlagged)
   }, [selectedTask])
@@ -56,10 +72,14 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
     hasChanges = hasChanges || dueDate !== selectedTask.dueDate
 
     if (hasChanges) {
-      console.log(`Changes detected`)
-      selectedTask.onEdit({ content, dueDate, note })
+      selectedTask.onEdit({
+        content,
+        dueDate: toDDmmYY(dueDate),
+        note,
+      })
     }
 
+    clearTimeout(syncId)
     syncId = undefined
   }
 
@@ -86,16 +106,14 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
   }
 
   function handleDueDateChange(value) {
-    console.log(value.getUTCMilliseconds())
-
-    // setDueDate(value)
-    // if (!!syncId) {
-    //   clearTimeout(syncId)
-    // }
-    // syncId = setTimeout(
-    //   () => requestChanges({ content, note, dueDate: value }),
-    //   1000,
-    // )
+    setDueDate(value)
+    if (!!syncId) {
+      clearTimeout(syncId)
+    }
+    syncId = setTimeout(
+      () => requestChanges({ content, note, dueDate: value }),
+      1000,
+    )
   }
 
   if (!selectedTask) return <h1>Empty</h1>
@@ -147,7 +165,9 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
         <Stack className={'ms-bgColor-white ms-depth-4'}>
           <ControlWrapper>
             <Button
-              content={'Add due date'}
+              content={
+                !dueDate ? 'Add due date' : `Due: ${dueDate.toDateString()}`
+              }
               iconName={'DateTime'}
               hasDivider
               onClick={() => setShowCalendarPicker(!showCalendarPicker)}

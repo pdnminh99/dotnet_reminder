@@ -83,15 +83,7 @@ const divStyle = {
 }
 
 export const CalendarPicker = props => {
-  function epochToLocalDate(epochValue) {
-    let date = new Date()
-    if (!!epochValue) date.setUTCMilliseconds(epochValue)
-    return date
-  }
-
-  const [selectedDate, setSelectedDate] = useState(
-    epochToLocalDate(props.selectedDate),
-  )
+  const [selectedDate, setSelectedDate] = useState(props.selectedDate)
 
   function onSelectDate(date) {
     props.onPick(date)

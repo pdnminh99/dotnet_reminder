@@ -105,11 +105,13 @@ const useCustomTasks = _ => {
     task.onCheck = async () => {
       if (isUndefined(task.taskId)) return
       let result = undefined
+      let dueDate = !!task.dueDate ? task.dueDate.split(' ')[0] : undefined
 
       if (task.isCompleted) {
         // Call server api
         result = await updateTask({
           ...task,
+          dueDate,
           completedAt: undefined,
         })
 
@@ -127,6 +129,7 @@ const useCustomTasks = _ => {
         // Call server api
         result = await updateTask({
           ...task,
+          dueDate,
           completedAt: now,
         })
 
@@ -158,8 +161,14 @@ const useCustomTasks = _ => {
     task.onFlag = async () => {
       if (isUndefined(task.taskId)) return
 
+      let dueDate = !!task.dueDate ? task.dueDate.split(' ')[0] : undefined
+
       // Call server api
-      let result = await updateTask({ ...task, isFlagged: !task.isFlagged })
+      let result = await updateTask({
+        ...task,
+        dueDate,
+        isFlagged: !task.isFlagged,
+      })
 
       if (!result) return
 
@@ -192,8 +201,11 @@ const useCustomTasks = _ => {
     task.onEdit = async ({ content, dueDate, note }) => {
       if (!task.taskId) return
 
+      dueDate = !!dueDate ? dueDate.split(' ')[0] : undefined
+
       let result = await updateTask({ ...task, content, dueDate, note })
       if (!result) return
+      assignTaskMethod(result)
 
       if (task.isCompleted) {
         completedTasks = completedTasks.map(c => {
@@ -213,6 +225,8 @@ const useCustomTasks = _ => {
 
         setIncompletedTasks(incompletedTasks)
       }
+
+      setSelectedTask(result)
       setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
     }
 

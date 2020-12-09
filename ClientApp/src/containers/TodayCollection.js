@@ -1,14 +1,6 @@
-import React, { useEffect, useState } from 'react'
-import { Stack } from '@fluentui/react'
+import React from 'react'
 import '../components/Reminder.css'
-import { CollectionHeader, TaskDetail } from '../components'
-import { deleteTask, getTodayTasks, updateTask } from '../operations'
-import { TasksList } from '../components/TasksList'
-import {
-  EmptyTodayTasksList,
-  LoadingScreen,
-  NoContent,
-} from '../components/EmptyTasksList'
+import { NoContent } from '../components/EmptyTasksList'
 
 export const TodayCollection = _ => {
   return <NoContent width={800} height={450} />

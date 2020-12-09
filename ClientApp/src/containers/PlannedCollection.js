@@ -72,11 +72,13 @@ const usePlannedTasks = _ => {
 
       if (!task.taskId) return
       let result = undefined
+      let dueDate = !!task.dueDate ? task.dueDate.split(' ')[0] : undefined
 
       if (task.isCompleted) {
         // Call server api
         result = await updateTask({
           ...task,
+          dueDate,
           completedAt: undefined,
         })
 
@@ -100,6 +102,7 @@ const usePlannedTasks = _ => {
         // Call server api
         result = await updateTask({
           ...task,
+          dueDate,
           completedAt: now,
         })
 
@@ -133,8 +136,14 @@ const usePlannedTasks = _ => {
     task.onFlag = async () => {
       if (!task.taskId) return
 
+      let dueDate = !!task.dueDate ? task.dueDate.split(' ')[0] : undefined
+
       // Call server api
-      let result = await updateTask({ ...task, isFlagged: !task.isFlagged })
+      let result = await updateTask({
+        ...task,
+        dueDate,
+        isFlagged: !task.isFlagged,
+      })
 
       if (!result) return
 
@@ -166,6 +175,8 @@ const usePlannedTasks = _ => {
 
     task.onEdit = async ({ content, dueDate, note }) => {
       if (!task.taskId) return
+
+      dueDate = !!dueDate ? dueDate.split(' ')[0] : undefined
 
       let result = await updateTask({ ...task, content, dueDate, note })
       if (!result) return
