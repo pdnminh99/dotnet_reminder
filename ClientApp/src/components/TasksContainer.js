@@ -54,7 +54,7 @@ export const TasksContainer = ({
                 horizontal
                 grow={1}
                 align={'center'}
-                styles={{ root: { paddingLeft: '11px', fontWeight: 'bold' } }}
+                styles={{ root: { paddingLeft: '14px', fontWeight: 500 } }}
               >
                 <span>{groupName}</span>
               </Stack.Item>

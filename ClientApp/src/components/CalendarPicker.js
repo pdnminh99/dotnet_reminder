@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Calendar,
   DayOfWeek,
@@ -84,8 +84,9 @@ const divStyle = {
 
 export const CalendarPicker = props => {
   function epochToLocalDate(epochValue) {
-    if (!epochValue) return undefined
-    return new Date().setUTCMilliseconds(epochValue)
+    let date = new Date()
+    if (!!epochValue) date.setUTCMilliseconds(epochValue)
+    return date
   }
 
   const [selectedDate, setSelectedDate] = useState(
@@ -93,13 +94,11 @@ export const CalendarPicker = props => {
   )
 
   function onSelectDate(date) {
-    console.log(date)
+    props.onPick(date)
     setSelectedDate(date)
   }
 
   function onDismiss() {
-    console.log(selectedDate)
-    console.log(`Calendar picker dismiss.`)
     return selectedDate
   }
 

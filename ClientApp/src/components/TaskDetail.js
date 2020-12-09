@@ -86,14 +86,16 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
   }
 
   function handleDueDateChange(value) {
-    setDueDate(value)
-    if (!!syncId) {
-      clearTimeout(syncId)
-    }
-    syncId = setTimeout(
-      () => requestChanges({ content, note, dueDate: value }),
-      1000,
-    )
+    console.log(value.getUTCMilliseconds())
+
+    // setDueDate(value)
+    // if (!!syncId) {
+    //   clearTimeout(syncId)
+    // }
+    // syncId = setTimeout(
+    //   () => requestChanges({ content, note, dueDate: value }),
+    //   1000,
+    // )
   }
 
   if (!selectedTask) return <h1>Empty</h1>
