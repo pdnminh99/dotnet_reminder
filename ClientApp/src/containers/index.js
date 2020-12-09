@@ -5,10 +5,12 @@ import { Link, Redirect, Route, Switch, useLocation } from 'react-router-dom'
 import { CollectionNav } from './CollectionNav'
 import { TopNav } from '../components'
 import { CustomCollection } from './CustomCollection'
-import { FlaggedCollection } from './FlaggedCollection'
-import { PlannedCollection } from './PlannedCollection'
-import { TasksCollection } from './TasksCollection'
-import { TodayCollection } from './TodayCollection'
+import {
+  TodayCollection,
+  PlannedCollection,
+  TasksCollection,
+  FlaggedCollection,
+} from './TodayCollection'
 import { SearchContainer } from './SearchContainer'
 import { CollectionUpdateNotifierContext } from '../utils'
 import { NoContent } from '../components/EmptyTasksList'

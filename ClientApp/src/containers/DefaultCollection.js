@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Stack } from '@fluentui/react'
 import '../components/Reminder.css'
 import { CollectionHeader, TaskDetail } from '../components'
-import { deleteTask, getAllTasks, updateTask } from '../operations'
+import { deleteTask, updateTask } from '../operations'
 import { TasksList } from '../components/TasksList'
 import { EmptyTasksList, LoadingScreen } from '../components/EmptyTasksList'
 
@@ -17,7 +17,7 @@ const taskDetailStyles = {
   },
 }
 
-const useAllTasks = _ => {
+const useDefaultTasks = fetchAPI => {
   // Tasks related states
   const [isProcessing, setProcessing] = useState(true)
 
@@ -30,7 +30,7 @@ const useAllTasks = _ => {
 
   useEffect(() => {
     async function syncTasks() {
-      const fetchResults = await getAllTasks()
+      const fetchResults = await fetchAPI()
 
       if (!!fetchResults) {
         collections = fetchResults
@@ -74,7 +74,6 @@ const useAllTasks = _ => {
 
       if (task.isCompleted) {
         // Call server api
-
         result = await updateTask({
           ...task,
           dueDate,
@@ -236,23 +235,17 @@ const useAllTasks = _ => {
   }
 
   function parseGroups(collections) {
-    return collections
-      .sort((before, after) => -after.name.localeCompare(before.name))
-      .filter(
-        ({ incompletedTasks, completedTasks }) =>
-          incompletedTasks.length > 0 || completedTasks.length > 0,
+    return collections.map(({ name, incompletedTasks, completedTasks }) => {
+      let items = [...incompletedTasks, ...completedTasks].sort(
+        (a, b) => a.taskId - b.taskId,
       )
-      .map(({ name, incompletedTasks, completedTasks }) => {
-        let items = [...incompletedTasks, ...completedTasks].sort(
-          (a, b) => a.taskId - b.taskId,
-        )
 
-        return {
-          name,
-          items,
-          shouldCollapsed: false,
-        }
-      })
+      return {
+        name,
+        items,
+        shouldCollapsed: false,
+      }
+    })
   }
 
   return {
@@ -266,7 +259,7 @@ const useAllTasks = _ => {
   }
 }
 
-export const TasksCollection = _ => {
+export const DefaultCollection = ({ fetchAPI }) => {
   const {
     isProcessing,
     tasksByGroups,
@@ -276,7 +269,7 @@ export const TasksCollection = _ => {
     setDetailActive,
 
     selectedTask,
-  } = useAllTasks()
+  } = useDefaultTasks(fetchAPI)
 
   if (isProcessing) return <LoadingScreen />
 
@@ -293,7 +286,7 @@ export const TasksCollection = _ => {
       >
         <Stack className='h-100'>
           <Stack.Item align='stretch' className={'pb-3'}>
-            <CollectionHeader name={'Tasks'} />
+            <CollectionHeader name={'Flagged'} />
           </Stack.Item>
 
           <Stack.Item align='stretch' styles={{ root: { overflow: 'auto' } }}>
