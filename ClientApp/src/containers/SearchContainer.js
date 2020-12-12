@@ -5,6 +5,7 @@ import { TaskDetail } from '../components'
 import { deleteTask, search, updateTask } from '../operations'
 import { TasksList } from '../components/TasksList'
 import { LoadingScreen, NoSearchResults } from '../components/EmptyTasksList'
+import { TaskSortType } from '../enums'
 
 const taskDetailStyles = {
   root: {
@@ -258,19 +259,17 @@ const useSearch = keyword => {
   }
 
   function parseGroups(collections) {
-    return collections
-      .map(({ name, incompletedTasks, completedTasks }) => {
-        let items = [...incompletedTasks, ...completedTasks].sort(
-          (a, b) => a.taskId - b.taskId,
-        )
+    return collections.map(({ name, incompletedTasks, completedTasks }) => {
+      let items = [...incompletedTasks, ...completedTasks].sort(
+        (a, b) => a.taskId - b.taskId,
+      )
 
-        return {
-          name,
-          items,
-          shouldCollapsed: false,
-        }
-      })
-      .filter(c => c.items.length > 0)
+      return {
+        name,
+        items,
+        shouldCollapsed: false,
+      }
+    })
   }
 
   return {
@@ -302,7 +301,11 @@ export const SearchContainer = ({ searchValue }) => {
     if (tasksByGroups.length === 0) return <NoSearchResults />
 
     return (
-      <TasksList tasksGroup={tasksByGroups} highlightKeyword={searchValue} />
+      <TasksList
+        tasksGroup={tasksByGroups}
+        highlightKeyword={searchValue}
+        sortType={TaskSortType.Default}
+      />
     )
   }
 

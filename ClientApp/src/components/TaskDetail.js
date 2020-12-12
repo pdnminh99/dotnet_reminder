@@ -141,6 +141,7 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
       syncId = undefined
     }
 
+    // Including `completedAt` field is uneccessary here.
     selectedTask.onCheck({
       taskId,
       content,
@@ -161,6 +162,7 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
       content,
       note,
       priority,
+      completedAt: selectedTask.completedAt,
       dueDate: toDateMonthYearString(dueDate),
     })
   }

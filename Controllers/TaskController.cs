@@ -32,8 +32,21 @@ public class TaskController : GenericController
                 Owner = null,
                 CreationDate = c.CreationDate,
                 LastEdited = c.LastEdited,
-                Tasks = c.Tasks
-                .Where(t => t.Content.ToLower().Contains(keyword))
+                Tasks = c.Name.ToLower().Contains(keyword) ?
+                c.Tasks.Select(t => new AppTask
+                {
+                    TaskId = t.TaskId,
+                    Content = t.Content,
+                    DueDate = t.DueDate,
+                    CompletedAt = t.CompletedAt,
+                    Priority = t.Priority,
+                    IsFlagged = t.IsFlagged,
+                    Note = t.Note,
+                    CreationDate = t.CreationDate,
+                    LastEdited = t.LastEdited,
+                    Collection = null
+                }).ToList() :
+                c.Tasks.Where(t => t.Content.ToLower().Contains(keyword))
                 .Select(t => new AppTask
                 {
                     TaskId = t.TaskId,
@@ -48,10 +61,9 @@ public class TaskController : GenericController
                     Collection = null
                 }).ToList()
             })
-            .Where(c => c.Tasks.Count > 0 || c.Name.Contains(keyword))
             .ToListAsync();
 
-        return Ok(collections);
+        return Ok(collections.Where(c => c.Tasks.Count > 0 || c.Name.ToLower().Contains(keyword)).ToList());
     }
 
     [HttpGet("Today")]
