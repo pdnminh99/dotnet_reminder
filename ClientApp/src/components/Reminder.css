@@ -107,3 +107,7 @@
 .hover-still-black:hover {
   color: black;
 }
+
+.hover-still-red:hover {
+  color: red;
+}

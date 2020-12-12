@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from 'react'
-import { invokeOrElse, isNotUndefined, isUndefined } from '../utils'
+import {
+  displayDueText,
+  invokeOrElse,
+  isNotUndefined,
+  isUndefined,
+  toMDYDateObject,
+} from '../utils'
 import {
   Stack,
   FontIcon,
   IconButton,
   Spinner,
   SpinnerSize,
+  Text,
 } from '@fluentui/react'
 import './Reminder.css'
 import { TaskSortType } from '../enums'
 import { Checkbox } from './Checkbox'
 import Highlighter from 'react-highlight-words'
+import { translatePriority } from '../utils'
 
 export const TasksContainer = ({
   groupName,
@@ -107,21 +115,26 @@ const TasksList = ({ tasks, sortType, highlightKeyword }) => {
     return result
   }
 
-  return rearrangeTasks(tasks).map(
-    (
-      {
-        taskId,
-        content,
-        dueDate,
-        note,
-        isCompleted,
-        isFlagged,
-        onSelect,
-        onCheck,
-        onFlag,
-      },
-      index,
-    ) => (
+  return rearrangeTasks(tasks).map(function (
+    {
+      taskId,
+      content,
+      dueDate,
+      note,
+      priority,
+      isCompleted,
+      isFlagged,
+      onSelect,
+      onCheck,
+      onFlag,
+    },
+    index,
+  ) {
+    let { color } = translatePriority(priority)
+
+    let { text, type } = displayDueText(toMDYDateObject(dueDate), isCompleted)
+
+    return (
       <Stack.Item
         key={index}
         className={'cursor-pointer ms-bgColor-gray20--hover'}
@@ -154,19 +167,39 @@ const TasksList = ({ tasks, sortType, highlightKeyword }) => {
 
           <Stack.Item grow={1} align={'stretch'}>
             <Stack
-              horizontal
               verticalAlign={'center'}
+              horizontalAlign={'start'}
               onClick={() => invokeOrElse(onSelect)}
               styles={{ root: { height: '100%', fontSize: '14px' } }}
             >
               <Highlighter
-                highlightStyle={{ backgroundColor: 'yellow' }}
+                unhighlightStyle={{
+                  textDecoration: isCompleted ? 'line-through' : 'none',
+                }}
+                highlightStyle={{
+                  backgroundColor: 'yellow',
+                  textDecoration: isCompleted ? 'line-through' : 'none',
+                }}
                 searchWords={!!highlightKeyword ? [highlightKeyword] : []}
                 autoEscape={true}
                 textToHighlight={content}
               />
+              {!!dueDate && (
+                <Text
+                  style={{ color: type === 1 ? 'red' : 'gray' }}
+                  variant={'smallPlus'}
+                >
+                  {text}
+                </Text>
+              )}
             </Stack>
           </Stack.Item>
+
+          {isNotUndefined(priority) && (
+            <Stack.Item grow={0} align={'center'} className={'px-3'}>
+              <FontIcon iconName={'Tag'} style={{ color }} />
+            </Stack.Item>
+          )}
 
           <Stack.Item grow={0} align={'center'} className={'px-3'}>
             <IconButton
@@ -183,6 +216,6 @@ const TasksList = ({ tasks, sortType, highlightKeyword }) => {
           </Stack.Item>
         </Stack>
       </Stack.Item>
-    ),
-  )
+    )
+  })
 }

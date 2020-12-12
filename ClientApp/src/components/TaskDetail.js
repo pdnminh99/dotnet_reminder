@@ -13,23 +13,18 @@ import {
   CommandButton,
 } from '@fluentui/react'
 import React, { useState, useEffect } from 'react'
-import { invokeOrElse } from '../utils'
+import {
+  invokeOrElse,
+  translatePriority,
+  displayDueText,
+  toDateMonthYearString,
+  toMDYDateObject,
+} from '../utils'
 import { Checkbox } from './Checkbox'
 import { CalendarPicker } from './CalendarPicker'
 import './Reminder.css'
 
 let syncId = undefined
-
-function toMDYDateObject(value) {
-  let dateParts = value.split(' ')[0].split('/')
-  // month is 0-based, that's why we need dataParts[1] - 1
-  return new Date(+dateParts[2], dateParts[1] - 1, +dateParts[0])
-}
-
-function toDateMonthYearString(value) {
-  if (!value) return undefined
-  return `${value.getDate()}/${value.getMonth() + 1}/${value.getFullYear()}`
-}
 
 export const TaskDetail = ({ selectedTask, onCancel }) => {
   const [isProcessing, setProcessing] = useState(false)
@@ -170,45 +165,13 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
     })
   }
 
-  function displayDueText() {
-    if (!dueDate) return { text: 'Add due date', type: 0 }
-
-    let today = new Date()
-
-    today.setHours(0)
-    today.setMinutes(0)
-    today.setSeconds(0)
-    today.setMilliseconds(0)
-
-    if (today.getTime() > dueDate.getTime()) {
-      return { text: `Overdue: ${dueDate.toDateString()}.`, type: 1 }
-    }
-
-    return { text: `Due: ${dueDate.toDateString()}`, type: 0 }
-  }
-
-  function translatePriority() {
-    switch (priority) {
-      case 0:
-        return { priorityName: 'Priority 1', color: 'green' }
-      case 1:
-        return { priorityName: 'Priority 2', color: 'blue' }
-      case 2:
-        return { priorityName: 'Priority 3', color: 'red' }
-      case 3:
-        return { priorityName: 'Priority 4', color: 'red' }
-      default:
-        return { priorityName: 'No priority', color: 'black' }
-    }
-  }
-
   if (!selectedTask) {
     return <h1>Empty</h1>
   }
 
-  let { text, type } = displayDueText()
+  let { text, type } = displayDueText(dueDate, isCompleted)
 
-  let { priorityName, color } = translatePriority()
+  let { priorityName, color } = translatePriority(priority)
 
   return (
     <Stack tokens={{ childrenGap: 10 }}>
@@ -355,7 +318,7 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
         <Stack horizontal horizontalAlign={'space-between'}>
           <IconButton
             iconProps={{ iconName: 'ClosePane' }}
-            className={'outline-none'}
+            className={'outline-none hover-still-black'}
             styles={{
               root: {
                 fontSize: '16px',
@@ -368,7 +331,7 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
 
           <IconButton
             iconProps={{ iconName: 'Delete' }}
-            className={'outline-none'}
+            className={'outline-none hover-still-red'}
             styles={{
               root: { fontSize: '16px', fontWeight: '500', color: 'red' },
             }}

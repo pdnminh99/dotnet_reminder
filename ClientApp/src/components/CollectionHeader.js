@@ -119,7 +119,7 @@ export const CollectionHeader = ({
                       return (
                         <CommandButton
                           key={key}
-                          className={'outline-none'}
+                          className={'outline-none hover-still-black'}
                           styles={{ root: { width: '100%' } }}
                           iconProps={iconProps}
                           text={text}
@@ -195,7 +195,7 @@ export const CollectionHeader = ({
                     return (
                       <CommandButton
                         key={key}
-                        className={'outline-none'}
+                        className={'outline-none hover-still-black'}
                         styles={{ root: { width: '100%' } }}
                         iconProps={iconProps}
                         text={text}
