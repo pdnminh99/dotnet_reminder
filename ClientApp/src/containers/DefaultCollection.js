@@ -281,7 +281,7 @@ const useDefaultTasks = fetchAPI => {
   }
 }
 
-export const DefaultCollection = ({ fetchAPI, collectionName }) => {
+export const DefaultCollection = ({ fetchAPI, collectionName, sortType }) => {
   const {
     isProcessing,
     tasksByGroups,
@@ -312,7 +312,7 @@ export const DefaultCollection = ({ fetchAPI, collectionName }) => {
           </Stack.Item>
 
           <Stack.Item align='stretch' styles={{ root: { overflow: 'auto' } }}>
-            <TasksList tasksGroup={tasksByGroups} />
+            <TasksList tasksGroup={tasksByGroups} sortType={sortType} />
           </Stack.Item>
         </Stack>
       </Stack.Item>

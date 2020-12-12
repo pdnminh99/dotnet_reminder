@@ -1,10 +1,18 @@
-import { Image, ImageFit, Stack, Text } from '@fluentui/react'
+import {
+  Image,
+  ImageFit,
+  Spinner,
+  SpinnerSize,
+  Stack,
+  Text,
+} from '@fluentui/react'
 import loadingPic from '../assets/images/please-be-patient.png'
 import goalSuccess from '../assets/images/awards.png'
 import error from '../assets/images/error.png'
 import empty from '../assets/images/no-messages.png'
 import build from '../assets/images/build.png'
 import searching from '../assets/images/searching.png'
+import delivery from '../assets/images/delivery.png'
 import React from 'react'
 
 export const Error = () => {
@@ -213,6 +221,36 @@ export const NoSearchResults = () => {
       >
         Try something else
       </Text>
+    </Stack>
+  )
+}
+
+export const Delivering = () => {
+  return (
+    <Stack
+      verticalAlign={'center'}
+      horizontalAlign={'center'}
+      className={'h-100 w-100'}
+    >
+      <Stack.Item grow={0}>
+        <Image
+          imageFit={ImageFit.contain}
+          width={800}
+          height={400}
+          src={delivery}
+          alt={'Preparing everything'}
+        />
+      </Stack.Item>
+
+      <Text
+        className={'pb-2'}
+        styles={{ root: { color: '#0078d7', fontWeight: 600 } }}
+        variant={'xxLarge'}
+      >
+        Loading
+      </Text>
+
+      <Spinner size={SpinnerSize.large} />
     </Stack>
   )
 }
