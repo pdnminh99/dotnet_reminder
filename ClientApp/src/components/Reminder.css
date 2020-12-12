@@ -103,3 +103,7 @@
   color: #fff;
   background-color: #0078d7;
 }
+
+.hover-still-black:hover {
+  color: black;
+}

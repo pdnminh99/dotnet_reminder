@@ -210,12 +210,19 @@ const useCustomTasks = _ => {
       setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
     }
 
-    task.onEdit = async ({ content, dueDate, note }) => {
+    task.onEdit = async ({ content, dueDate, note, priority }) => {
       if (!task.taskId) return
 
       dueDate = !!dueDate ? dueDate.split(' ')[0] : undefined
 
-      let result = await updateTask({ ...task, content, dueDate, note })
+      let result = await updateTask({
+        ...task,
+        content,
+        dueDate,
+        note,
+        priority,
+      })
+
       if (!result) return
       assignTaskMethod(result)
 

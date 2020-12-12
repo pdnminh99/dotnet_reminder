@@ -183,12 +183,19 @@ const useDefaultTasks = fetchAPI => {
     }
 
     // On Fields changes
-    task.onEdit = async function ({ content, dueDate, note }) {
+    task.onEdit = async function ({ content, dueDate, note, priority }) {
       if (!task.taskId) return
 
       dueDate = !!dueDate ? dueDate.split(' ')[0] : undefined
 
-      let result = await updateTask({ ...task, content, dueDate, note })
+      let result = await updateTask({
+        ...task,
+        content,
+        dueDate,
+        note,
+        priority,
+      })
+
       if (!result) return
       assignTaskMethods(result)
 

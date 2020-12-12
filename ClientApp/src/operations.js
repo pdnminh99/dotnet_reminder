@@ -122,6 +122,7 @@ export const updateTask = async ({
   isFlagged,
   dueDate,
   note,
+  priority,
   completedAt,
 }) => {
   const token = await authService.getAccessToken()
@@ -131,7 +132,14 @@ export const updateTask = async ({
   } else {
     const response = await fetch(`/api/v1/Task/${taskId}`, {
       method: 'PATCH',
-      body: JSON.stringify({ content, isFlagged, dueDate, note, completedAt }),
+      body: JSON.stringify({
+        content,
+        isFlagged,
+        dueDate,
+        note,
+        completedAt,
+        priority,
+      }),
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,

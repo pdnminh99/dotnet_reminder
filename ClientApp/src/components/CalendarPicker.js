@@ -1,31 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import {
-  Calendar,
-  DayOfWeek,
-  DateRangeType,
-  DefaultButton,
-  addDays,
-  getDateRangeArray,
-} from '@fluentui/react'
-
-// export interface ICalendarInlineExampleProps {
-//   isMonthPickerVisible?: boolean;
-//   dateRangeType: DateRangeType;
-//   autoNavigateOnSelection: boolean;
-//   showGoToToday: boolean;
-//   showNavigateButtons?: boolean;
-//   highlightCurrentMonth?: boolean;
-//   highlightSelectedMonth?: boolean;
-//   isDayPickerVisible?: boolean;
-//   showMonthPickerAsOverlay?: boolean;
-//   showWeekNumbers?: boolean;
-//   minDate?: Date;
-//   maxDate?: Date;
-//   restrictedDates?: Date[];
-//   showSixWeeksByDefault?: boolean;
-//   workWeekDays?: DayOfWeek[];
-//   firstDayOfWeek?: DayOfWeek;
-// }
+import React, { useState } from 'react'
+import { Calendar, DayOfWeek } from '@fluentui/react'
 
 const dayPickerStrings = {
   months: [

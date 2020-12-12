@@ -10,11 +10,13 @@ import {
   DefaultButton,
   Text,
   DialogType,
+  CommandButton,
 } from '@fluentui/react'
 import React, { useState, useEffect } from 'react'
 import { invokeOrElse } from '../utils'
 import { Checkbox } from './Checkbox'
 import { CalendarPicker } from './CalendarPicker'
+import './Reminder.css'
 
 let syncId = undefined
 
@@ -127,6 +129,17 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
     )
   }
 
+  function handlePriorityChange(value) {
+    setPriority(value)
+    if (!!syncId) {
+      clearTimeout(syncId)
+    }
+    syncId = setTimeout(
+      () => requestChanges({ content, note, dueDate, priority: value }),
+      1000,
+    )
+  }
+
   function handleOnCheck() {
     if (!!syncId) {
       clearTimeout(syncId)
@@ -157,9 +170,45 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
     })
   }
 
+  function displayDueText() {
+    if (!dueDate) return { text: 'Add due date', type: 0 }
+
+    let today = new Date()
+
+    today.setHours(0)
+    today.setMinutes(0)
+    today.setSeconds(0)
+    today.setMilliseconds(0)
+
+    if (today.getTime() > dueDate.getTime()) {
+      return { text: `Overdue: ${dueDate.toDateString()}.`, type: 1 }
+    }
+
+    return { text: `Due: ${dueDate.toDateString()}`, type: 0 }
+  }
+
+  function translatePriority() {
+    switch (priority) {
+      case 0:
+        return { priorityName: 'Priority 1', color: 'green' }
+      case 1:
+        return { priorityName: 'Priority 2', color: 'blue' }
+      case 2:
+        return { priorityName: 'Priority 3', color: 'red' }
+      case 3:
+        return { priorityName: 'Priority 4', color: 'red' }
+      default:
+        return { priorityName: 'No priority', color: 'black' }
+    }
+  }
+
   if (!selectedTask) {
     return <h1>Empty</h1>
   }
+
+  let { text, type } = displayDueText()
+
+  let { priorityName, color } = translatePriority()
 
   return (
     <Stack tokens={{ childrenGap: 10 }}>
@@ -205,24 +254,91 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
         <Stack className={'ms-bgColor-white ms-depth-4'}>
           <ControlWrapper>
             <Button
-              content={
-                !dueDate ? 'Add due date' : `Due: ${dueDate.toDateString()}`
-              }
+              content={text}
               iconName={'DateTime'}
               hasDivider
+              color={type === 1 ? 'red' : 'black'}
               onClick={() => setShowCalendarPicker(!showCalendarPicker)}
             />
           </ControlWrapper>
 
           {showCalendarPicker && (
-            <ControlWrapper align={'center'}>
-              <CalendarPicker
-                selectedDate={dueDate}
-                minDate={new Date()}
-                onPick={handleDueDateChange}
+            <>
+              <ControlWrapper align={'center'}>
+                <CalendarPicker
+                  selectedDate={dueDate}
+                  onPick={handleDueDateChange}
+                />
+              </ControlWrapper>
+              <DefaultButton
+                styles={{
+                  root: {
+                    border: 'none',
+                    borderBottomStyle: 'solid',
+                    borderBottomColor: 'lightgray',
+                    borderBottomWidth: '1px',
+                  },
+                }}
+                onClick={() => handleDueDateChange(undefined)}
+                className={'outline-none'}
+                disabled={!dueDate}
+                text={'Reset due date'}
               />
-            </ControlWrapper>
+            </>
           )}
+
+          <ControlWrapper>
+            <Button
+              content={priorityName}
+              color={color}
+              iconName={'Tag'}
+              items={[
+                {
+                  key: 'pu',
+                  onClick: () => handlePriorityChange(undefined),
+                  iconProps: {
+                    iconName: 'Tag',
+                    style: { color: 'black', fontWeight: '400' },
+                  },
+                  text: 'No priority',
+                  title: '',
+                },
+
+                {
+                  key: 'p0',
+                  onClick: () => handlePriorityChange(0),
+                  iconProps: {
+                    iconName: 'Tag',
+                    style: { color: 'green', fontWeight: '400' },
+                  },
+                  text: 'Priority 1',
+                  title: '',
+                },
+
+                {
+                  key: 'p1',
+                  onClick: () => handlePriorityChange(1),
+                  iconProps: {
+                    iconName: 'Tag',
+                    style: { color: 'blue', fontWeight: '400' },
+                  },
+                  text: 'Priority 2',
+                  title: '',
+                },
+
+                {
+                  key: 'p2',
+                  onClick: () => handlePriorityChange(2),
+                  iconProps: {
+                    iconName: 'Tag',
+                    style: { color: 'red', fontWeight: '400' },
+                  },
+                  text: 'Priority 3',
+                  title: '',
+                },
+              ]}
+            />
+          </ControlWrapper>
         </Stack>
       </Stack.Item>
 
@@ -230,7 +346,7 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
         <Button
           content={isFlagged ? 'Remove flag' : 'Flag this task'}
           iconName={'Flag'}
-          color={'#000'}
+          color={isFlagged ? '#0078d7' : 'black'}
           onClick={handleOnFlag}
         />
       </ControlWrapper>
@@ -308,7 +424,7 @@ const ControlWrapper = ({ children, hasDepth, align }) => {
   )
 }
 
-const Button = ({ content, iconName, hasDivider, onClick, color }) => {
+const Button = ({ content, iconName, hasDivider, onClick, color, items }) => {
   const customStyles = { root: { border: 'none', height: '50px' } }
 
   if (typeof hasDivider === 'boolean' && hasDivider) {
@@ -329,13 +445,11 @@ const Button = ({ content, iconName, hasDivider, onClick, color }) => {
           <Stack.Item className='px-2 h-100'>
             <FontIcon
               iconName={iconName}
-              styles={{
-                root: {
-                  borderRadius: '0.125rem',
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  color,
-                },
+              style={{
+                color,
+                borderRadius: '0.125rem',
+                fontSize: '16px',
+                fontWeight: '500',
               }}
             />
           </Stack.Item>
@@ -347,6 +461,32 @@ const Button = ({ content, iconName, hasDivider, onClick, color }) => {
           </Stack.Item>
         </Stack>
       )}
+      menuProps={
+        !!items
+          ? {
+              onRenderMenuList: props => {
+                return (
+                  <Stack align={'stretch'}>
+                    {props.items.map(p => {
+                      let { key, iconProps, text, onClick } = p
+
+                      return (
+                        <CommandButton
+                          key={key}
+                          className={'outline-none hover-still-black'}
+                          iconProps={iconProps}
+                          text={text}
+                          onClick={onClick}
+                        />
+                      )
+                    })}
+                  </Stack>
+                )
+              },
+              items,
+            }
+          : undefined
+      }
     />
   )
 }
