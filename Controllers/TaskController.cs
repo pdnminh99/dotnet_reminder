@@ -17,6 +17,43 @@ public class TaskController : GenericController
     {
     }
 
+    [HttpGet("Search")]
+    public async Task<IActionResult> Search(string keyword)
+    {
+        await StartAuthenticate($"search for keyword: {keyword}");
+        keyword = keyword.ToLower();
+
+        List<Collection> collections = await Context.Collections
+            .Where(c => c.Owner == CurrentUser)
+            .Select(c => new Collection
+            {
+                CollectionId = c.CollectionId,
+                Name = c.Name,
+                Owner = null,
+                CreationDate = c.CreationDate,
+                LastEdited = c.LastEdited,
+                Tasks = c.Tasks
+                .Where(t => t.Content.ToLower().Contains(keyword))
+                .Select(t => new AppTask
+                {
+                    TaskId = t.TaskId,
+                    Content = t.Content,
+                    DueDate = t.DueDate,
+                    CompletedAt = t.CompletedAt,
+                    Priority = t.Priority,
+                    IsFlagged = t.IsFlagged,
+                    Note = t.Note,
+                    CreationDate = t.CreationDate,
+                    LastEdited = t.LastEdited,
+                    Collection = null
+                }).ToList()
+            })
+            .Where(c => c.Tasks.Count > 0 || c.Name.Contains(keyword))
+            .ToListAsync();
+
+        return Ok(collections);
+    }
+
     [HttpGet("Today")]
     public async Task<IActionResult> GetTodayTasks()
     {
@@ -39,6 +76,7 @@ public class TaskController : GenericController
                     Content = t.Content,
                     DueDate = t.DueDate,
                     CompletedAt = t.CompletedAt,
+                    Priority = t.Priority,
                     IsFlagged = t.IsFlagged,
                     Note = t.Note,
                     CreationDate = t.CreationDate,
@@ -73,6 +111,7 @@ public class TaskController : GenericController
                     TaskId = t.TaskId,
                     Content = t.Content,
                     DueDate = t.DueDate,
+                    Priority = t.Priority,
                     CompletedAt = t.CompletedAt,
                     IsFlagged = t.IsFlagged,
                     Note = t.Note,
@@ -108,6 +147,7 @@ public class TaskController : GenericController
                     TaskId = t.TaskId,
                     Content = t.Content,
                     DueDate = t.DueDate,
+                    Priority = t.Priority,
                     CompletedAt = t.CompletedAt,
                     IsFlagged = t.IsFlagged,
                     Note = t.Note,
@@ -141,6 +181,7 @@ public class TaskController : GenericController
                     TaskId = t.TaskId,
                     Content = t.Content,
                     DueDate = t.DueDate,
+                    Priority = t.Priority,
                     CompletedAt = t.CompletedAt,
                     IsFlagged = t.IsFlagged,
                     Note = t.Note,
@@ -191,6 +232,7 @@ public class TaskController : GenericController
                 TaskId = t.TaskId,
                 Content = t.Content,
                 DueDate = t.DueDate,
+                Priority = t.Priority,
                 Note = t.Note,
                 CompletedAt = t.CompletedAt,
                 IsFlagged = t.IsFlagged,
@@ -222,6 +264,9 @@ public class TaskController : GenericController
 
         hasChanges = hasChanges || task.CompletedAt != instance.CompletedAt;
         task.CompletedAt = instance.CompletedAt;
+
+        hasChanges = hasChanges || task.Priority != instance.Priority;
+        task.Priority = instance.Priority;
 
         // Commit changes if there are changes
         if (hasChanges)
@@ -268,11 +313,5 @@ public class TaskController : GenericController
         if (task.Collection?.Tasks != null)
             task.Collection.Tasks = null;
         return Ok(task);
-    }
-
-    [HttpPut("{taskId}/{toCollection}")]
-    public Task<IActionResult> Move(int taskId, int toCollectionId)
-    {
-        throw new NotImplementedException();
     }
 }

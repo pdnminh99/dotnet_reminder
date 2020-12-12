@@ -10,12 +10,14 @@ import {
 import './Reminder.css'
 import { TaskSortType } from '../enums'
 import { Checkbox } from './Checkbox'
+import Highlighter from 'react-highlight-words'
 
 export const TasksContainer = ({
   groupName,
   tasks,
   sortType,
   shouldCollapsed,
+  highlightKeyword,
 }) => {
   const [isCollapsed, setCollapsed] = useState(
     isNotUndefined(shouldCollapsed) ? shouldCollapsed : true,
@@ -56,7 +58,12 @@ export const TasksContainer = ({
                 align={'center'}
                 styles={{ root: { paddingLeft: '14px', fontWeight: 500 } }}
               >
-                <span>{groupName}</span>
+                <Highlighter
+                  highlightStyle={{ backgroundColor: 'yellow' }}
+                  searchWords={!!highlightKeyword ? [highlightKeyword] : []}
+                  autoEscape={true}
+                  textToHighlight={groupName}
+                />
               </Stack.Item>
             </Stack>
           </Stack.Item>
@@ -64,7 +71,11 @@ export const TasksContainer = ({
           {/* Group content */}
           {!isCollapsed && (
             <Stack.Item>
-              <TasksList tasks={tasks} sortType={sortType} />
+              <TasksList
+                tasks={tasks}
+                sortType={sortType}
+                highlightKeyword={highlightKeyword}
+              />
             </Stack.Item>
           )}
         </>
@@ -73,7 +84,7 @@ export const TasksContainer = ({
   )
 }
 
-const TasksList = ({ tasks, sortType }) => {
+const TasksList = ({ tasks, sortType, highlightKeyword }) => {
   function rearrangeTasks(tasks) {
     let result = undefined
 
@@ -148,7 +159,12 @@ const TasksList = ({ tasks, sortType }) => {
               onClick={() => invokeOrElse(onSelect)}
               styles={{ root: { height: '100%', fontSize: '14px' } }}
             >
-              <span>{content}</span>
+              <Highlighter
+                highlightStyle={{ backgroundColor: 'yellow' }}
+                searchWords={!!highlightKeyword ? [highlightKeyword] : []}
+                autoEscape={true}
+                textToHighlight={content}
+              />
             </Stack>
           </Stack.Item>
 

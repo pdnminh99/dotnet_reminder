@@ -3,7 +3,12 @@ import { InsertField, TasksContainer } from '../components'
 import { Stack } from '@fluentui/react'
 import { EmptyTasksList } from './EmptyTasksList'
 
-export const TasksList = ({ tasksGroup, onInsert, sortType }) => {
+export const TasksList = ({
+  tasksGroup,
+  highlightKeyword,
+  onInsert,
+  sortType,
+}) => {
   return (
     <Stack className={'pb-5'}>
       {!!onInsert && (
@@ -22,6 +27,7 @@ export const TasksList = ({ tasksGroup, onInsert, sortType }) => {
                 tasks={items}
                 sortType={sortType}
                 shouldCollapsed={shouldCollapsed}
+                highlightKeyword={highlightKeyword}
               />
             )
           })

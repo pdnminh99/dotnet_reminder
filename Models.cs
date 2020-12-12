@@ -50,6 +50,10 @@ public class AppTask
 
     [DefaultValue("")] public string Note { get; set; }
 
+    [DefaultValue(null)]
+    [Range(minimum: 0, maximum: 3, ErrorMessage = "{0} can only in range from 0 to 3, or empty.")]
+    public int? Priority { get; set; }
+
     [JsonIgnore] public DateTime? CreationDate { get; set; }
 
     [JsonPropertyName("creationDate")] public long? CreationDateInUnix => Utils.DateTimeToUnixTime(CreationDate);

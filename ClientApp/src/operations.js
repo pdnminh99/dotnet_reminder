@@ -226,3 +226,20 @@ export const getAllTasks = async () => {
 
   return undefined
 }
+
+export const search = async keyword => {
+  if (!keyword) return undefined
+
+  const token = await authService.getAccessToken()
+
+  if (!token) {
+    console.error('Cannot send GET request without being authenticated.')
+  } else {
+    const response = await fetch(`/api/v1/Task/Search?keyword=${keyword}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    if (response.status === 200) return await response.json()
+  }
+
+  return []
+}
