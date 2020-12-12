@@ -4,6 +4,7 @@ import goalSuccess from '../assets/images/awards.png'
 import error from '../assets/images/error.png'
 import empty from '../assets/images/no-messages.png'
 import build from '../assets/images/build.png'
+import searching from '../assets/images/searching.png'
 import React from 'react'
 
 export const Error = () => {
@@ -176,6 +177,41 @@ export const NoContent = ({ width, height }) => {
         variant={'mediumPlus'}
       >
         This feature is not ready!
+      </Text>
+    </Stack>
+  )
+}
+
+export const NoSearchResults = () => {
+  return (
+    <Stack
+      verticalAlign={'center'}
+      horizontalAlign={'center'}
+      className={'h-100 w-100'}
+    >
+      <Stack.Item grow={0}>
+        <Image
+          imageFit={ImageFit.contain}
+          width={800}
+          height={400}
+          src={searching}
+          alt={'No results'}
+        />
+      </Stack.Item>
+
+      <Text
+        styles={{ root: { color: '#0078d7', fontWeight: 600 } }}
+        variant={'xxLarge'}
+      >
+        No result found!
+      </Text>
+
+      <Text
+        className={'pb-10'}
+        styles={{ root: { color: 'gray' } }}
+        variant={'mediumPlus'}
+      >
+        Try something else
       </Text>
     </Stack>
   )

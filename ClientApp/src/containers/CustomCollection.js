@@ -5,7 +5,6 @@ import { CollectionHeader, TaskDetail } from '../components'
 import {
   CollectionUpdateNotifierContext,
   fromEpochToLocalDatetime,
-  isNotUndefined,
   isUndefined,
 } from '../utils'
 import { useHistory, useParams } from 'react-router-dom'
@@ -17,9 +16,9 @@ import {
   updateCollection,
   updateTask,
 } from '../operations'
-import { NotifierType, TaskSortType } from '../enums'
+import { TaskSortType } from '../enums'
 import { TasksList } from '../components/TasksList'
-import { LoadingScreen } from '../components/EmptyTasksList'
+import { Error, LoadingScreen } from '../components/EmptyTasksList'
 
 const taskDetailStyles = {
   root: {
@@ -55,13 +54,15 @@ const useCustomTasks = _ => {
 
   const [isFetching, setFetchingState] = useState(true)
 
+  const [isError, setError] = useState(false)
+
   useEffect(() => {
     async function syncTasks() {
       setFetchingState(true)
 
       const fetchResults = await retrieveTasks(cid)
 
-      if (isNotUndefined(fetchResults)) {
+      if (!!fetchResults) {
         incompletedTasks = fetchResults.incompletedTasks
         completedTasks = fetchResults.completedTasks
 
@@ -86,9 +87,13 @@ const useCustomTasks = _ => {
         }, 1000)
 
         setTasksByGroups(parseGroups(incompletedTasks, completedTasks))
+      } else {
+        setFetchingState(false)
+        setError(true)
       }
     }
 
+    setError(false)
     syncTasks()
   }, [cid])
 
@@ -376,6 +381,7 @@ const useCustomTasks = _ => {
     handleEditollectionName,
     handleDeleteCollection,
 
+    isError,
     isFetching,
     isProcessing,
     selectedTask,
@@ -397,6 +403,7 @@ export const CustomCollection = () => {
     handleEditollectionName,
     handleDeleteCollection,
 
+    isError,
     isProcessing,
     isFetching,
     selectedTask,
@@ -409,6 +416,8 @@ export const CustomCollection = () => {
   }
 
   if (isFetching) return <LoadingScreen />
+
+  if (isError) return <Error />
 
   return (
     <Stack horizontal className='h-100 w-100'>

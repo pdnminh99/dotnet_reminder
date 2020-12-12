@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { Stack, IconButton, Text } from '@fluentui/react'
+import { Stack, Text } from '@fluentui/react'
 import '../components/Reminder.css'
 import { TaskDetail } from '../components'
 import { deleteTask, search, updateTask } from '../operations'
 import { TasksList } from '../components/TasksList'
-import { EmptyTasksList, LoadingScreen } from '../components/EmptyTasksList'
+import { LoadingScreen, NoSearchResults } from '../components/EmptyTasksList'
 
 const taskDetailStyles = {
   root: {
@@ -299,7 +299,7 @@ export const SearchContainer = ({ searchValue }) => {
   function renderContent() {
     if (isProcessing) return <LoadingScreen />
 
-    if (tasksByGroups.length === 0) return <EmptyTasksList />
+    if (tasksByGroups.length === 0) return <NoSearchResults />
 
     return (
       <TasksList tasksGroup={tasksByGroups} highlightKeyword={searchValue} />
@@ -351,21 +351,6 @@ const SearchHeader = ({ value }) => {
         <Text variant={'xLarge'} className='px-3'>
           Results for: <span style={{ fontStyle: 'italic' }}>{value}</span>
         </Text>
-      </Stack.Item>
-
-      <Stack.Item grow={1} horizontalAlign='end'>
-        <Stack horizontalAlign='end'>
-          <IconButton
-            iconProps={{
-              iconName: 'Cancel',
-              styles: { root: { color: '#000', fontSize: '16px' } },
-            }}
-            title='CollapseMenu'
-            ariaLabel='CollapseMenu'
-            disabled={false}
-            borderless={true}
-          />
-        </Stack>
       </Stack.Item>
     </Stack>
   )
