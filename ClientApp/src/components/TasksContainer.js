@@ -103,7 +103,23 @@ const TasksList = ({ tasks, sortType, highlightKeyword }) => {
         )
         break
       case TaskSortType.DueDate:
-        result = tasks.sort((before, after) => before.dueDate - after.dueDate)
+        let today = new Date()
+        today.setHours(0)
+        today.setMinutes(0)
+        today.setSeconds(0)
+        today.setMilliseconds(0)
+
+        result = tasks.sort((before, after) => {
+          if (!before.dueDate) return 1
+          if (!after.dueDate) return -1
+
+          let fromTodayToBefore =
+            today.getTime() - toMDYDateObject(before.dueDate)
+          let fromTodayToAfter =
+            today.getTime() - toMDYDateObject(after.dueDate)
+
+          return fromTodayToAfter - fromTodayToBefore
+        })
         break
       case TaskSortType.Default:
       case TaskSortType.CreationDate:
@@ -197,7 +213,7 @@ const TasksList = ({ tasks, sortType, highlightKeyword }) => {
 
           {isNotUndefined(priority) && (
             <Stack.Item grow={0} align={'center'} className={'px-3'}>
-              <FontIcon iconName={'Tag'} style={{ color }} />
+              <FontIcon iconName={'Tag'} style={{ color, fontWeight: 500 }} />
             </Stack.Item>
           )}
 

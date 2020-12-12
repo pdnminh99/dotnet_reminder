@@ -102,7 +102,7 @@ const Searchbar = ({ onSearchValueChange }) => {
       <Stack.Item grow={0} align={'center'} className={'px-2'}>
         <FontIcon
           iconName='Search'
-          iconProps={{ styles: { root: { color: '#0078D7' } } }}
+          style={{ color: '#0078D7', fontWeight: 500 }}
         />
       </Stack.Item>
       <Stack.Item grow={1} styles={{ root: { paddingRight: '5px' } }}>
