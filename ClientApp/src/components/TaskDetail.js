@@ -49,6 +49,10 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
     !!selectedTask ? selectedTask.isFlagged : false,
   )
 
+  const [priority, setPriority] = useState(
+    !!selectedTask ? selectedTask.priority : undefined,
+  )
+
   const [showCalendarPicker, setShowCalendarPicker] = useState(false)
 
   useEffect(() => {
@@ -66,20 +70,23 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
 
     setIsCompleted(selectedTask.isCompleted)
     setFlag(selectedTask.isFlagged)
+    setPriority(selectedTask.priority)
   }, [selectedTask])
 
-  function requestChanges({ content, note, dueDate }) {
+  function requestChanges({ content, note, dueDate, priority }) {
     let hasChanges = false
 
     hasChanges = hasChanges || content !== selectedTask.content
     hasChanges = hasChanges || note !== selectedTask.note
     hasChanges = hasChanges || dueDate !== selectedTask.dueDate
+    hasChanges = hasChanges || priority !== selectedTask.priority
 
     if (hasChanges) {
       selectedTask.onEdit({
         content,
         dueDate: toDateMonthYearString(dueDate),
         note,
+        priority,
       })
     }
 
@@ -93,7 +100,7 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
       clearTimeout(syncId)
     }
     syncId = setTimeout(
-      () => requestChanges({ content: target.value, note, dueDate }),
+      () => requestChanges({ content: target.value, note, dueDate, priority }),
       1000,
     )
   }
@@ -104,7 +111,7 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
       clearTimeout(syncId)
     }
     syncId = setTimeout(
-      () => requestChanges({ content, note: target.value, dueDate }),
+      () => requestChanges({ content, note: target.value, dueDate, priority }),
       1000,
     )
   }
@@ -115,7 +122,7 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
       clearTimeout(syncId)
     }
     syncId = setTimeout(
-      () => requestChanges({ content, note, dueDate: value }),
+      () => requestChanges({ content, note, priority, dueDate: value }),
       1000,
     )
   }
@@ -130,6 +137,7 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
       taskId,
       content,
       note,
+      priority,
       dueDate: toDateMonthYearString(dueDate),
     })
   }
@@ -144,6 +152,7 @@ export const TaskDetail = ({ selectedTask, onCancel }) => {
       taskId,
       content,
       note,
+      priority,
       dueDate: toDateMonthYearString(dueDate),
     })
   }

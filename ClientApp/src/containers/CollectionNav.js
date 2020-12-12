@@ -21,7 +21,6 @@ import {
 import { standardCollections } from '../dummy_data'
 import { matchPath, useHistory } from 'react-router'
 import { createCollection, retrieveCollections } from '../operations'
-import { NotifierType } from '../enums'
 
 const preprocessCollection = ({ collectionId, name }) => ({
   collectionId: collectionId,
@@ -38,62 +37,35 @@ export const CollectionNav = ({ pathname }) => {
 
   const history = useHistory()
 
-  useEffect(() => {
-    if (isNotUndefined(notifier)) {
-      const { type, collection } = notifier
-
-      if (type === NotifierType.Delete) {
-        setCollections(
-          collections
-            .filter(c => c.collectionId !== collection.collectionId)
-            .map(c => ({
-              ...c,
-              isActive: !!matchPath(pathname, c.url),
-            })),
-        )
-      }
-
-      if (type === NotifierType.Update) {
-        setCollections(
-          collections.map(c => {
-            let result = {
-              ...c,
-              isActive: !!matchPath(pathname, c.url),
-            }
-
-            if (result.collectionId === collection.collectionId) {
-              result.name = collection.name
-            }
-
-            return result
-          }),
-        )
-      }
-
-      setNotifier(undefined)
-    }
-  }, [notifier])
-
   const [collapsed, setCollapsed] = useState(false)
 
   const [defaults, setDefaults] = useState(standardCollections)
 
   const [collections, setCollections] = useState([])
 
-  useEffect(() => {
-    async function fetchCollections() {
-      let collections = await retrieveCollections()
+  async function fetchCollections() {
+    let collections = await retrieveCollections()
 
-      if (isNotUndefined(collections)) {
-        setCollections(
-          collections.map(preprocessCollection).map(c => ({
-            ...c,
-            isActive: !!matchPath(pathname, c.url),
-          })),
-        )
-      }
+    if (isNotUndefined(collections)) {
+      setCollections(
+        collections.map(preprocessCollection).map(c => ({
+          ...c,
+          isActive: !!matchPath(pathname, c.url),
+        })),
+      )
     }
+  }
 
+  // Refresh nav whenever changes occur
+  useEffect(() => {
+    if (!!notifier) {
+      fetchCollections()
+      setNotifier(undefined)
+    }
+  }, [notifier])
+
+  // Init data on first load
+  useEffect(() => {
     fetchCollections()
   }, [])
 

@@ -338,34 +338,17 @@ const useCustomTasks = _ => {
     setName(value)
     setIsProcessing(true)
 
-    let result = await updateCollection(cid, value)
+    if (!(await updateCollection(cid, value))) setName(oldName)
+    else setNotifier(true)
 
-    if (isUndefined(result)) setName(oldName)
-    else {
-      setNotifier({
-        collection: {
-          collectionId: parseInt(cid),
-          name: value,
-        },
-        type: NotifierType.Update,
-      })
-    }
     setIsProcessing(false)
   }
 
   async function handleDeleteCollection() {
     setIsProcessing(true)
 
-    let result = await deleteCollection(cid)
-    if (isNotUndefined(result)) {
-      setNotifier({
-        collection: {
-          collectionId: parseInt(cid),
-          name,
-        },
-        type: NotifierType.Delete,
-      })
-
+    if (!!(await deleteCollection(cid))) {
+      setNotifier(true)
       setSelectedTask(undefined)
       setDetailActive(false)
       history.push('/today')
