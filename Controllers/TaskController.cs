@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-
 
 [Route("api/v1/[controller]")]
 public class TaskController : GenericController
@@ -15,20 +17,161 @@ public class TaskController : GenericController
     {
     }
 
+    [HttpGet("Search")]
+    public async Task<IActionResult> Search(string keyword)
+    {
+        await StartAuthenticate($"search for keyword: {keyword}");
+        keyword = keyword.ToLower();
+
+        List<Collection> collections = await Context.Collections
+            .Where(c => c.Owner == CurrentUser)
+            .Select(c => new Collection
+            {
+                CollectionId = c.CollectionId,
+                Name = c.Name,
+                Owner = null,
+                CreationDate = c.CreationDate,
+                LastEdited = c.LastEdited,
+                Tasks = c.Name.ToLower().Contains(keyword) ?
+                c.Tasks.Select(t => new AppTask
+                {
+                    TaskId = t.TaskId,
+                    Content = t.Content,
+                    DueDate = t.DueDate,
+                    CompletedAt = t.CompletedAt,
+                    Priority = t.Priority,
+                    IsFlagged = t.IsFlagged,
+                    Note = t.Note,
+                    CreationDate = t.CreationDate,
+                    LastEdited = t.LastEdited,
+                    Collection = null
+                }).ToList() :
+                c.Tasks.Where(t => t.Content.ToLower().Contains(keyword))
+                .Select(t => new AppTask
+                {
+                    TaskId = t.TaskId,
+                    Content = t.Content,
+                    DueDate = t.DueDate,
+                    CompletedAt = t.CompletedAt,
+                    Priority = t.Priority,
+                    IsFlagged = t.IsFlagged,
+                    Note = t.Note,
+                    CreationDate = t.CreationDate,
+                    LastEdited = t.LastEdited,
+                    Collection = null
+                }).ToList()
+            })
+            .ToListAsync();
+
+        return Ok(collections.Where(c => c.Tasks.Count > 0 || c.Name.ToLower().Contains(keyword)).ToList());
+    }
+
     [HttpGet("Today")]
     public async Task<IActionResult> GetTodayTasks()
     {
         await StartAuthenticate("get today's tasks");
 
-        throw new NotImplementedException();
+        List<Collection> collections = await Context.Collections
+            .Where(c => c.Owner == CurrentUser)
+            .Select(c => new Collection
+            {
+                CollectionId = c.CollectionId,
+                Name = c.Name,
+                Owner = null,
+                CreationDate = c.CreationDate,
+                LastEdited = c.LastEdited,
+                Tasks = c.Tasks
+                .Where(t => t.DueDate != null)
+                .Select(t => new AppTask
+                {
+                    TaskId = t.TaskId,
+                    Content = t.Content,
+                    DueDate = t.DueDate,
+                    CompletedAt = t.CompletedAt,
+                    Priority = t.Priority,
+                    IsFlagged = t.IsFlagged,
+                    Note = t.Note,
+                    CreationDate = t.CreationDate,
+                    LastEdited = t.LastEdited,
+                    Collection = null
+                }).ToList()
+            })
+            .Where(c => c.Tasks.Count > 0)
+            .ToListAsync();
+
+        return Ok(collections);
     }
 
     [HttpGet("Planned")]
     public async Task<IActionResult> GetPlanned()
     {
-        await StartAuthenticate("get today's tasks");
+        await StartAuthenticate("get planned tasks");
 
-        throw new NotImplementedException();
+        List<Collection> collections = await Context.Collections
+            .Where(c => c.Owner == CurrentUser)
+            .Select(c => new Collection
+            {
+                CollectionId = c.CollectionId,
+                Name = c.Name,
+                Owner = null,
+                CreationDate = c.CreationDate,
+                LastEdited = c.LastEdited,
+                Tasks = c.Tasks
+                .Where(t => t.DueDate != null)
+                .Select(t => new AppTask
+                {
+                    TaskId = t.TaskId,
+                    Content = t.Content,
+                    DueDate = t.DueDate,
+                    Priority = t.Priority,
+                    CompletedAt = t.CompletedAt,
+                    IsFlagged = t.IsFlagged,
+                    Note = t.Note,
+                    CreationDate = t.CreationDate,
+                    LastEdited = t.LastEdited,
+                    Collection = null
+                }).ToList()
+            })
+            .Where(c => c.Tasks.Count > 0)
+            .ToListAsync();
+
+        return Ok(collections);
+    }
+
+    [HttpGet("Flagged")]
+    public async Task<IActionResult> GetFlagged()
+    {
+        await StartAuthenticate("get flagged tasks");
+
+        List<Collection> collections = await Context.Collections
+            .Where(c => c.Owner == CurrentUser)
+            .Select(c => new Collection
+            {
+                CollectionId = c.CollectionId,
+                Name = c.Name,
+                Owner = null,
+                CreationDate = c.CreationDate,
+                LastEdited = c.LastEdited,
+                Tasks = c.Tasks
+                .Where(t => t.IsFlagged)
+                .Select(t => new AppTask
+                {
+                    TaskId = t.TaskId,
+                    Content = t.Content,
+                    DueDate = t.DueDate,
+                    Priority = t.Priority,
+                    CompletedAt = t.CompletedAt,
+                    IsFlagged = t.IsFlagged,
+                    Note = t.Note,
+                    CreationDate = t.CreationDate,
+                    LastEdited = t.LastEdited,
+                    Collection = null
+                }).ToList()
+            })
+            .Where(c => c.Tasks.Count > 0)
+            .ToListAsync();
+
+        return Ok(collections);
     }
 
     [HttpGet("{collectionId}")]
@@ -36,7 +179,30 @@ public class TaskController : GenericController
     {
         await StartAuthenticate("get today's tasks");
 
-        Collection collection = await Context.Collections.FindAsync(collectionId);
+        Collection collection = await Context.Collections
+            .Where(c => c.CollectionId == collectionId)
+            .Select(c => new Collection
+            {
+                CollectionId = c.CollectionId,
+                Name = c.Name,
+                Owner = c.Owner,
+                CreationDate = c.CreationDate,
+                LastEdited = c.LastEdited,
+                Tasks = c.Tasks.Select(t => new AppTask
+                {
+                    TaskId = t.TaskId,
+                    Content = t.Content,
+                    DueDate = t.DueDate,
+                    Priority = t.Priority,
+                    CompletedAt = t.CompletedAt,
+                    IsFlagged = t.IsFlagged,
+                    Note = t.Note,
+                    CreationDate = t.CreationDate,
+                    LastEdited = t.LastEdited,
+                    Collection = null
+                }).ToList()
+            })
+            .FirstOrDefaultAsync();
         if (collection == null) return NotFound($"Collection with id [{collectionId}] is not found.");
 
         Utils.CheckIfBelongToCurrentUser(collection.Owner, CurrentUser, Logger,
@@ -71,7 +237,22 @@ public class TaskController : GenericController
     {
         await StartAuthenticate($"update task [{taskId}]");
 
-        AppTask task = await Context.Tasks.FindAsync(taskId);
+        AppTask task = await Context.Tasks
+            .Where(t => t.TaskId == taskId)
+            .Select(t => new AppTask
+            {
+                TaskId = t.TaskId,
+                Content = t.Content,
+                DueDate = t.DueDate,
+                Priority = t.Priority,
+                Note = t.Note,
+                CompletedAt = t.CompletedAt,
+                IsFlagged = t.IsFlagged,
+                Collection = t.Collection,
+                CreationDate = t.CreationDate,
+                LastEdited = t.LastEdited
+            }).FirstOrDefaultAsync();
+
         if (task == null)
             return NotFound($"Task with id [{taskId}] is not found.");
 
@@ -96,6 +277,9 @@ public class TaskController : GenericController
         hasChanges = hasChanges || task.CompletedAt != instance.CompletedAt;
         task.CompletedAt = instance.CompletedAt;
 
+        hasChanges = hasChanges || task.Priority != instance.Priority;
+        task.Priority = instance.Priority;
+
         // Commit changes if there are changes
         if (hasChanges)
         {
@@ -115,7 +299,21 @@ public class TaskController : GenericController
     {
         await StartAuthenticate($"delete task [{taskId}]");
 
-        AppTask task = await Context.Tasks.FindAsync(taskId);
+        AppTask task = await Context.Tasks
+            .Where(t => t.TaskId == taskId)
+            .Select(t => new AppTask
+            {
+                TaskId = t.TaskId,
+                Content = t.Content,
+                DueDate = t.DueDate,
+                Note = t.Note,
+                CompletedAt = t.CompletedAt,
+                IsFlagged = t.IsFlagged,
+                Collection = t.Collection,
+                CreationDate = t.CreationDate,
+                LastEdited = t.LastEdited
+            }).FirstOrDefaultAsync();
+
         if (task == null)
             return NotFound($"Task with id [{taskId}] is not found.");
 
@@ -127,11 +325,5 @@ public class TaskController : GenericController
         if (task.Collection?.Tasks != null)
             task.Collection.Tasks = null;
         return Ok(task);
-    }
-
-    [HttpPut("{taskId}/{toCollection}")]
-    public Task<IActionResult> Move(int taskId, int toCollectionId)
-    {
-        throw new NotImplementedException();
     }
 }

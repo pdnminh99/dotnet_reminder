@@ -24,15 +24,17 @@ public class AppTask
     [Required(AllowEmptyStrings = false, ErrorMessage = "Task `Content` field must not empty or null.")]
     public string Content { get; set; }
 
-    [JsonIgnore] [DefaultValue(null)] public DateTime? DueDate { get; set; }
-
+    [JsonIgnore]
+    [DefaultValue(null)] public DateTime? DueDate { get; set; }
+#nullable enable
     [NotMapped]
     [JsonPropertyName("dueDate")]
-    public long? DueDateInUnix
+    public string? DueDateInUnix
     {
-        get => Utils.DateTimeToUnixTime(DueDate);
-        set => DueDate = Utils.UnixTimeToDateTime(value);
+        get => DueDate?.ToLocalTime().ToString();
+        set => DueDate = value == null ? null : DateTime.Parse(value);
     }
+#nullable disable
 
     [JsonIgnore] [DefaultValue(null)] public DateTime? CompletedAt { get; set; }
 
@@ -47,6 +49,10 @@ public class AppTask
     [DefaultValue(false)] public bool IsFlagged { get; set; }
 
     [DefaultValue("")] public string Note { get; set; }
+
+    [DefaultValue(null)]
+    [Range(minimum: 0, maximum: 3, ErrorMessage = "{0} can only in range from 0 to 3, or empty.")]
+    public int? Priority { get; set; }
 
     [JsonIgnore] public DateTime? CreationDate { get; set; }
 

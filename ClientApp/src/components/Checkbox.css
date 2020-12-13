@@ -1,0 +1,13 @@
+.checkmark-checked {
+  color: #fff;
+  background-color: transparent;
+}
+
+.checkmark-blank {
+  color: transparent;
+  background-color: transparent;
+}
+
+.circle:hover .checkmark-blank {
+  color: #0078d7;
+}

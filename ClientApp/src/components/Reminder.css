@@ -1,63 +1,113 @@
 /* Layout */
-*, *:focus, *:hover {
-    outline: none;
+*,
+*:focus,
+*:hover {
+  outline: none;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 /* Customizable */
+.outline-none:focus {
+  outline: none;
+}
 
 .underline-off {
-    text-decoration: none;
+  text-decoration: none;
 }
 
 .bg-gray-300 {
-    background-color: lightgray;
+  background-color: lightgray;
 }
 
 .cursor-pointer {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 .bg-azure {
-    background-color: #0078D7;
+  background-color: #0078d7;
 }
 
 .bg-azure-light {
-    background-color: #c3ddf7;
+  background-color: #c3ddf7;
 }
 
 .border-none {
-    border: none;
-    outline: none;
+  border: none;
+  outline: none;
 }
 
 .rounded-sm {
-    border-radius: 0.125rem;
+  border-radius: 0.125rem;
 }
 
 .rounded {
-    border-radius: 0.25rem;
+  border-radius: 0.25rem;
 }
 
 .circle {
-    border-radius: 50%;
+  border-radius: 50%;
 }
 
 .bg-gray-300--hover:hover {
-    background-color: lightgray;
+  background-color: lightgray;
 }
 
 .bg-azure-dark--hover:hover {
-    background-color: #005a9e;
+  background-color: #005a9e;
 }
 
 .border-b-azure {
-    border-bottom-color: #005a9e;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
+  border-bottom-color: #005a9e;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
 }
 
 .border-b-gray {
-    border-bottom-color: lightgray;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
+  border-bottom-color: lightgray;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+}
+
+.border-b-transparent {
+  border-bottom-color: transparent;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+}
+
+.font-sans {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.unflag-icon {
+  border-radius: '0.125rem';
+  font-size: 16px;
+  font-weight: 500;
+  color: #0078d7;
+  background-color: transparent;
+}
+
+.unflag-icon:hover {
+  color: #0078d7;
+  background-color: transparent;
+}
+
+.flag-icon {
+  border-radius: '0.125rem';
+  font-size: 16px;
+  font-weight: 500;
+  color: #fff;
+  background-color: #0078d7;
+}
+
+.flag-icon:hover {
+  color: #fff;
+  background-color: #0078d7;
+}
+
+.hover-still-black:hover {
+  color: black;
+}
+
+.hover-still-red:hover {
+  color: red;
 }
